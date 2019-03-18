@@ -1,3 +1,14 @@
+GIT
+  remote: https://github.com/robwierzbowski/jekyll-picture-tag/
+  revision: 342b4f86eaea7df910dd388e106dc628e6c80956
+  specs:
+    jekyll-picture-tag (1.2.0)
+      fastimage (~> 2)
+      jekyll (< 4)
+      mime-types (~> 3)
+      mini_magick (~> 4)
+      objective_elements (~> 1.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -9,6 +20,7 @@ GEM
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0.6.0)
     eventmachine (1.2.7-x64-mingw32)
+    fastimage (2.1.5)
     ffi (1.10.0-x64-mingw32)
     forwardable-extended (2.6.0)
     http_parser.rb (0.6.0)
@@ -29,10 +41,13 @@ GEM
       safe_yaml (~> 1.0)
     jekyll-feed (0.11.0)
       jekyll (~> 3.3)
+    jekyll-paginate (1.1.0)
     jekyll-sass-converter (1.5.2)
       sass (~> 3.4)
     jekyll-seo-tag (2.6.0)
       jekyll (~> 3.3)
+    jekyll-tagging (1.1.0)
+      nuggets
     jekyll-watch (2.1.2)
       listen (~> 3.0)
     kramdown (1.17.0)
@@ -42,10 +57,12 @@ GEM
       rb-inotify (~> 0.9, >= 0.9.7)
       ruby_dep (~> 1.2)
     mercenary (0.3.6)
-    minima (2.5.0)
-      jekyll (~> 3.5)
-      jekyll-feed (~> 0.9)
-      jekyll-seo-tag (~> 2.1)
+    mime-types (3.2.2)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2018.0812)
+    mini_magick (4.9.3)
+    nuggets (1.6.0)
+    objective_elements (1.1.0)
     pathutil (0.16.2)
       forwardable-extended (~> 2.6)
     public_suffix (3.0.3)
@@ -60,6 +77,8 @@ GEM
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
+    support-for (1.0.7)
+      sass (~> 3.3)
     tzinfo (2.0.0)
       concurrent-ruby (~> 1.0)
     tzinfo-data (1.2018.9)
@@ -72,7 +91,11 @@ PLATFORMS
 DEPENDENCIES
   jekyll (~> 3.8.5)
   jekyll-feed (~> 0.6)
-  minima (~> 2.0)
+  jekyll-paginate
+  jekyll-picture-tag!
+  jekyll-seo-tag
+  jekyll-tagging
+  support-for
   tzinfo-data
   wdm (~> 0.1.0)
 
