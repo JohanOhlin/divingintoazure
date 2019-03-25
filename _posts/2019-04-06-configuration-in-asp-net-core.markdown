@@ -2,10 +2,10 @@
 layout: post
 title: "Configuration in ASP.NET Core"
 date: 2019-03-18
-tags: .net-core
+tags: asp.net-core
 ---
 
-<p class="intro"><span class="dropcap">I</span>n ASP.NET Core there are some very interesting ways of handling and injecting options into classes. In this post I compare the different options you have at your disposal</p>
+<p class="intro"><span class="dropcap">I</span>n ASP.NET Core there are some very interesting ways of handling and injecting options into classes. In this post I compare the different options you have at your disposal.</p>
 
 #### Initial setup
 
