@@ -1,24 +1,18 @@
 ---
 layout: default
-title: About Long Haul
+title: About me
 ---
 
 <div class="post">
-	<h1 class="pageTitle">About Long Haul</h1>
-	<img src="{{ '/assets/img/touring.jpg' | prepend: site.baseurl }}" alt="">
-	<p class="intro">Long Haul is a minimal, long form <a href="http://jekyllrb.com">Jekyll</a> Theme. It can be used as is or customized to your hearts desire.</p>
-	<p>Long Haul was created in honor of all the hard working touring bicycles that have traversed the globe time and time again. Take it for a spin.</p>
-	<h2>Features</h2>
-	<ul>
-		<li>Built with SASS + GULP + BROWSERSYNC + AUTOPREFIXER</li>
-  		<li>SVG Social Icons from <a href="http://customizr.net/icons/">Customizr</a></li>
-  		<li><a href="http://responsive-nav.com/">Responsive Nav Menu</a></li>
-  		<li><a href="https://github.com/snaptortoise/jekyll-rss-feeds">XML Feed for RSS Readers</a></li>
-  		<li>Contact Form via <a href="http://formspree.io/">Formspree</a></li>
-      <li>5 Post Loop with excerpt on Home Page</li>
-  		<li>Previous / Next Post Navigation</li>
-      <li>Estimated Reading Time for posts</li>
-  		<li><a href="https://github.com/adobe-webplatform/dropcap.js">Drop Cap</a> on posts</li>
-  		<li><a href="http://typecast.com/blog/a-more-modern-scale-for-web-typography">A Better Type Scale</a></li>
-  	</ul>
+	<h1 class="pageTitle">About me</h1>
+	<img src="{{ '/assets/img/azure-background.jpg' | prepend: site.baseurl }}" alt="">
+	<p class="intro"><span class="dropcap">A</span> swede currently amused by the strange situation this (not so) United Kingdom has ended up with due to the Brexit limbo it has positioned itself in. I'm glad I wasn't allowed to vote - no one can blame me!</p>	
+  <h4>Describing myself</h4>
+	<p>Christian, husband, entrepreneur, world traveller, blog writer, allotment novice and programmer...</p>
+
+	<h4>Technologies I focus on</h4>
+	<p>This is something that can vary quite some over time. For the last years, Microsoft's cloud solution Azure has been of quite some interest, with a specific focus on CosmosDb. I prefer .Net Core over the old framework, but that doesn't mean I've managed to convince my boss yet. React enforced by Typescript is a given winner - I don't mind the overhead TS brings.</p>
+
+	<h4>I write about</h4>
+	<p>You will indeed find a lot of posts about the topics I focus on. But some are also summaries and guide lines for myself and as such they can cover many other areas that I find of interest. I hope you something find useful to read...</p>
 </div>

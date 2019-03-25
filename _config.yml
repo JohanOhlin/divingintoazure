@@ -10,30 +10,43 @@ permalink: blog/:title/
 
 markdown: kramdown
 highlighter: rouge
-plugins: [jekyll-paginate]
+
+plugins: [jekyll-paginate, jekyll-feed]
 paginate: 5
 
 # Disqus Comments
-comments: true
 disqus:
   # Leave shortname blank to disable comments site-wide.
   # Disable comments for any post by adding `comments: false` to that post's YAML Front Matter.
   shortname: diving-into-azure.disqus.com
+  comments: true
+
+# Picture configs
+picture:
+  source: "assets/img"
+  output: "assets/img"
+  nomarkdown: false
+
+# Tags
+tag_page_layout: tag_page
+tag_permalink_style: pretty
+tag_page_dir: tag
+tag_page_data:
+  sitemap: false
 
 navigation:
   - title: Home
     url: /index.html
   - title: About
     url: /about
-  - title: Contact
-    url: /contact
 
 social:
   github: johanohlin
   twitter: ohlinjohan
   email: johan.ohlin@outlook.com
+  linkedin: johanohlin
 
-google_analytics: "UA-58263416-1"
+google_analytics: "UA-33665467-2"
 
 # Exclude these files from your production _site
 exclude:
@@ -41,4 +54,14 @@ exclude:
   - Gemfile.lock
   - LICENSE
   - README.md
-  - CNAME
+  - _example_posts
+  - node_modules
+  - gulpfile.js
+  - oldstuff.md
+  - package-lock.json
+  - package.json
+  - .gitignore
+  - css
+  - assets/img/2018*
+  - assets/img/2019*
+  - assets/img/2020*

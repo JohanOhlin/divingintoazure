@@ -4,6 +4,36 @@
   http://sourcey.com
 ***************/
 
+figure.highlight {
+
+
+}
+
+table.rouge-table {
+  border: none;
+  margin-bottom: 0;
+  // .lineno {
+  //   margin: 0;
+  // }
+  // td.gutter {
+  //   padding-bottom: 0;
+  // }
+  // pre {
+  //   margin: 0;
+  //   padding-bottom: 0;
+  // }
+  td {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    pre {
+      margin: 0;
+    }
+    &.code {
+      padding-left: 10px;
+    }
+  }
+}
 .highlight {
   white-space: pre; 
   overflow: auto; 
@@ -11,9 +41,13 @@
   -moz-border-radius: 3px; 
   -webkit-border-radius: 3px; 
   border-radius: 3px;
-  padding: 20px; 
+  padding: 10px; 
   background: #343642;
   color: #C1C2C3;
+  pre {
+    margin: 0;
+    font-size: 0.8em;
+  }
 }
 .highlight .hll { background-color: #ffc; }
 .highlight .gd { color: #2e3436; background-color: #0e1416; }
