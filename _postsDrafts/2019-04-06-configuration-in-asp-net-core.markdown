@@ -11,21 +11,40 @@ tags: asp.net-core
 
 Before we go into the different injection options you have, we first need to set the sceen with a simple example of how options are setup in ASP.NET Core.
 
-It's not needed to create a class representing your configuration options, but it surely makes things easier later on when using the options.
+It's not needed to create a class representing your configuration options, but it surely makes things easier later on when using the options. You can have a lot of different settings classes that are injected wherever needed.
 
 {% highlight csharp linenos %}
 public class MyServiceSettings
 {
   public bool DefaultValue { get; set; }
+  public int AnotherSetting { get; set; }
+  public string StringSetting { get; set; }
 }
 {% endhighlight %}
 
-A config file named <code class="code">appsettings.json</code> will automatically be imported as a settings file. So we create that file and let the JSON structure mimic the configuration class previously created.
+The configuration can be read from several different sources:
+
+Provider |Provides configuration from…
+--- | ---
+Azure Key Vault Configuration Provider (Security topics) | Azure Key Vault
+Command-line Configuration Provider | Command-line parameters
+Custom configuration provider | Custom source
+Environment Variables Configuration Provider | Environment variables
+File Configuration Provider | Files (INI, JSON, XML)
+Key-per-file Configuration Provider | Directory files
+Memory Configuration Provider | In-memory collections
+User secrets (Secret Manager) (Security topics) | File in the user profile directory
+
+In this example we'll just use a json file which is the standard way of doing it. One neat thing is that configuration settings can be read from several different sources and merged together. You can read about the other providers [here](https://docs.microsoft.com/en-gb/aspnet/core/fundamentals/configuration/index?view=aspnetcore-2.2).
+
+A config file named <code class="code">appsettings.json</code> will automatically be searched for and imported as a settings file. We create that file and let the JSON structure mimic the configuration class previously created.
 
 {% highlight json linenos %}
 {
   "MyServiceSettings": {
-    "DefaultValue": true
+    "DefaultValue": true,
+    "AnotherSetting": 14,
+    "StringSetting": "maybe"
   }
 }
 {% endhighlight %}
@@ -50,7 +69,7 @@ The options are now configured and we can use them in the code.
 
 #### Comparison
 
-There are theee different ways to handle option injection in your classes.
+There are theee different ways to handle option injection in your classes. They are all quite straight forward to use. 
 
 Interface | Automatic reloading | Works in a singleton service
 --- | --- | ---
@@ -76,7 +95,7 @@ public class MyService
 
 #### IOptionMonitor
 
-This option keeps an eye on the file and calls <code class="code">OnChange</code> when the file is changed. This makes it possible for you to make changes to your <code class="code">application.json</code> file without having to reload the app.
+This option keeps an eye on the file and calls <code class="code">OnChange</code> when the file is changed. This makes it possible for you to make changes to your <code class="code">application.json</code> file without having to reload the app. 
 
 {% highlight csharp linenos %}
 public class MyService

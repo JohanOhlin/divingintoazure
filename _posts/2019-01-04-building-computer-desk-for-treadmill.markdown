@@ -9,11 +9,11 @@ tags: diy
 
 I've seen some people buy a treadmill desk that seems to work really great. But these also cost a small fortune (£1500 - £3000). I already have a treadmill and decided to build a simple laptop desk with things I could find at a local DIY store (B&Q).
 
-{% 
-  include image.html 
-  url="2019-01-04-threadmill/2019_threadmill_table_img1.jpg" 
-  alt="" 
-  description="" 
+{%
+  include image.html
+  url="2019-01-04-threadmill/2019_threadmill_table_img1.jpg"
+  alt=""
+  description=""
 %}
 
 The total cost for legs, a shelf and some brackets ended up at £35. Many DIY stores can cut longer pieces of wood into the size you want, and for free (B&Q have this service).

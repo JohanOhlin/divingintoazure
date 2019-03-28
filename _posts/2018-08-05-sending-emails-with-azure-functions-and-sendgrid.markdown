@@ -13,7 +13,7 @@ Create a new C# function with an HTTP trigger. Authorization level can be specif
 
 Replace the default code with the following snippet.
 
-{% highlight csharp %}
+{% highlight csharp linenos %}
 #r "SendGrid"
 using System;
 using System.Net;

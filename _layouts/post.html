@@ -54,6 +54,9 @@ layout: default
     </a>
     {% endif %}
   </div>
+  <div style="margin-bottom:2rem;">
+      {% include tag_cloud.html %}
+  </div>
 </div>
 
 {% if site.disqus.shortname %} {% include disqus.html %} {% endif %}

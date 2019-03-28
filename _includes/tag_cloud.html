@@ -1,0 +1,24 @@
+<div style="clear:both; padding-top:2rem;" class="container">
+  {% assign maxcount = 1 %}
+  {% assign multiplier = 1 %}
+  {% assign maxsize = 70 %}
+  {% assign minsize = 20 %}
+
+  {% for tag in site.tags %}
+    {% if tag[1].size > maxcount %}
+      {% assign maxcount = tag[1].size %}
+    {% endif %}
+  {% endfor %}
+  {% assign multiplier = maxsize | minus: minsize | divided_by: maxcount %}
+  {% if multiplier > 10 %}
+    {% assign multiplier = 10 %}
+  {% endif %}
+  
+  {% for tag in site.tags | sort: self %}
+    <a href="/tag/{{ tag[0] }}/"
+    style="font-size: {{ tag[1] | size | minus: 1 | times: multiplier | plus: minsize }}px; line-height:70%; text-decoration:none;">
+        {{ tag[0] }}
+    </a>
+    <span>&nbsp;</span>
+  {% endfor %}
+  </div>

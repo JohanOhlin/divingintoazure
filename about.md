@@ -5,7 +5,7 @@ title: About me
 
 <div class="post">
 	<h1 class="pageTitle">About me</h1>
-	<img src="{{ '/assets/img/azure-background.jpg' | prepend: site.baseurl }}" alt="">
+	{% picture azure-background.jpg %}	
 	<p class="intro"><span class="dropcap">A</span> swede currently amused by the strange situation this (not so) United Kingdom has ended up with due to the Brexit limbo it has positioned itself in. I'm glad I wasn't allowed to vote - no one can blame me!</p>	
   <h4>Describing myself</h4>
 	<p>Christian, husband, entrepreneur, world traveller, blog writer, allotment novice and programmer...</p>

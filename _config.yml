@@ -3,7 +3,7 @@ description:
   Take a deep dive into a selection of all the awesome things Azure has to offer. All
   mixed up with .Net Core, React, TypeScript and some private projects.
 
-url: https://johanohlin.github.io
+url: https://www.johanohlin.com
 baseurl: ""
 paginate_path: "blog/page:num/"
 permalink: blog/:title/
@@ -65,3 +65,7 @@ exclude:
   - assets/img/2018*
   - assets/img/2019*
   - assets/img/2020*
+
+include:
+  - .nojekyll
+  - CNAME

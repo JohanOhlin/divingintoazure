@@ -4,28 +4,28 @@ title: "Custom themes in Office UI Fabric for React"
 date: 2018-08-01
 tags: react office-ui-fabric
 ---
-<p class="intro"><span class="dropcap">I</span>n a recent project, I've started to use Office UI Fabric as component library for a React application. This is an interesting piece of Microsoft work - who knew they would ever create open source React components?</p> 
+<p class="intro"><span class="dropcap">I</span>n a recent project, I've started to use Office UI Fabric as component library for a React application. This is an interesting piece of Microsoft work - who knew they would ever create open source React components?</p>
 
 The components are well made, but the documentation is lagging behind in good examples, a bit like the MSDN documentation - full of property specifications, but few fully fledged examples.
 
 One neat piece of functionality when working with themes for Office UI Fabric is the [Theme Generator](https://developer.microsoft.com/en-us/fabric#/styles/themegenerator). It gives you the possibility to specify your colours of choice and see the theme generated shades.
 
-{% 
-  include image.html 
-  url="2018-08-01-custom-themes/theme-generator-selection.png" 
-  alt="Selecting your own colours in the Theme" 
-  description="You can select your own colours in the Theme" 
+{%
+  include image.html
+  url="2018-08-01-custom-themes/theme-generator-selection.png"
+  alt="Selecting your own colours in the Theme"
+  description="You can select your own colours in the Theme"
 %}
 
 If I were to wish for something here it would be the possibility to define a secondary colour as well to create a complementary matching pair based on the colour wheel. However, that's not how this theme works and you're stuck with a monochromatic solution. The focus of this component library is to be functional and simplistic - something it does succeed well with.
 
 The colours you've chosen are also analysed based upon how well they work together. A contrast ratio of less than 4.5 is pointed out and you are recommended to go back to the colour selection to pick other colours.
 
-{% 
-  include image.html 
-  url="2018-08-01-custom-themes/theme-generator-accessibility.png" 
-  alt="Your colour choice is analysed for accessibility" 
-  description="Your colour choice is analysed for accessibility" 
+{%
+  include image.html
+  url="2018-08-01-custom-themes/theme-generator-accessibility.png"
+  alt="Your colour choice is analysed for accessibility"
+  description="Your colour choice is analysed for accessibility"
 %}
 
 The theme generator produces different outputs for you to use, but for embedding themes into React applications the JSON option is the best. In the official [documentation](https://github.com/OfficeDev/office-ui-fabric-react/tree/master/packages/styling#usage-via-javascript-styling-libraries-glamor-aphrodite) you can read about how themes can be imported and used. However, something is wrong in their examples, it just doesn't work. Instead I had to do in the following way.
