@@ -5,8 +5,8 @@
     <description>Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects.</description>
     <link>https://www.johanohlin.com/</link>
     <atom:link href="https://www.johanohlin.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 28 Mar 2019 09:58:39 +0000</pubDate>
-    <lastBuildDate>Thu, 28 Mar 2019 09:58:39 +0000</lastBuildDate>
+    <pubDate>Thu, 28 Mar 2019 10:49:14 +0000</pubDate>
+    <lastBuildDate>Thu, 28 Mar 2019 10:49:14 +0000</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       
@@ -295,6 +295,281 @@
     
       
       <item>
+        <title>Practical flexbox examples</title>
+        <description>&lt;p class=&quot;intro&quot;&gt;&lt;span class=&quot;dropcap&quot;&gt;T&lt;/span&gt;he Flexbox CSS styling of web sites is gaining more and more popularity. This post is not a complete overview of what you can do with flexbox but rather a gathering of different flexbox techniques that I've found useful over the years.&lt;/p&gt;
+
+&lt;p&gt;In the initial examples below I’ll assume the following HTML snippet as a base.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;sectionWrapper&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;sectionContent&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;Section longer 1&lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;sectionContent&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;Section 2&lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;sectionContent&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;S 3&lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;sectionContent&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;Section 4&lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h4 id=&quot;basic-flexbox-layout&quot;&gt;Basic flexbox layout&lt;/h4&gt;
+
+&lt;p&gt;Use &lt;code class=&quot;code&quot;&gt;flex-direction&lt;/code&gt; to swap between row and column. This indicates direction of items.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-csharp&quot; data-lang=&quot;csharp&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sectionWrapper&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;image&quot;&gt;
+  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-in-columns-400by44-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/divs-in-columns-800by87-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/divs-in-columns-1200by131-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/divs-in-columns-1237by135-658e8d.webp 1237w&quot; type=&quot;image/webp&quot; /&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-in-columns-400by44-658e8d.png 400w, /assets/img/2018-11-09-flexbox/divs-in-columns-800by87-658e8d.png 800w, /assets/img/2018-11-09-flexbox/divs-in-columns-1200by131-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/divs-in-columns-1237by135-658e8d.png 1237w&quot; type=&quot;image/png&quot; /&gt;
+  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/divs-in-columns-800by87-658e8d.png&quot; /&gt;
+&lt;/picture&gt;
+
+  &lt;figcaption&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;If you line up container divs (i.e. rows in a grid) then you need to think to opposite - the attribute &lt;code class=&quot;code&quot;&gt;column&lt;/code&gt; means your container becomes rows, one of top of the other, in a column.&lt;/p&gt;
+
+&lt;figure class=&quot;image&quot;&gt;
+  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-in-rows-400by151-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/divs-in-rows-800by303-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/divs-in-rows-1200by454-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/divs-in-rows-1228by465-658e8d.webp 1228w&quot; type=&quot;image/webp&quot; /&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-in-rows-400by151-658e8d.png 400w, /assets/img/2018-11-09-flexbox/divs-in-rows-800by303-658e8d.png 800w, /assets/img/2018-11-09-flexbox/divs-in-rows-1200by454-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/divs-in-rows-1228by465-658e8d.png 1228w&quot; type=&quot;image/png&quot; /&gt;
+  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/divs-in-rows-800by303-658e8d.png&quot; /&gt;
+&lt;/picture&gt;
+
+  &lt;figcaption&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;fill-space&quot;&gt;Fill space&lt;/h4&gt;
+
+&lt;p&gt;As seen in the previous example, the divs are not filling up the whole row. This can be solved by increasing the space between the items using &lt;code class=&quot;code&quot;&gt;justify-content&lt;/code&gt;.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nc&quot;&gt;.sectionWrapper&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;justify-content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;space-between&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The result would look like this&lt;/p&gt;
+
+&lt;figure class=&quot;image&quot;&gt;
+  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-space-between-400by46-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/divs-on-row-space-between-800by93-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/divs-on-row-space-between-1200by139-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/divs-on-row-space-between-1239by144-658e8d.webp 1239w&quot; type=&quot;image/webp&quot; /&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-space-between-400by46-658e8d.png 400w, /assets/img/2018-11-09-flexbox/divs-on-row-space-between-800by93-658e8d.png 800w, /assets/img/2018-11-09-flexbox/divs-on-row-space-between-1200by139-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/divs-on-row-space-between-1239by144-658e8d.png 1239w&quot; type=&quot;image/png&quot; /&gt;
+  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-space-between-800by93-658e8d.png&quot; /&gt;
+&lt;/picture&gt;
+
+  &lt;figcaption&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Other options instead of &lt;code class=&quot;code&quot;&gt;space-between&lt;/code&gt; are &lt;code class=&quot;code&quot;&gt;space-evenly&lt;/code&gt;, &lt;code class=&quot;code&quot;&gt;space-around&lt;/code&gt;, &lt;code class=&quot;code&quot;&gt;flex-start&lt;/code&gt; and &lt;code class=&quot;code&quot;&gt;flex-end&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Another way to fill the row is to increase the size of the divs which can be done by adding the &lt;code class=&quot;code&quot;&gt;flex-grow&lt;/code&gt; property.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nc&quot;&gt;.sectionContent&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;flex-grow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The divs are now distributed all over the row.&lt;/p&gt;
+
+&lt;figure class=&quot;image&quot;&gt;
+  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-fill-space-400by48-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-800by95-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-1200by143-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-1234by147-658e8d.webp 1234w&quot; type=&quot;image/webp&quot; /&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-fill-space-400by48-658e8d.png 400w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-800by95-658e8d.png 800w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-1200by143-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-1234by147-658e8d.png 1234w&quot; type=&quot;image/png&quot; /&gt;
+  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-fill-space-800by95-658e8d.png&quot; /&gt;
+&lt;/picture&gt;
+
+  &lt;figcaption&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;In a practical example we simulate four lists with drag-and-drop behaviour where the purple sections show the droppable areas. However, by default the divs only fill up the area where you have items inside them, which can make a column like S2 difficult to drop items into.&lt;/p&gt;
+
+&lt;figure class=&quot;image&quot;&gt;
+  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/items-in-dnd-lists-400by176-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-800by352-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-1200by528-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-1232by542-658e8d.webp 1232w&quot; type=&quot;image/webp&quot; /&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/items-in-dnd-lists-400by176-658e8d.png 400w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-800by352-658e8d.png 800w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-1200by528-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-1232by542-658e8d.png 1232w&quot; type=&quot;image/png&quot; /&gt;
+  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/items-in-dnd-lists-800by352-658e8d.png&quot; /&gt;
+&lt;/picture&gt;
+
+  &lt;figcaption&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;By adding &lt;code class=&quot;code&quot;&gt;flex-grow: 1&lt;/code&gt; for the purple droppable div, we solve this problem.&lt;/p&gt;
+
+&lt;figure class=&quot;image&quot;&gt;
+  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/items-in-dnd-lists-same-height-400by176-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-same-height-800by352-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-same-height-1200by527-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-same-height-1231by541-658e8d.webp 1231w&quot; type=&quot;image/webp&quot; /&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/items-in-dnd-lists-same-height-400by176-658e8d.png 400w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-same-height-800by352-658e8d.png 800w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-same-height-1200by527-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-same-height-1231by541-658e8d.png 1231w&quot; type=&quot;image/png&quot; /&gt;
+  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/items-in-dnd-lists-same-height-800by352-658e8d.png&quot; /&gt;
+&lt;/picture&gt;
+
+  &lt;figcaption&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;The same technique can be used to push a footer at the bottom of a page, or a card. Simply let the middle content of the item have &lt;code class=&quot;code&quot;&gt;flex-grow:1&lt;/code&gt; and the footer will be pushed down to the bottom&lt;/p&gt;
+
+&lt;figure class=&quot;image&quot;&gt;
+  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/flexbox-footer-pushed-down2-400by270-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/flexbox-footer-pushed-down2-800by539-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/flexbox-footer-pushed-down2-1200by809-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/flexbox-footer-pushed-down2-1472by992-658e8d.webp 1472w&quot; type=&quot;image/webp&quot; /&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/flexbox-footer-pushed-down2-400by270-658e8d.png 400w, /assets/img/2018-11-09-flexbox/flexbox-footer-pushed-down2-800by539-658e8d.png 800w, /assets/img/2018-11-09-flexbox/flexbox-footer-pushed-down2-1200by809-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/flexbox-footer-pushed-down2-1472by992-658e8d.png 1472w&quot; type=&quot;image/png&quot; /&gt;
+  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/flexbox-footer-pushed-down2-800by539-658e8d.png&quot; /&gt;
+&lt;/picture&gt;
+
+  &lt;figcaption&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;fill-space-with-same-size-for-all-divs&quot;&gt;Fill space with same size for all divs&lt;/h4&gt;
+
+&lt;p&gt;By default, &lt;code class=&quot;code&quot;&gt;flex-basis&lt;/code&gt; is set to auto to adjust for the different size of the elements inside, as can be seen here.&amp;lt;/p&amp;gt;&lt;/p&gt;
+
+&lt;figure class=&quot;image&quot;&gt;
+  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-fill-space-400by48-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-800by95-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-1200by143-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-1234by147-658e8d.webp 1234w&quot; type=&quot;image/webp&quot; /&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-fill-space-400by48-658e8d.png 400w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-800by95-658e8d.png 800w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-1200by143-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-1234by147-658e8d.png 1234w&quot; type=&quot;image/png&quot; /&gt;
+  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-fill-space-800by95-658e8d.png&quot; /&gt;
+&lt;/picture&gt;
+
+  &lt;figcaption&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;To make all columns have the same width we need to set the &lt;code class=&quot;code&quot;&gt;flex-basis&lt;/code&gt;, forcing all columns to have the same base.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nc&quot;&gt;.sectionContent&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;flex-grow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;flex-basis&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The result will then look like this&lt;/p&gt;
+
+&lt;figure class=&quot;image&quot;&gt;
+  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/sections-with-same-size-400by45-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/sections-with-same-size-800by90-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/sections-with-same-size-1200by136-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/sections-with-same-size-1238by140-658e8d.webp 1238w&quot; type=&quot;image/webp&quot; /&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/sections-with-same-size-400by45-658e8d.png 400w, /assets/img/2018-11-09-flexbox/sections-with-same-size-800by90-658e8d.png 800w, /assets/img/2018-11-09-flexbox/sections-with-same-size-1200by136-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/sections-with-same-size-1238by140-658e8d.png 1238w&quot; type=&quot;image/png&quot; /&gt;
+  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/sections-with-same-size-800by90-658e8d.png&quot; /&gt;
+&lt;/picture&gt;
+
+  &lt;figcaption&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;align-content-in-center&quot;&gt;Align content in center&lt;/h4&gt;
+
+&lt;p&gt;Horizontal alignment has always been easy through auto margin. But vertical alignment has been a pain and always forced me to google it. With flex box style it’s so much easier.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nc&quot;&gt;.centerContent&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;align-items&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;center&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;justify-content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;center&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;This is how the titles (and other parts) in the above examples got centered in the middle of the divs&lt;/p&gt;
+
+&lt;h4 id=&quot;separate-items&quot;&gt;Separate items&lt;/h4&gt;
+
+&lt;p&gt;Normally, the divs are separated by the same amount of space. But by tweaking the margin, you can change that behaviour.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nc&quot;&gt;.sectionWrapper&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;flex-direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nc&quot;&gt;.sectionContent&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nc&quot;&gt;.sectionContent&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;:last-child&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;margin-left&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;auto&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;image&quot;&gt;
+  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-last-to-right-400by47-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/divs-on-row-last-to-right-800by94-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/divs-on-row-last-to-right-1200by142-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/divs-on-row-last-to-right-1238by146-658e8d.webp 1238w&quot; type=&quot;image/webp&quot; /&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-last-to-right-400by47-658e8d.png 400w, /assets/img/2018-11-09-flexbox/divs-on-row-last-to-right-800by94-658e8d.png 800w, /assets/img/2018-11-09-flexbox/divs-on-row-last-to-right-1200by142-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/divs-on-row-last-to-right-1238by146-658e8d.png 1238w&quot; type=&quot;image/png&quot; /&gt;
+  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-last-to-right-800by94-658e8d.png&quot; /&gt;
+&lt;/picture&gt;
+
+  &lt;figcaption&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;divs-overflowing-on-next-row&quot;&gt;Divs overflowing on next row&lt;/h4&gt;
+
+&lt;p&gt;By default, when &lt;code class=&quot;code&quot;&gt;flex-direction&lt;/code&gt; is set to row then all items are displayed on a single row. To wrap items on several rows, use the &lt;code class=&quot;code&quot;&gt;flex-wrap&lt;/code&gt; setting.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nc&quot;&gt;.overflowingList&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;flex-direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;flex-wrap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wrap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;image&quot;&gt;
+  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/flex-wrap-400by285-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/flex-wrap-597by425-658e8d.webp 597w&quot; type=&quot;image/webp&quot; /&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/flex-wrap-400by285-658e8d.png 400w, /assets/img/2018-11-09-flexbox/flex-wrap-597by425-658e8d.png 597w&quot; type=&quot;image/png&quot; /&gt;
+  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/flex-wrap-597by425-658e8d.png&quot; /&gt;
+&lt;/picture&gt;
+
+  &lt;figcaption&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;any-neat-flexbox-snippets-you-think-i-should-add&quot;&gt;Any neat Flexbox snippets you think I should add?&lt;/h4&gt;
+&lt;p&gt;Do you have any good suggestions of useful Flexbox examples that you think I should have added? Please write them to the comments below.&lt;/p&gt;
+</description>
+        
+          <description>&lt;p class=&quot;intro&quot;&gt;&lt;span class=&quot;dropcap&quot;&gt;T&lt;/span&gt;he Flexbox CSS styling of web sites is gaining more and more popularity. This post is not a complete overview of what you can do with flexbox but rather a gathering of different flexbox techniques that I've found useful over the years.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Fri, 09 Nov 2018 00:00:00 +0000</pubDate>
+        <link>https://www.johanohlin.com/blog/practical-flexbox-examples/</link>
+        <guid isPermaLink="true">https://www.johanohlin.com/blog/practical-flexbox-examples/</guid>
+        
+        <category>css</category>
+        
+        <category>flexbox</category>
+        
+        <category>html</category>
+        
+        
+      </item>
+      
+    
+      
+      <item>
         <title>Sending emails with web hooks in Azure Function and Sendgrid</title>
         <description>&lt;p class=&quot;intro&quot;&gt;&lt;span class=&quot;dropcap&quot;&gt;S&lt;/span&gt;ometimes you might need to send emails from an Azure Function, maybe a status email to admin or a notification to a user. In this example, I show you how to create an async function that can send SendGrid emails. By letting the function be triggered by an HTTP call you can easily connect other Azure function or flows and send emails as needed.&lt;/p&gt;
 
@@ -304,7 +579,59 @@
 
 &lt;p&gt;Replace the default code with the following snippet.&lt;/p&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-csharp&quot; data-lang=&quot;csharp&quot;&gt;&lt;span class=&quot;err&quot;&gt;#&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;SendGrid&quot;&lt;/span&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-csharp&quot; data-lang=&quot;csharp&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;err&quot;&gt;#&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;SendGrid&quot;&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;System.Net&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;SendGrid.Helpers.Mail&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
@@ -355,7 +682,7 @@
   &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;To&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;set&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Subject&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;set&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Body&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;set&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;h4 id=&quot;update-bindings&quot;&gt;Update bindings&lt;/h4&gt;
 
