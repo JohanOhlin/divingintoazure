@@ -1,12 +1,12 @@
 {
   "name": "diving-into-azure",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A blog about Azure and other things",
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Brian Maier Jr.",
+  "author": "Johan Ohlin",
   "license": "MIT",
   "devDependencies": {
     "browser-sync": "^2.26.3",
