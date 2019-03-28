@@ -3,10 +3,10 @@
   <channel>
     <title>Diving into Azure</title>
     <description>Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects.</description>
-    <link>https://johanohlin.github.io/</link>
-    <atom:link href="https://johanohlin.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 28 Mar 2019 09:54:17 +0000</pubDate>
-    <lastBuildDate>Thu, 28 Mar 2019 09:54:17 +0000</lastBuildDate>
+    <link>https://www.johanohlin.com/</link>
+    <atom:link href="https://www.johanohlin.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Thu, 28 Mar 2019 09:58:39 +0000</pubDate>
+    <lastBuildDate>Thu, 28 Mar 2019 09:58:39 +0000</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       
@@ -174,8 +174,8 @@
 </description>
         
         <pubDate>Mon, 18 Mar 2019 00:00:00 +0000</pubDate>
-        <link>https://johanohlin.github.io/blog/automapper-profiles/</link>
-        <guid isPermaLink="true">https://johanohlin.github.io/blog/automapper-profiles/</guid>
+        <link>https://www.johanohlin.com/blog/automapper-profiles/</link>
+        <guid isPermaLink="true">https://www.johanohlin.com/blog/automapper-profiles/</guid>
         
         <category>automapper</category>
         
@@ -284,8 +284,8 @@
 </description>
         
         <pubDate>Fri, 04 Jan 2019 00:00:00 +0000</pubDate>
-        <link>https://johanohlin.github.io/blog/building-computer-desk-for-treadmill/</link>
-        <guid isPermaLink="true">https://johanohlin.github.io/blog/building-computer-desk-for-treadmill/</guid>
+        <link>https://www.johanohlin.com/blog/building-computer-desk-for-treadmill/</link>
+        <guid isPermaLink="true">https://www.johanohlin.com/blog/building-computer-desk-for-treadmill/</guid>
         
         <category>diy</category>
         
@@ -413,8 +413,8 @@
 </description>
         
         <pubDate>Sun, 05 Aug 2018 00:00:00 +0100</pubDate>
-        <link>https://johanohlin.github.io/blog/sending-emails-with-azure-functions-and-sendgrid/</link>
-        <guid isPermaLink="true">https://johanohlin.github.io/blog/sending-emails-with-azure-functions-and-sendgrid/</guid>
+        <link>https://www.johanohlin.com/blog/sending-emails-with-azure-functions-and-sendgrid/</link>
+        <guid isPermaLink="true">https://www.johanohlin.com/blog/sending-emails-with-azure-functions-and-sendgrid/</guid>
         
         <category>azure</category>
         
@@ -530,8 +530,8 @@
 </description>
         
         <pubDate>Wed, 01 Aug 2018 00:00:00 +0100</pubDate>
-        <link>https://johanohlin.github.io/blog/custom-themes-in-office-ui-fabric-for-react/</link>
-        <guid isPermaLink="true">https://johanohlin.github.io/blog/custom-themes-in-office-ui-fabric-for-react/</guid>
+        <link>https://www.johanohlin.com/blog/custom-themes-in-office-ui-fabric-for-react/</link>
+        <guid isPermaLink="true">https://www.johanohlin.com/blog/custom-themes-in-office-ui-fabric-for-react/</guid>
         
         <category>react</category>
         
@@ -684,8 +684,8 @@
 </description>
         
         <pubDate>Fri, 15 Nov 2013 00:00:00 +0000</pubDate>
-        <link>https://johanohlin.github.io/blog/recursive-cte-calls-in-tsql/</link>
-        <guid isPermaLink="true">https://johanohlin.github.io/blog/recursive-cte-calls-in-tsql/</guid>
+        <link>https://www.johanohlin.com/blog/recursive-cte-calls-in-tsql/</link>
+        <guid isPermaLink="true">https://www.johanohlin.com/blog/recursive-cte-calls-in-tsql/</guid>
         
         <category>t-sql</category>
         
@@ -827,8 +827,8 @@
 </description>
         
         <pubDate>Fri, 15 Nov 2013 00:00:00 +0000</pubDate>
-        <link>https://johanohlin.github.io/blog/group-concatenation-in-tsql-using-cte/</link>
-        <guid isPermaLink="true">https://johanohlin.github.io/blog/group-concatenation-in-tsql-using-cte/</guid>
+        <link>https://www.johanohlin.com/blog/group-concatenation-in-tsql-using-cte/</link>
+        <guid isPermaLink="true">https://www.johanohlin.com/blog/group-concatenation-in-tsql-using-cte/</guid>
         
         <category>t-sql</category>
         
