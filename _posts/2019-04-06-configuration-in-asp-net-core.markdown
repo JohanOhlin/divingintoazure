@@ -10,7 +10,7 @@ blog_serie: configuration_aspnet_core
 
 {%
   include blog_serie.html
-  id="configuration_aspnet_core"
+  page=page
 %}
 
 ASP.NET Core has a pluggable configuration system where configuration settings can be imported from a number of different sources. These sources are then merged together into one configuration object. I write more about the different configuration providers here. In this post I'll focus on settings in the standard <code class="code">appsettings.json</code> file.

@@ -10,7 +10,7 @@ blog_serie: configuration_aspnet_core
 
 {%
   include blog_serie.html
-  id="configuration_aspnet_core"
+  page=page
 %}
 
 This post builds upon two previous posts concerning [basic configuration]({{ site.baseurl }}{% post_url 2019-04-06-configuration-in-asp-net-core %}) and [injecting options]({{ site.baseurl }}{% post_url 2019-04-06-injecting-options-in-aspnet-core %}).
