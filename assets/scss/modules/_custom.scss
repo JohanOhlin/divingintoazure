@@ -1,3 +1,26 @@
+.post {
+  .blog_serie {
+    margin: 15px;
+    padding: 5px 10px;
+    background-color: #f7f7f7;
+    .blog_serie_title {
+      font-size: 1.6rem;
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    }
+    ul {
+      margin: 0 !important;
+      padding: 0;
+    }
+    li {
+      list-style-type: none;
+      a {
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+
 code.code {
   border: 1px solid black;
   border-radius: 5px;

@@ -1,11 +1,17 @@
 ---
 layout: post
 title: "Configuration in ASP.NET Core"
-date: 2019-04-06
+date: 2019-04-01
 tags: asp.net-core .net-core
+blog_serie: configuration_aspnet_core
 ---
 
 <p class="intro"><span class="dropcap">C</span>onfiguration in your app can sometimes be a pain. Some values are set in code, some are extracted from the environment in which you're running and some are secret and can't be defined anywhere near a repository. ASP.NET Core helps you manage all these settings in a very smooth way</p>
+
+{%
+  include blog_serie.html
+  id="configuration_aspnet_core"
+%}
 
 ASP.NET Core has a pluggable configuration system where configuration settings can be imported from a number of different sources. These sources are then merged together into one configuration object. I write more about the different configuration providers here. In this post I'll focus on settings in the standard <code class="code">appsettings.json</code> file.
 

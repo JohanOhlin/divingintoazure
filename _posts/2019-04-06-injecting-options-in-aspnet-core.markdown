@@ -1,11 +1,17 @@
 ---
 layout: post
 title: "Injecting Options in ASP.NET Core"
-date: 2019-04-06
+date: 2019-04-01
 tags: asp.net-core
+blog_serie: configuration_aspnet_core
 ---
  
 <p class="intro"><span class="dropcap">I</span>n ASP.NET Core there are some very interesting ways of handling and injecting options into classes. In this post I compare some of the different options you have at your disposal.</p>
+
+{%
+  include blog_serie.html
+  page=page
+%}
 
 In a [previous post]({{ site.baseurl }}{% post_url 2019-04-06-configuration-in-asp-net-core %}) I wrote the basics about how to configure options in ASP.NET Core. If you're not familiar with this topic then I suggest you read through that blog first.
 
