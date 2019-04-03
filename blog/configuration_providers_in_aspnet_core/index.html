@@ -9,12 +9,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects.">
-    <title>Building a computer desk for the treadmill</title>
+    <title>Configuration providers in ASP.NET Core</title>
 
     <!-- Open Graph Meta -->
     <meta content="Diving into Azure" property="og:site_name">
     
-      <meta content="Building a computer desk for the treadmill" property="og:title">
+      <meta content="Configuration providers in ASP.NET Core" property="og:title">
     
     
       <meta content="article" property="og:type">
@@ -23,10 +23,10 @@
       <meta content="Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects." property="og:description">
     
     
-      <meta content="https://www.johanohlin.com/blog/building-computer-desk-for-treadmill/" property="og:url">
+      <meta content="https://www.johanohlin.com/blog/configuration_providers_in_aspnet_core/" property="og:url">
     
     
-      <meta content="2019-01-04T00:00:00+00:00" property="article:published_time">
+      <meta content="2019-04-01T00:00:00+01:00" property="article:published_time">
       <meta content="https://www.johanohlin.com/about/" property="article:author">
     
     
@@ -38,10 +38,10 @@
     <meta name="twitter:site" content="@ohlinjohan">
     <meta name="twitter:creator" content="@ohlinjohan">
     
-      <meta name="twitter:title" content="Building a computer desk for the treadmill">
+      <meta name="twitter:title" content="Configuration providers in ASP.NET Core">
     
     
-      <meta name="twitter:url" content="https://www.johanohlin.com/blog/building-computer-desk-for-treadmill/">
+      <meta name="twitter:url" content="https://www.johanohlin.com/blog/configuration_providers_in_aspnet_core/">
     
     
       <meta name="twitter:description" content="Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects.">
@@ -60,7 +60,7 @@
     <!-- Stylesheet -->
     <link rel="stylesheet" href="/assets/css/style.css">
     <!--[if IE 8]><link rel="stylesheet" href="/assets/css/ie.css"><![endif]-->
-    <link rel="canonical" href="https://www.johanohlin.com/blog/building-computer-desk-for-treadmill/">
+    <link rel="canonical" href="https://www.johanohlin.com/blog/configuration_providers_in_aspnet_core/">
 
     <!-- Modernizr -->
     <script src="/assets/js/modernizr.custom.15390.js" type="text/javascript"></script>
@@ -106,102 +106,198 @@ ga('send', 'pageview');
       <div class="container">
          <div class="post">
   
-  <h1 class="postTitle">Building a computer desk for the treadmill</h1>
+  <h1 class="postTitle">Configuration providers in ASP.NET Core</h1>
   <p class="meta">
-    January 04, 2019 |
-    <span class="time">3</span>
+    April 01, 2019 |
+    <span class="time">4</span>
     Minute Read
   </p>
 
-  <p class="intro"><span class="dropcap">O</span>nce in a while I have the opportunity to work from home. These days I barely leave the house due to the cold and rainy weather here in UK. It would be great if I could walk and work at the same time!</p>
+  <p class="intro"><span class="dropcap">C</span>onfiguration providers in ASP.NET Core offers a pluggable architecture for using many different sources for your app settings.</p>
 
-<p>I’ve seen some people buy a treadmill desk that seems to work really great. But these also cost a small fortune (£1500 - £3000). I already have a treadmill and decided to build a simple laptop desk with things I could find at a local DIY store (B&amp;Q).</p>
+<div class="narrow blog_serie">
+  <div class="blog_serie">
+    <div class="blog_serie_title">Other articles in this serie</div>
+    <ul>
+      
+        
+          
+            <li><a href="/blog/injecting-options-in-aspnet-core/">Injecting Options in ASP.NET Core</a></li>          
+          
+        
+      
+        
+          
+        
+      
+        
+          
+            <li><a href="/blog/configuration-in-asp-net-core/">Configuration in ASP.NET Core</a></li>          
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </ul>    
+  </div>
+</div>
 
-<figure class="image">
-  <picture class="awesome" data-volume="11">
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img1-400by245-016792.webp 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img1-800by490-016792.webp 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img1-1000by613-016792.webp 1000w" type="image/webp" />
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img1-400by245-016792.jpg 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img1-800by490-016792.jpg 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img1-1000by613-016792.jpg 1000w" type="image/jpeg" />
-  <img class="some-other-class" src="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img1-800by490-016792.jpg" />
-</picture>
+<p>This post builds upon two previous posts concerning <a href="/blog/configuration-in-asp-net-core/">basic configuration</a> and <a href="/blog/injecting-options-in-aspnet-core/">injecting options</a>.</p>
 
-  <figcaption></figcaption>
-</figure>
+<h4 id="configuration-providers">Configuration providers</h4>
 
-<p>The total cost for legs, a shelf and some brackets ended up at £35. Many DIY stores can cut longer pieces of wood into the size you want, and for free (B&amp;Q have this service).</p>
+<p>The configuration can be read from several different providers. These providers all provide key-value pairs of data that will be merged together.</p>
 
-<p>To make the legs really stable I carved out a little from the them before attaching the cross-beam</p>
+<table>
+  <thead>
+    <tr>
+      <th>Provider</th>
+      <th>Provides configuration from</th>
+      <th>Applied by default</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Azure Key Vault Configuration Provider (Security topics)</td>
+      <td>Azure Key Vault</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <td>Command-line Configuration Provider</td>
+      <td>Command-line parameters</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <td>Custom configuration provider</td>
+      <td>Custom source</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td><a href="#environment-variables">Environment Variables Configuration Provider</a></td>
+      <td>Environment variables</td>
+      <td>Yes (prefixed only)</td>
+    </tr>
+    <tr>
+      <td><a href="#file-configuration">File Configuration Provider</a></td>
+      <td>Files (INI, JSON, XML)</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <td>Key-per-file Configuration Provider</td>
+      <td>Directory files</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td>Memory Configuration Provider</td>
+      <td>In-memory collections</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td>User secrets (Secret Manager) (Security topics)</td>
+      <td>File in the user profile directory</td>
+      <td>Yes</td>
+    </tr>
+  </tbody>
+</table>
 
-<figure class="image">
-  <picture class="awesome" data-volume="11">
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img2-400by533-c24d95.webp 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img2-800by1066-c24d95.webp 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img2-1000by1333-c24d95.webp 1000w" type="image/webp" />
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img2-400by533-c24d95.jpg 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img2-800by1066-c24d95.jpg 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img2-1000by1333-c24d95.jpg 1000w" type="image/jpeg" />
-  <img class="some-other-class" src="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img2-800by1066-c24d95.jpg" />
-</picture>
+<p>Not all of these are applied by default. Some has to be manually configured and enabled. You can read more about how that’s done <a href="https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-2.2#environment-variables-configuration-provider" target="_blank" rel="noopener">here</a>.</p>
 
-  <figcaption></figcaption>
-</figure>
+<p>When more than one configuration service is enabled, the last configuration source specified wins and sets the configuration value.</p>
 
-<p>Legs are ready and the glue is drying</p>
+<h4 id="file-configuration">File Configuration</h4>
 
-<figure class="image">
-  <picture class="awesome" data-volume="11">
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img4-400by533-4386f8.webp 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img4-800by1066-4386f8.webp 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img4-1000by1333-4386f8.webp 1000w" type="image/webp" />
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img4-400by533-4386f8.jpg 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img4-800by1066-4386f8.jpg 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img4-1000by1333-4386f8.jpg 1000w" type="image/jpeg" />
-  <img class="some-other-class" src="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img4-800by1066-4386f8.jpg" />
-</picture>
+<p>Read this blog post for examples of how to use this</p>
 
-  <figcaption></figcaption>
-</figure>
+<p>ASP.NET Core also searches for a settings file with the current environment in the name, as in <code class="code">appsettings.{Environment}.json</code>. The environment specific configuration file is imported after the generic one and will thus override the generic values.</p>
 
-<p>The brackets cost only £2.50 each and give a much needed stability to the table</p>
+<p>By default, you have <code class="code">Development</code>, <code class="code">Staging</code> and <code class="code">Production</code> to choose from, but you can specify environments yourself if needed. These environments are written with the first character as upper case and the rest lower case. This is important if you are using the code in case sensitive environments, i.e. Linux.</p>
 
-<figure class="image">
-  <picture class="awesome" data-volume="11">
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img3-400by533-47e1e8.webp 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img3-800by1066-47e1e8.webp 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img3-1000by1333-47e1e8.webp 1000w" type="image/webp" />
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img3-400by533-47e1e8.jpg 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img3-800by1066-47e1e8.jpg 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img3-1000by1333-47e1e8.jpg 1000w" type="image/jpeg" />
-  <img class="some-other-class" src="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img3-800by1066-47e1e8.jpg" />
-</picture>
+<h4 id="environment-variables">Environment Variables</h4>
 
-  <figcaption></figcaption>
-</figure>
+<p>Per default, only environment variables prefixed with <code class="code">ASPNETCORE_</code> will be included. The prefix will be removed before the variables are used in the hierarchy.</p>
 
-<p>Since I have a Surface Pro laptop I need a little support at the back so the kickstand wont fall off the table.</p>
+<p>The prefix can be changed to a custom string if needed (see example <a href="#customization">here</a>).</p>
 
-<figure class="image">
-  <picture class="awesome" data-volume="11">
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img5-400by272-d65ca5.webp 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img5-800by543-d65ca5.webp 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img5-1000by679-d65ca5.webp 1000w" type="image/webp" />
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img5-400by272-d65ca5.jpg 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img5-800by543-d65ca5.jpg 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img5-1000by679-d65ca5.jpg 1000w" type="image/jpeg" />
-  <img class="some-other-class" src="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img5-800by543-d65ca5.jpg" />
-</picture>
+<p>If you’re using hierarchies in your configuration (as we used in <a href="/blog/configuration-in-asp-net-core/">this</a> example) then your keys need to be hierarchical also. To match the content of this appsettings.json file</p>
 
-  <figcaption></figcaption>
-</figure>
+<figure class="highlight"><pre><code class="language-json" data-lang="json"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="code"><pre><span class="p">{</span><span class="w">
+  </span><span class="s2">"FirstServiceSettings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"AnotherSetting"</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"StringSetting"</span><span class="p">:</span><span class="w"> </span><span class="s2">"maybe"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
 
-<p>The desk isn’t so deep, mainly because this was the only suitable shelf size they had in the store that was wide enough. The table would probably be more stable if desk was deeper and legs further apart on each side, but this chosen solution works well for me and the table can stay where it is even when the threadmill is raised up.</p>
+<p>You need to write the environment variables this way</p>
 
-<figure class="image">
-  <picture class="awesome" data-volume="11">
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img6-400by533-4c25a3.webp 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img6-800by1066-4c25a3.webp 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img6-1000by1333-4c25a3.webp 1000w" type="image/webp" />
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img6-400by533-4c25a3.jpg 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img6-800by1066-4c25a3.jpg 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img6-1000by1333-4c25a3.jpg 1000w" type="image/jpeg" />
-  <img class="some-other-class" src="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img6-800by1066-4c25a3.jpg" />
-</picture>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+</pre></td><td class="code"><pre><span class="nv">ASPNETCORE_FirstServiceSettings__AnotherSetting</span><span class="o">=</span>25</pre></td></tr></tbody></table></code></pre></figure>
 
-  <figcaption></figcaption>
-</figure>
+<p>If you use Azure and specify app settings for your web app then these will be injected (and have the priority) as environment variables. When you click Save, the Azure App will be restarted and after that the changed environment variables will be available for the app.</p>
 
-<p>In the picture above, the table looks quite high. But when you stand on the treadmill you’re quite high up as well so it works really well when using it.</p>
+<h4 id="customization">Customization</h4>
 
-<figure class="image">
-  <picture class="awesome" data-volume="11">
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_header_image-400by300-3fd090.webp 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_header_image-800by600-3fd090.webp 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_header_image-1200by900-3fd090.webp 1200w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_header_image-1500by1125-3fd090.webp 1500w" type="image/webp" />
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_header_image-400by300-3fd090.jpg 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_header_image-800by600-3fd090.jpg 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_header_image-1200by900-3fd090.jpg 1200w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_header_image-1500by1125-3fd090.jpg 1500w" type="image/jpeg" />
-  <img class="some-other-class" src="/assets/img/2019-01-04-threadmill/2019_threadmill_table_header_image-800by600-3fd090.jpg" />
-</picture>
+<p>If you need to customize the orders in which the providers are processed (since an imported value will override any previously imported values) then you can change this in the <code class="code">Program.cs</code> file. The following example shows how you can override and reconfigure the existing configuration.</p>
 
-  <figcaption></figcaption>
-</figure>
+<figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+</pre></td><td class="code"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">Program</span>
+<span class="p">{</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+  <span class="p">{</span>
+      <span class="nf">CreateWebHostBuilder</span><span class="p">(</span><span class="n">args</span><span class="p">).</span><span class="nf">Build</span><span class="p">().</span><span class="nf">Run</span><span class="p">();</span>
+  <span class="p">}</span>
 
-<p>So, my desk is completed and it actually works really well to use. I was a little worried while building it that it would be somewhat wobbly. But that hasn’t been the case. It isn’t as fancy as the bought ones and I can’t lower or raise the table, but it surely is much more affordable to build it yourself. I recommend to give it a try.</p>
+  <span class="k">public</span> <span class="k">static</span> <span class="n">IWebHostBuilder</span> <span class="nf">CreateWebHostBuilder</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span> <span class="p">=&gt;</span>
+    <span class="n">WebHost</span><span class="p">.</span><span class="nf">CreateDefaultBuilder</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+      <span class="p">.</span><span class="nf">ConfigureAppConfiguration</span><span class="p">((</span><span class="n">hostingContext</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span> <span class="p">=&gt;</span>
+      <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">env</span> <span class="p">=</span> <span class="n">hostingContext</span><span class="p">.</span><span class="n">HostingEnvironment</span><span class="p">;</span>
+
+        <span class="n">config</span><span class="p">.</span><span class="nf">SetBasePath</span><span class="p">(</span><span class="n">Directory</span><span class="p">.</span><span class="nf">GetCurrentDirectory</span><span class="p">());</span>
+        <span class="n">config</span><span class="p">.</span><span class="nf">AddXmlFile</span><span class="p">(</span><span class="s">"settings.xml"</span><span class="p">,</span> <span class="n">optional</span><span class="p">:</span> <span class="k">false</span><span class="p">,</span> <span class="n">reloadOnChange</span><span class="p">:</span> <span class="k">false</span><span class="p">);</span>
+        <span class="n">config</span><span class="p">.</span><span class="nf">AddJsonFile</span><span class="p">(</span><span class="s">"application.json"</span><span class="p">,</span> <span class="n">optional</span><span class="p">:</span> <span class="k">false</span><span class="p">,</span> <span class="n">reloadOnChange</span><span class="p">:</span> <span class="k">true</span><span class="p">);</span>
+        <span class="n">config</span><span class="p">.</span><span class="nf">AddJsonFile</span><span class="p">(</span><span class="s">$"appsettings.</span><span class="p">{</span><span class="n">env</span><span class="p">.</span><span class="n">EnvironmentName</span><span class="p">}</span><span class="s">.json"</span><span class="p">,</span> <span class="n">optional</span><span class="p">:</span> <span class="k">true</span><span class="p">,</span> <span class="n">reloadOnChange</span><span class="p">:</span> <span class="k">true</span><span class="p">);</span>
+        <span class="n">config</span><span class="p">.</span><span class="nf">AddEnvironmentVariables</span><span class="p">(</span><span class="s">"ASPNETCORE_"</span><span class="p">);</span>
+        <span class="n">config</span><span class="p">.</span><span class="nf">AddCommandLine</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
+      <span class="p">})</span>
+      <span class="p">.</span><span class="n">UseStartup</span><span class="p">&lt;</span><span class="n">Startup</span><span class="p">&gt;();</span>
+<span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<p>It’s important to set the base path as the first step so the files will be searched for in the right place.</p>
 
 
   <!-- POST NAVIGATION -->
@@ -209,15 +305,15 @@ ga('send', 'pageview');
     
     <a
       class="prev"
-      href="/blog/practical-flexbox-examples/"
-      ><span>&laquo;&nbsp;Practical flexbox examples</span>
+      href="/blog/configuration-in-asp-net-core/"
+      ><span>&laquo;&nbsp;Configuration in ASP.NET Core</span>
       
     </a>
      
     <a
       class="next"
-      href="/blog/automapper-profiles/"
-      ><span>AutoMapper profile injections&nbsp;&raquo;</span>
+      href="/blog/injecting-options-in-aspnet-core/"
+      ><span>Injecting Options in ASP.NET Core&nbsp;&raquo;</span>
       
     </a>
     
@@ -314,8 +410,8 @@ ga('send', 'pageview');
 <div id="disqus_thread"></div>
 <script>
   var disqus_config = function() {
-    this.page.url = "https://www.johanohlin.com/blog/building-computer-desk-for-treadmill/";
-    this.page.identifier = "https://www.johanohlin.com/blog/building-computer-desk-for-treadmill/";
+    this.page.url = "https://www.johanohlin.com/blog/configuration_providers_in_aspnet_core/";
+    this.page.identifier = "https://www.johanohlin.com/blog/configuration_providers_in_aspnet_core/";
   };
   (function() {
     // DON'T EDIT BELOW THIS LINE

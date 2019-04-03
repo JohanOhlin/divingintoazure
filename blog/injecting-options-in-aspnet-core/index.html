@@ -9,12 +9,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects.">
-    <title>Building a computer desk for the treadmill</title>
+    <title>Injecting Options in ASP.NET Core</title>
 
     <!-- Open Graph Meta -->
     <meta content="Diving into Azure" property="og:site_name">
     
-      <meta content="Building a computer desk for the treadmill" property="og:title">
+      <meta content="Injecting Options in ASP.NET Core" property="og:title">
     
     
       <meta content="article" property="og:type">
@@ -23,10 +23,10 @@
       <meta content="Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects." property="og:description">
     
     
-      <meta content="https://www.johanohlin.com/blog/building-computer-desk-for-treadmill/" property="og:url">
+      <meta content="https://www.johanohlin.com/blog/injecting-options-in-aspnet-core/" property="og:url">
     
     
-      <meta content="2019-01-04T00:00:00+00:00" property="article:published_time">
+      <meta content="2019-04-01T00:00:00+01:00" property="article:published_time">
       <meta content="https://www.johanohlin.com/about/" property="article:author">
     
     
@@ -38,10 +38,10 @@
     <meta name="twitter:site" content="@ohlinjohan">
     <meta name="twitter:creator" content="@ohlinjohan">
     
-      <meta name="twitter:title" content="Building a computer desk for the treadmill">
+      <meta name="twitter:title" content="Injecting Options in ASP.NET Core">
     
     
-      <meta name="twitter:url" content="https://www.johanohlin.com/blog/building-computer-desk-for-treadmill/">
+      <meta name="twitter:url" content="https://www.johanohlin.com/blog/injecting-options-in-aspnet-core/">
     
     
       <meta name="twitter:description" content="Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects.">
@@ -60,7 +60,7 @@
     <!-- Stylesheet -->
     <link rel="stylesheet" href="/assets/css/style.css">
     <!--[if IE 8]><link rel="stylesheet" href="/assets/css/ie.css"><![endif]-->
-    <link rel="canonical" href="https://www.johanohlin.com/blog/building-computer-desk-for-treadmill/">
+    <link rel="canonical" href="https://www.johanohlin.com/blog/injecting-options-in-aspnet-core/">
 
     <!-- Modernizr -->
     <script src="/assets/js/modernizr.custom.15390.js" type="text/javascript"></script>
@@ -106,102 +106,192 @@ ga('send', 'pageview');
       <div class="container">
          <div class="post">
   
-  <h1 class="postTitle">Building a computer desk for the treadmill</h1>
+  <h1 class="postTitle">Injecting Options in ASP.NET Core</h1>
   <p class="meta">
-    January 04, 2019 |
+    April 01, 2019 |
     <span class="time">3</span>
     Minute Read
   </p>
 
-  <p class="intro"><span class="dropcap">O</span>nce in a while I have the opportunity to work from home. These days I barely leave the house due to the cold and rainy weather here in UK. It would be great if I could walk and work at the same time!</p>
+  <p class="intro"><span class="dropcap">I</span>n ASP.NET Core there are some very interesting ways of handling and injecting options into classes. In this post I compare some of the different options you have at your disposal.</p>
 
-<p>I’ve seen some people buy a treadmill desk that seems to work really great. But these also cost a small fortune (£1500 - £3000). I already have a treadmill and decided to build a simple laptop desk with things I could find at a local DIY store (B&amp;Q).</p>
+<div class="narrow blog_serie">
+  <div class="blog_serie">
+    <div class="blog_serie_title">Other articles in this serie</div>
+    <ul>
+      
+        
+          
+        
+      
+        
+          
+            <li><a href="/blog/configuration_providers_in_aspnet_core/">Configuration providers in ASP.NET Core</a></li>          
+          
+        
+      
+        
+          
+            <li><a href="/blog/configuration-in-asp-net-core/">Configuration in ASP.NET Core</a></li>          
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </ul>    
+  </div>
+</div>
 
-<figure class="image">
-  <picture class="awesome" data-volume="11">
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img1-400by245-016792.webp 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img1-800by490-016792.webp 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img1-1000by613-016792.webp 1000w" type="image/webp" />
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img1-400by245-016792.jpg 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img1-800by490-016792.jpg 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img1-1000by613-016792.jpg 1000w" type="image/jpeg" />
-  <img class="some-other-class" src="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img1-800by490-016792.jpg" />
-</picture>
+<p>In a <a href="/blog/configuration-in-asp-net-core/">previous post</a> I wrote the basics about how to configure options in ASP.NET Core. If you’re not familiar with this topic then I suggest you read through that blog first.</p>
 
-  <figcaption></figcaption>
-</figure>
+<h4 id="comparison">Comparison</h4>
 
-<p>The total cost for legs, a shelf and some brackets ended up at £35. Many DIY stores can cut longer pieces of wood into the size you want, and for free (B&amp;Q have this service).</p>
+<p>There are a few different ways to handle option injection in your classes. They are all quite straight forward to use.</p>
 
-<p>To make the legs really stable I carved out a little from the them before attaching the cross-beam</p>
+<table>
+  <thead>
+    <tr>
+      <th>Interface</th>
+      <th>Automatic reloading</th>
+      <th>Works in a singleton service</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>IOption</td>
+      <td>No</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <td>IOption Monitor</td>
+      <td>Yes (but you have to hook into change event)</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <td>IOption Snapshot</td>
+      <td>Yes (re-calculated for each call)</td>
+      <td>No</td>
+    </tr>
+  </tbody>
+</table>
 
-<figure class="image">
-  <picture class="awesome" data-volume="11">
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img2-400by533-c24d95.webp 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img2-800by1066-c24d95.webp 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img2-1000by1333-c24d95.webp 1000w" type="image/webp" />
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img2-400by533-c24d95.jpg 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img2-800by1066-c24d95.jpg 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img2-1000by1333-c24d95.jpg 1000w" type="image/jpeg" />
-  <img class="some-other-class" src="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img2-800by1066-c24d95.jpg" />
-</picture>
+<h4 id="ioption">IOption</h4>
 
-  <figcaption></figcaption>
-</figure>
+<p>If your options change seldom and you’re OK with restarting your app when you change your app then this should be your choice. Options are read at startup and there’s no overhead for re-reading the file or watching for changes for every request.</p>
 
-<p>Legs are ready and the glue is drying</p>
+<figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="code"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">MyService</span>
+<span class="p">{</span>
+  <span class="k">private</span> <span class="k">readonly</span> <span class="n">MyServiceSettings</span> <span class="n">settings</span><span class="p">;</span>
 
-<figure class="image">
-  <picture class="awesome" data-volume="11">
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img4-400by533-4386f8.webp 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img4-800by1066-4386f8.webp 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img4-1000by1333-4386f8.webp 1000w" type="image/webp" />
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img4-400by533-4386f8.jpg 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img4-800by1066-4386f8.jpg 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img4-1000by1333-4386f8.jpg 1000w" type="image/jpeg" />
-  <img class="some-other-class" src="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img4-800by1066-4386f8.jpg" />
-</picture>
+  <span class="k">public</span> <span class="nf">MyService</span><span class="p">(</span><span class="n">IOptions</span><span class="p">&lt;</span><span class="n">MyServiceSettings</span><span class="p">&gt;</span> <span class="n">options</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">settings</span> <span class="p">=</span> <span class="n">options</span><span class="p">.</span><span class="n">Value</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
 
-  <figcaption></figcaption>
-</figure>
+<h4 id="ioptionmonitor">IOptionMonitor</h4>
 
-<p>The brackets cost only £2.50 each and give a much needed stability to the table</p>
+<p>This option keeps an eye on the file and calls <code class="code">OnChange</code> when the file is changed. This makes it possible for you to make changes to your <code class="code">application.json</code> file without having to reload the app.</p>
 
-<figure class="image">
-  <picture class="awesome" data-volume="11">
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img3-400by533-47e1e8.webp 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img3-800by1066-47e1e8.webp 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img3-1000by1333-47e1e8.webp 1000w" type="image/webp" />
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img3-400by533-47e1e8.jpg 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img3-800by1066-47e1e8.jpg 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img3-1000by1333-47e1e8.jpg 1000w" type="image/jpeg" />
-  <img class="some-other-class" src="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img3-800by1066-47e1e8.jpg" />
-</picture>
+<figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+</pre></td><td class="code"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">MyService</span>
+<span class="p">{</span>
+  <span class="k">private</span> <span class="n">MyServiceSettings</span> <span class="n">settings</span><span class="p">;</span>
 
-  <figcaption></figcaption>
-</figure>
+  <span class="k">public</span> <span class="nf">MyService</span><span class="p">(</span><span class="n">IOptionsMonitor</span><span class="p">&lt;</span><span class="n">MyServiceSettings</span><span class="p">&gt;</span> <span class="n">options</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">settings</span> <span class="p">=</span> <span class="n">options</span><span class="p">.</span><span class="n">CurrentValue</span><span class="p">;</span>
+    <span class="n">options</span><span class="p">.</span><span class="nf">OnChange</span><span class="p">(</span><span class="n">OnSettingsChange</span><span class="p">);</span>
+  <span class="p">}</span>
 
-<p>Since I have a Surface Pro laptop I need a little support at the back so the kickstand wont fall off the table.</p>
+  <span class="k">private</span> <span class="k">void</span> <span class="nf">OnSettingsChange</span><span class="p">(</span><span class="n">MyServiceSettings</span> <span class="n">settings</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="n">settings</span> <span class="p">=</span> <span class="n">settings</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
 
-<figure class="image">
-  <picture class="awesome" data-volume="11">
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img5-400by272-d65ca5.webp 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img5-800by543-d65ca5.webp 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img5-1000by679-d65ca5.webp 1000w" type="image/webp" />
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img5-400by272-d65ca5.jpg 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img5-800by543-d65ca5.jpg 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img5-1000by679-d65ca5.jpg 1000w" type="image/jpeg" />
-  <img class="some-other-class" src="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img5-800by543-d65ca5.jpg" />
-</picture>
+<h4 id="ioptionsnapshot">IOptionSnapshot</h4>
 
-  <figcaption></figcaption>
-</figure>
+<p>The last option gives us the possibility to re-read the settings file for every time the dependency injection is executed. No need to handle change requests since you’ll always have a new file.</p>
 
-<p>The desk isn’t so deep, mainly because this was the only suitable shelf size they had in the store that was wide enough. The table would probably be more stable if desk was deeper and legs further apart on each side, but this chosen solution works well for me and the table can stay where it is even when the threadmill is raised up.</p>
+<p>This is a scoped service and can’t be accessed from a singleton service. This might not be a problem to you, but it’s good to keep in mind. <code class="code">IOptionMonitor</code> works just fine in a singleton.</p>
 
-<figure class="image">
-  <picture class="awesome" data-volume="11">
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img6-400by533-4c25a3.webp 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img6-800by1066-4c25a3.webp 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img6-1000by1333-4c25a3.webp 1000w" type="image/webp" />
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img6-400by533-4c25a3.jpg 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img6-800by1066-4c25a3.jpg 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_img6-1000by1333-4c25a3.jpg 1000w" type="image/jpeg" />
-  <img class="some-other-class" src="/assets/img/2019-01-04-threadmill/2019_threadmill_table_img6-800by1066-4c25a3.jpg" />
-</picture>
+<figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="code"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">MyService</span>
+<span class="p">{</span>
+  <span class="k">private</span> <span class="k">readonly</span> <span class="n">MyServiceSettings</span> <span class="n">settings</span><span class="p">;</span>
 
-  <figcaption></figcaption>
-</figure>
+  <span class="k">public</span> <span class="nf">MyService</span><span class="p">(</span><span class="n">IOptionsSnapshot</span><span class="p">&lt;</span><span class="n">MyServiceSettings</span><span class="p">&gt;</span> <span class="n">options</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">settings</span> <span class="p">=</span> <span class="n">options</span><span class="p">.</span><span class="n">Value</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
 
-<p>In the picture above, the table looks quite high. But when you stand on the treadmill you’re quite high up as well so it works really well when using it.</p>
+<h4 id="iconfiguration">IConfiguration</h4>
 
-<figure class="image">
-  <picture class="awesome" data-volume="11">
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_header_image-400by300-3fd090.webp 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_header_image-800by600-3fd090.webp 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_header_image-1200by900-3fd090.webp 1200w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_header_image-1500by1125-3fd090.webp 1500w" type="image/webp" />
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-01-04-threadmill/2019_threadmill_table_header_image-400by300-3fd090.jpg 400w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_header_image-800by600-3fd090.jpg 800w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_header_image-1200by900-3fd090.jpg 1200w, /assets/img/2019-01-04-threadmill/2019_threadmill_table_header_image-1500by1125-3fd090.jpg 1500w" type="image/jpeg" />
-  <img class="some-other-class" src="/assets/img/2019-01-04-threadmill/2019_threadmill_table_header_image-800by600-3fd090.jpg" />
-</picture>
+<p>It’s also possible to inject the whole configuration object into your class.</p>
 
-  <figcaption></figcaption>
-</figure>
+<figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">HomeController</span> <span class="p">:</span> <span class="n">Controller</span>
+<span class="p">{</span>
+  <span class="k">private</span> <span class="k">readonly</span> <span class="n">SecondServiceSettings</span> <span class="n">_settings</span><span class="p">;</span>
 
-<p>So, my desk is completed and it actually works really well to use. I was a little worried while building it that it would be somewhat wobbly. But that hasn’t been the case. It isn’t as fancy as the bought ones and I can’t lower or raise the table, but it surely is much more affordable to build it yourself. I recommend to give it a try.</p>
+  <span class="k">public</span> <span class="nf">HomeController</span><span class="p">(</span><span class="n">IConfiguration</span> <span class="n">configuration</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">_settings</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">SecondServiceSettings</span><span class="p">();</span>
+    <span class="n">configuration</span><span class="p">.</span><span class="nf">Bind</span><span class="p">(</span><span class="s">"SecondServiceSettings"</span><span class="p">,</span> <span class="n">_settings</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<p>This is not recommended since it’ll break the separation of concerns that you should only have the options available that you need.</p>
 
 
   <!-- POST NAVIGATION -->
@@ -209,18 +299,11 @@ ga('send', 'pageview');
     
     <a
       class="prev"
-      href="/blog/practical-flexbox-examples/"
-      ><span>&laquo;&nbsp;Practical flexbox examples</span>
+      href="/blog/configuration_providers_in_aspnet_core/"
+      ><span>&laquo;&nbsp;Configuration providers in ASP.NET Core</span>
       
     </a>
      
-    <a
-      class="next"
-      href="/blog/automapper-profiles/"
-      ><span>AutoMapper profile injections&nbsp;&raquo;</span>
-      
-    </a>
-    
   </div>
   <div style="margin-bottom:2rem;">
       <div style="clear:both; padding-top:2rem;" class="container">
@@ -314,8 +397,8 @@ ga('send', 'pageview');
 <div id="disqus_thread"></div>
 <script>
   var disqus_config = function() {
-    this.page.url = "https://www.johanohlin.com/blog/building-computer-desk-for-treadmill/";
-    this.page.identifier = "https://www.johanohlin.com/blog/building-computer-desk-for-treadmill/";
+    this.page.url = "https://www.johanohlin.com/blog/injecting-options-in-aspnet-core/";
+    this.page.identifier = "https://www.johanohlin.com/blog/injecting-options-in-aspnet-core/";
   };
   (function() {
     // DON'T EDIT BELOW THIS LINE
