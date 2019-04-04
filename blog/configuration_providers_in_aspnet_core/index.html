@@ -166,9 +166,9 @@ ga('send', 'pageview');
   </thead>
   <tbody>
     <tr>
-      <td>Azure Key Vault Configuration Provider (Security topics)</td>
+      <td>Azure Key Vault Configuration Provider</td>
       <td>Azure Key Vault</td>
-      <td>Yes</td>
+      <td>No</td>
     </tr>
     <tr>
       <td>Command-line Configuration Provider</td>
@@ -201,7 +201,7 @@ ga('send', 'pageview');
       <td>No</td>
     </tr>
     <tr>
-      <td>User secrets (Secret Manager) (Security topics)</td>
+      <td>User secrets (Secret Manager)</td>
       <td>File in the user profile directory</td>
       <td>Yes</td>
     </tr>
@@ -214,11 +214,11 @@ ga('send', 'pageview');
 
 <h4 id="file-configuration">File Configuration</h4>
 
-<p>Read this blog post for examples of how to use this</p>
+<p>The build in support allows you to import JSON, XML and INI files into your configuration. Read <a href="/blog/configuration-in-asp-net-core/">this blog post</a> for examples of how to use the standard <code class="code">appsettings.json</code> file for defining your configuration.</p>
 
 <p>ASP.NET Core also searches for a settings file with the current environment in the name, as in <code class="code">appsettings.{Environment}.json</code>. The environment specific configuration file is imported after the generic one and will thus override the generic values.</p>
 
-<p>By default, you have <code class="code">Development</code>, <code class="code">Staging</code> and <code class="code">Production</code> to choose from, but you can specify environments yourself if needed. These environments are written with the first character as upper case and the rest lower case. This is important if you are using the code in case sensitive environments, i.e. Linux.</p>
+<p>The pre-defined environments are <code class="code">Development</code>, <code class="code">Staging</code> and <code class="code">Production</code>, but you can specify environments yourself if needed. These environments are written with the first character as upper case and the rest lower case. This is important if you are using the code in case sensitive environments, i.e. Linux.</p>
 
 <h4 id="environment-variables">Environment Variables</h4>
 

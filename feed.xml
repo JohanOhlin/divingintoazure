@@ -5,8 +5,8 @@
     <description>Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects.</description>
     <link>https://www.johanohlin.com/</link>
     <atom:link href="https://www.johanohlin.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 04 Apr 2019 10:02:45 +0100</pubDate>
-    <lastBuildDate>Thu, 04 Apr 2019 10:02:45 +0100</lastBuildDate>
+    <pubDate>Thu, 04 Apr 2019 10:14:35 +0100</pubDate>
+    <lastBuildDate>Thu, 04 Apr 2019 10:14:35 +0100</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       
@@ -65,9 +65,9 @@
   &lt;/thead&gt;
   &lt;tbody&gt;
     &lt;tr&gt;
-      &lt;td&gt;Azure Key Vault Configuration Provider (Security topics)&lt;/td&gt;
+      &lt;td&gt;Azure Key Vault Configuration Provider&lt;/td&gt;
       &lt;td&gt;Azure Key Vault&lt;/td&gt;
-      &lt;td&gt;Yes&lt;/td&gt;
+      &lt;td&gt;No&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td&gt;Command-line Configuration Provider&lt;/td&gt;
@@ -100,7 +100,7 @@
       &lt;td&gt;No&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td&gt;User secrets (Secret Manager) (Security topics)&lt;/td&gt;
+      &lt;td&gt;User secrets (Secret Manager)&lt;/td&gt;
       &lt;td&gt;File in the user profile directory&lt;/td&gt;
       &lt;td&gt;Yes&lt;/td&gt;
     &lt;/tr&gt;
@@ -113,11 +113,11 @@
 
 &lt;h4 id=&quot;file-configuration&quot;&gt;File Configuration&lt;/h4&gt;
 
-&lt;p&gt;Read this blog post for examples of how to use this&lt;/p&gt;
+&lt;p&gt;The build in support allows you to import JSON, XML and INI files into your configuration. Read &lt;a href=&quot;/blog/configuration-in-asp-net-core/&quot;&gt;this blog post&lt;/a&gt; for examples of how to use the standard &lt;code class=&quot;code&quot;&gt;appsettings.json&lt;/code&gt; file for defining your configuration.&lt;/p&gt;
 
 &lt;p&gt;ASP.NET Core also searches for a settings file with the current environment in the name, as in &lt;code class=&quot;code&quot;&gt;appsettings.{Environment}.json&lt;/code&gt;. The environment specific configuration file is imported after the generic one and will thus override the generic values.&lt;/p&gt;
 
-&lt;p&gt;By default, you have &lt;code class=&quot;code&quot;&gt;Development&lt;/code&gt;, &lt;code class=&quot;code&quot;&gt;Staging&lt;/code&gt; and &lt;code class=&quot;code&quot;&gt;Production&lt;/code&gt; to choose from, but you can specify environments yourself if needed. These environments are written with the first character as upper case and the rest lower case. This is important if you are using the code in case sensitive environments, i.e. Linux.&lt;/p&gt;
+&lt;p&gt;The pre-defined environments are &lt;code class=&quot;code&quot;&gt;Development&lt;/code&gt;, &lt;code class=&quot;code&quot;&gt;Staging&lt;/code&gt; and &lt;code class=&quot;code&quot;&gt;Production&lt;/code&gt;, but you can specify environments yourself if needed. These environments are written with the first character as upper case and the rest lower case. This is important if you are using the code in case sensitive environments, i.e. Linux.&lt;/p&gt;
 
 &lt;h4 id=&quot;environment-variables&quot;&gt;Environment Variables&lt;/h4&gt;
 
