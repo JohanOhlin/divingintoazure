@@ -122,7 +122,7 @@ ga('send', 'pageview');
       
         
           
-            <li><a href="/blog/configuration_providers_in_aspnet_core/">Configuration providers in ASP.NET Core</a></li>          
+            <li><a href="/blog/configuration-providers-in-aspnet-core/">Configuration providers in ASP.NET Core</a></li>          
           
         
       
@@ -150,13 +150,50 @@ ga('send', 'pageview');
   </div>
 </div>
 
-<p>ASP.NET Core has a pluggable configuration system where configuration settings can be imported from a number of different sources. These sources are then merged together into one configuration object. I write more about the different configuration providers here. In this post I’ll focus on settings in the standard <code class="code">appsettings.json</code> file.</p>
+<p>ASP.NET Core has a pluggable configuration system where configuration settings can be imported from a number of <a href="/blog/configuration-providers-in-aspnet-core/">different sources</a>. These sources are then merged together into one hierarchical configuration object.</p>
+
+<p>When you create a new ASP.Net Core Web App in Visual Studio, it’ll automatically create a configuration file for you named <code class="code">appsettings.json</code>. By default it only contains logging and CORS settings but we’re free to add any type of hierarchical configuratin that we need.</p>
+
+<p>In this example I’ve added two extra sections (<i>FirstServiceSettings</i> and <i>SecondServiceSettings</i>) to the file that I’ll use as specific option groups for my web app.</p>
+
+<figure class="highlight"><pre><code class="language-json" data-lang="json"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre></td><td class="code"><pre><span class="p">{</span><span class="w">
+  </span><span class="s2">"FirstServiceSettings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"AnotherSetting"</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"SecondServiceSettings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"MinRetries"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"MaxRetries"</span><span class="p">:</span><span class="w"> </span><span class="mi">40</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"CostPerRetry"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.02</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"Logging"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"LogLevel"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"Default"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Warning"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"AllowedHosts"</span><span class="p">:</span><span class="w"> </span><span class="s2">"*"</span><span class="w">
+</span><span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
 
 <h4 id="options-pattern">Options pattern</h4>
 
 <p>Settings are grouped together as classes in what’s called the <i>options pattern</i>. By separating options you can decouple different parts of your app so it only knows the settings it needs to know, in accordance with the theory of <a href="https://en.wikipedia.org/wiki/Separation_of_concerns" target="_blank" rel="noopener">separation of concerns</a>.</p>
 
-<p>It’s not mandatory to create options classes for your options but it’s something you should consider according to Microsoft. Here’s an example of a few settings classes that we’ll use in the examples through out this post.</p>
+<p>It’s not mandatory to create options classes for your options but it’s something you should consider. Here’s an example of a few settings classes that we’ll use in the examples through out this post.</p>
 
 <figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
 2
@@ -182,6 +219,8 @@ ga('send', 'pageview');
   <span class="k">public</span> <span class="kt">int</span> <span class="n">MinRetries</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
   <span class="k">public</span> <span class="kt">decimal</span> <span class="n">CostPerRetry</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
 <span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<p>Since the JSON file example previously shown only is one of many possible configuration providers, it’s not needed to include all the settings you need for your option classes. The JSON file might specify some basic values while a secrets manager brings in passwords.</p>
 
 <h4 id="map-classes-to-configuration">Map classes to configuration</h4>
 
@@ -214,7 +253,7 @@ ga('send', 'pageview');
   <span class="p">...</span>
 <span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
 
-<p>The option classes are now registered and we can use them in the code. You can read more about how these option classes are used in code in <a href="/blog/injecting-options-in-aspnet-core/">this blog post</a>.</p>
+<p>The option classes are now registered and we can use them in the code by <a href="/blog/injecting-options-in-aspnet-core/">injecting them using dependency injection</a>.</p>
 
 <h4 id="make-options-read-only">Make options read-only</h4>
 
@@ -227,7 +266,7 @@ ga('send', 'pageview');
 3
 4
 5
-</pre></td><td class="code"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">ServiceSettings</span>
+</pre></td><td class="code"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">ProtectedSettings</span>
 <span class="p">{</span>
   <span class="k">public</span> <span class="kt">string</span> <span class="n">HiddenSetting</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">private</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
   <span class="k">private</span> <span class="kt">string</span> <span class="n">VeryHiddenSetting</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
@@ -245,7 +284,7 @@ ga('send', 'pageview');
 8
 </pre></td><td class="code"><pre><span class="k">public</span> <span class="k">void</span> <span class="nf">ConfigureServices</span><span class="p">(</span><span class="n">IServiceCollection</span> <span class="n">services</span><span class="p">)</span>
 <span class="p">{</span>
-  <span class="n">services</span><span class="p">.</span><span class="n">Configure</span><span class="p">&lt;</span><span class="n">ServiceSettings</span><span class="p">&gt;(</span><span class="n">Configuration</span><span class="p">.</span><span class="nf">GetSection</span><span class="p">(</span><span class="s">"ServiceSettings"</span><span class="p">),</span> <span class="n">options</span> <span class="p">=&gt;</span>
+  <span class="n">services</span><span class="p">.</span><span class="n">Configure</span><span class="p">&lt;</span><span class="n">ProtectedSettings</span><span class="p">&gt;(</span><span class="n">Configuration</span><span class="p">.</span><span class="nf">GetSection</span><span class="p">(</span><span class="s">"ProtectedSettings"</span><span class="p">),</span> <span class="n">options</span> <span class="p">=&gt;</span>
   <span class="p">{</span>
       <span class="n">options</span><span class="p">.</span><span class="n">BindNonPublicProperties</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
   <span class="p">});</span>
@@ -253,37 +292,6 @@ ga('send', 'pageview');
 <span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
 
 <p>The option values are now protected later on.</p>
-
-<h4 id="file-configuration">File Configuration</h4>
-
-<p>When you create a new ASP.Net Core Web App in Visual Studio, it’ll automatically create a configuration file for you named <code class="code">appsettings.json</code>. By default it only contains logging and CORS settings. In this file we can add the sub-options we want to use in our program. The JSON structure in the file needs to mimic the option classes previously created.</p>
-
-<figure class="highlight"><pre><code class="language-json" data-lang="json"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-</pre></td><td class="code"><pre><span class="p">{</span><span class="w">
-  </span><span class="s2">"FirstServiceSettings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="s2">"AnotherSetting"</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"StringSetting"</span><span class="p">:</span><span class="w"> </span><span class="s2">"maybe"</span><span class="w">
-  </span><span class="p">},</span><span class="w">
-  </span><span class="s2">"SecondServiceSettings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="s2">"MinRetries"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"MaxRetries"</span><span class="p">:</span><span class="w"> </span><span class="mi">40</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"CostPerRetry"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.02</span><span class="w">
-  </span><span class="p">},</span><span class="w">
-  </span><span class="err">...</span><span class="w">
-</span><span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
-
-<p>Since this JSON file only is one of many possible configuration providers, it’s not needed to include all the settings you need for your option classes. The JSON file might specify some basic values while a secrets manager brings in passwords.</p>
 
 <h4 id="configure-options-using-a-delegate">Configure options using a delegate</h4>
 

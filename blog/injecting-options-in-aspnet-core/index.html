@@ -109,7 +109,7 @@ ga('send', 'pageview');
   <h1 class="postTitle">Injecting Options in ASP.NET Core</h1>
   <p class="meta">
     March 31, 2019 |
-    <span class="time">3</span>
+    <span class="time">4</span>
     Minute Read
   </p>
 
@@ -122,7 +122,7 @@ ga('send', 'pageview');
       
         
           
-            <li><a href="/blog/configuration_providers_in_aspnet_core/">Configuration providers in ASP.NET Core</a></li>          
+            <li><a href="/blog/configuration-providers-in-aspnet-core/">Configuration providers in ASP.NET Core</a></li>          
           
         
       
@@ -185,7 +185,7 @@ ga('send', 'pageview');
 
 <h4 id="ioption">IOption</h4>
 
-<p>If your options change seldom and you’re OK with restarting your app when you change your app then this should be your choice. Options are read at startup and there’s no overhead for re-reading the file or watching for changes for every request.</p>
+<p>If your options change seldom and you’re OK with restarting your app (or application pool) when you change your app settings then this could be your choice. Options are read at startup and there’s no overhead for re-reading the file or watching for changes for every request.</p>
 
 <figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
 2
@@ -241,9 +241,11 @@ ga('send', 'pageview');
   <span class="p">}</span>
 <span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
 
+<p><code class="code">IOptionsMonitor</code> has a caching layer behind the scenes that stores the values. You can interact with this caching layer to clear the cache, forcing an update, but also to inject new values if needed. This will then trigger the <code class="code">OnChange</code> event to be triggered in code where used.</p>
+
 <h4 id="ioptionsnapshot">IOptionSnapshot</h4>
 
-<p>The last option gives us the possibility to re-read the settings file for every time the dependency injection is executed. No need to handle change requests since you’ll always have a new file.</p>
+<p>The last option gives us the possibility to re-read the settings file for every new request. No need to handle change requests since you’ll always have a new file.</p>
 
 <p>This is a scoped service and can’t be accessed from a singleton service. This might not be a problem to you, but it’s good to keep in mind. <code class="code">IOptionMonitor</code> works just fine in a singleton.</p>
 
@@ -293,6 +295,12 @@ ga('send', 'pageview');
 
 <p>This is not recommended since it’ll break the separation of concerns that you should only have the options available that you need.</p>
 
+<h4 id="which-one-to-choose">Which one to choose</h4>
+
+<p>If you read <a href="https://docs.microsoft.com/en-gb/aspnet/core/fundamentals/configuration/options?view=aspnetcore-2.2#options-interfaces" target="_blank" rel="noopener">Microsoft’s documentation</a> you can see that most focus is being put on the <code class="code">IOptionMonitor</code> alternative. This is probably due to the interaction possibilities you have with it. However it comes with the need to write a few extra lines of code to make use of the change requests.</p>
+
+<p><code class="code">IOption</code> and <code class="code">IOptionSnapshot</code> are also good options but they offer less functionality, which still might be good enough for your needs.</p>
+
 
   <!-- POST NAVIGATION -->
   <div class="postNav clearfix">
@@ -306,7 +314,7 @@ ga('send', 'pageview');
      
     <a
       class="next"
-      href="/blog/configuration_providers_in_aspnet_core/"
+      href="/blog/configuration-providers-in-aspnet-core/"
       ><span>Configuration providers in ASP.NET Core&nbsp;&raquo;</span>
       
     </a>

@@ -5,8 +5,8 @@
     <description>Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects.</description>
     <link>https://www.johanohlin.com/</link>
     <atom:link href="https://www.johanohlin.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 04 Apr 2019 10:14:35 +0100</pubDate>
-    <lastBuildDate>Thu, 04 Apr 2019 10:14:35 +0100</lastBuildDate>
+    <pubDate>Fri, 05 Apr 2019 08:47:37 +0100</pubDate>
+    <lastBuildDate>Fri, 05 Apr 2019 08:47:37 +0100</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       
@@ -111,9 +111,35 @@
 
 &lt;p&gt;When more than one configuration service is enabled, the last configuration source specified wins and sets the configuration value.&lt;/p&gt;
 
+&lt;h4 id=&quot;hierarchical-configurations&quot;&gt;Hierarchical configurations&lt;/h4&gt;
+
+&lt;p&gt;Most providers handle configurations as key-value pairs. To mimic the hierarchical structure we have in the internal configuration object, the keys can describe a path instead of just a key. By default &lt;code class=&quot;code&quot;&gt;:&lt;/code&gt; is used to separate levels in hierarchy. However, in some environments a colon has other meanings as well and this can cause issues. It’s therefore recommended to use &lt;code class=&quot;code&quot;&gt;__&lt;/code&gt; (duble underscore) instead.&lt;/p&gt;
+
+&lt;p&gt;This key example&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-json&quot; data-lang=&quot;json&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;err&quot;&gt;Logging__LogLevel__Default=Info&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Would then map to the following configuration setting&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-json&quot; data-lang=&quot;json&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Logging&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;LogLevel&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Default&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Warning&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
 &lt;h4 id=&quot;file-configuration&quot;&gt;File Configuration&lt;/h4&gt;
 
-&lt;p&gt;The build in support allows you to import JSON, XML and INI files into your configuration. Read &lt;a href=&quot;/blog/configuration-in-asp-net-core/&quot;&gt;this blog post&lt;/a&gt; for examples of how to use the standard &lt;code class=&quot;code&quot;&gt;appsettings.json&lt;/code&gt; file for defining your configuration.&lt;/p&gt;
+&lt;p&gt;The built in support allows you to import JSON, XML and INI files into your configuration. Read &lt;a href=&quot;/blog/configuration-in-asp-net-core/&quot;&gt;this blog post&lt;/a&gt; for examples of how to use the standard &lt;code class=&quot;code&quot;&gt;appsettings.json&lt;/code&gt; file for defining your configuration.&lt;/p&gt;
 
 &lt;p&gt;ASP.NET Core also searches for a settings file with the current environment in the name, as in &lt;code class=&quot;code&quot;&gt;appsettings.{Environment}.json&lt;/code&gt;. The environment specific configuration file is imported after the generic one and will thus override the generic values.&lt;/p&gt;
 
@@ -121,11 +147,9 @@
 
 &lt;h4 id=&quot;environment-variables&quot;&gt;Environment Variables&lt;/h4&gt;
 
-&lt;p&gt;Per default, only environment variables prefixed with &lt;code class=&quot;code&quot;&gt;ASPNETCORE_&lt;/code&gt; will be included. The prefix will be removed before the variables are used in the hierarchy.&lt;/p&gt;
+&lt;p&gt;Per default, only environment variables prefixed with &lt;code class=&quot;code&quot;&gt;ASPNETCORE_&lt;/code&gt; will be included. The prefix will be removed before the variables are used in the hierarchy. The prefix can be changed to a custom string if needed (see example &lt;a href=&quot;#customization&quot;&gt;here&lt;/a&gt;).&lt;/p&gt;
 
-&lt;p&gt;The prefix can be changed to a custom string if needed (see example &lt;a href=&quot;#customization&quot;&gt;here&lt;/a&gt;).&lt;/p&gt;
-
-&lt;p&gt;If you’re using hierarchies in your configuration (as we used in &lt;a href=&quot;/blog/configuration-in-asp-net-core/&quot;&gt;this&lt;/a&gt; example) then your keys need to be hierarchical also. To match the content of this appsettings.json file&lt;/p&gt;
+&lt;p&gt;To match the content of this appsettings.json file&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-json&quot; data-lang=&quot;json&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
 2
@@ -204,8 +228,8 @@
 </description>
         
         <pubDate>Tue, 02 Apr 2019 00:00:00 +0100</pubDate>
-        <link>https://www.johanohlin.com/blog/configuration_providers_in_aspnet_core/</link>
-        <guid isPermaLink="true">https://www.johanohlin.com/blog/configuration_providers_in_aspnet_core/</guid>
+        <link>https://www.johanohlin.com/blog/configuration-providers-in-aspnet-core/</link>
+        <guid isPermaLink="true">https://www.johanohlin.com/blog/configuration-providers-in-aspnet-core/</guid>
         
         <category>asp.net-core</category>
         
@@ -227,7 +251,7 @@
       
         
           
-            &lt;li&gt;&lt;a href=&quot;/blog/configuration_providers_in_aspnet_core/&quot;&gt;Configuration providers in ASP.NET Core&lt;/a&gt;&lt;/li&gt;          
+            &lt;li&gt;&lt;a href=&quot;/blog/configuration-providers-in-aspnet-core/&quot;&gt;Configuration providers in ASP.NET Core&lt;/a&gt;&lt;/li&gt;          
           
         
       
@@ -290,7 +314,7 @@
 
 &lt;h4 id=&quot;ioption&quot;&gt;IOption&lt;/h4&gt;
 
-&lt;p&gt;If your options change seldom and you’re OK with restarting your app when you change your app then this should be your choice. Options are read at startup and there’s no overhead for re-reading the file or watching for changes for every request.&lt;/p&gt;
+&lt;p&gt;If your options change seldom and you’re OK with restarting your app (or application pool) when you change your app settings then this could be your choice. Options are read at startup and there’s no overhead for re-reading the file or watching for changes for every request.&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-csharp&quot; data-lang=&quot;csharp&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
 2
@@ -346,9 +370,11 @@
   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
+&lt;p&gt;&lt;code class=&quot;code&quot;&gt;IOptionsMonitor&lt;/code&gt; has a caching layer behind the scenes that stores the values. You can interact with this caching layer to clear the cache, forcing an update, but also to inject new values if needed. This will then trigger the &lt;code class=&quot;code&quot;&gt;OnChange&lt;/code&gt; event to be triggered in code where used.&lt;/p&gt;
+
 &lt;h4 id=&quot;ioptionsnapshot&quot;&gt;IOptionSnapshot&lt;/h4&gt;
 
-&lt;p&gt;The last option gives us the possibility to re-read the settings file for every time the dependency injection is executed. No need to handle change requests since you’ll always have a new file.&lt;/p&gt;
+&lt;p&gt;The last option gives us the possibility to re-read the settings file for every new request. No need to handle change requests since you’ll always have a new file.&lt;/p&gt;
 
 &lt;p&gt;This is a scoped service and can’t be accessed from a singleton service. This might not be a problem to you, but it’s good to keep in mind. &lt;code class=&quot;code&quot;&gt;IOptionMonitor&lt;/code&gt; works just fine in a singleton.&lt;/p&gt;
 
@@ -397,6 +423,12 @@
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;This is not recommended since it’ll break the separation of concerns that you should only have the options available that you need.&lt;/p&gt;
+
+&lt;h4 id=&quot;which-one-to-choose&quot;&gt;Which one to choose&lt;/h4&gt;
+
+&lt;p&gt;If you read &lt;a href=&quot;https://docs.microsoft.com/en-gb/aspnet/core/fundamentals/configuration/options?view=aspnetcore-2.2#options-interfaces&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Microsoft’s documentation&lt;/a&gt; you can see that most focus is being put on the &lt;code class=&quot;code&quot;&gt;IOptionMonitor&lt;/code&gt; alternative. This is probably due to the interaction possibilities you have with it. However it comes with the need to write a few extra lines of code to make use of the change requests.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;code&quot;&gt;IOption&lt;/code&gt; and &lt;code class=&quot;code&quot;&gt;IOptionSnapshot&lt;/code&gt; are also good options but they offer less functionality, which still might be good enough for your needs.&lt;/p&gt;
 </description>
         
           <description>&lt;p class=&quot;intro&quot;&gt;&lt;span class=&quot;dropcap&quot;&gt;I&lt;/span&gt;n ASP.NET Core there are some very interesting ways of handling and injecting options into classes. In this post I compare some of the different options you have at your disposal.&lt;/p&gt;
@@ -425,7 +457,7 @@
       
         
           
-            &lt;li&gt;&lt;a href=&quot;/blog/configuration_providers_in_aspnet_core/&quot;&gt;Configuration providers in ASP.NET Core&lt;/a&gt;&lt;/li&gt;          
+            &lt;li&gt;&lt;a href=&quot;/blog/configuration-providers-in-aspnet-core/&quot;&gt;Configuration providers in ASP.NET Core&lt;/a&gt;&lt;/li&gt;          
           
         
       
@@ -453,13 +485,50 @@
   &lt;/div&gt;
 &lt;/div&gt;
 
-&lt;p&gt;ASP.NET Core has a pluggable configuration system where configuration settings can be imported from a number of different sources. These sources are then merged together into one configuration object. I write more about the different configuration providers here. In this post I’ll focus on settings in the standard &lt;code class=&quot;code&quot;&gt;appsettings.json&lt;/code&gt; file.&lt;/p&gt;
+&lt;p&gt;ASP.NET Core has a pluggable configuration system where configuration settings can be imported from a number of &lt;a href=&quot;/blog/configuration-providers-in-aspnet-core/&quot;&gt;different sources&lt;/a&gt;. These sources are then merged together into one hierarchical configuration object.&lt;/p&gt;
+
+&lt;p&gt;When you create a new ASP.Net Core Web App in Visual Studio, it’ll automatically create a configuration file for you named &lt;code class=&quot;code&quot;&gt;appsettings.json&lt;/code&gt;. By default it only contains logging and CORS settings but we’re free to add any type of hierarchical configuratin that we need.&lt;/p&gt;
+
+&lt;p&gt;In this example I’ve added two extra sections (&lt;i&gt;FirstServiceSettings&lt;/i&gt; and &lt;i&gt;SecondServiceSettings&lt;/i&gt;) to the file that I’ll use as specific option groups for my web app.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-json&quot; data-lang=&quot;json&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;FirstServiceSettings&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;AnotherSetting&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;SecondServiceSettings&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;MinRetries&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;MaxRetries&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;40&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;CostPerRetry&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.02&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Logging&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;LogLevel&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Default&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Warning&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;AllowedHosts&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;*&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;h4 id=&quot;options-pattern&quot;&gt;Options pattern&lt;/h4&gt;
 
 &lt;p&gt;Settings are grouped together as classes in what’s called the &lt;i&gt;options pattern&lt;/i&gt;. By separating options you can decouple different parts of your app so it only knows the settings it needs to know, in accordance with the theory of &lt;a href=&quot;https://en.wikipedia.org/wiki/Separation_of_concerns&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;separation of concerns&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;It’s not mandatory to create options classes for your options but it’s something you should consider according to Microsoft. Here’s an example of a few settings classes that we’ll use in the examples through out this post.&lt;/p&gt;
+&lt;p&gt;It’s not mandatory to create options classes for your options but it’s something you should consider. Here’s an example of a few settings classes that we’ll use in the examples through out this post.&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-csharp&quot; data-lang=&quot;csharp&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
 2
@@ -485,6 +554,8 @@
   &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MinRetries&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;set&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;decimal&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CostPerRetry&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;set&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Since the JSON file example previously shown only is one of many possible configuration providers, it’s not needed to include all the settings you need for your option classes. The JSON file might specify some basic values while a secrets manager brings in passwords.&lt;/p&gt;
 
 &lt;h4 id=&quot;map-classes-to-configuration&quot;&gt;Map classes to configuration&lt;/h4&gt;
 
@@ -517,7 +588,7 @@
   &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p&gt;The option classes are now registered and we can use them in the code. You can read more about how these option classes are used in code in &lt;a href=&quot;/blog/injecting-options-in-aspnet-core/&quot;&gt;this blog post&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The option classes are now registered and we can use them in the code by &lt;a href=&quot;/blog/injecting-options-in-aspnet-core/&quot;&gt;injecting them using dependency injection&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h4 id=&quot;make-options-read-only&quot;&gt;Make options read-only&lt;/h4&gt;
 
@@ -530,7 +601,7 @@
 3
 4
 5
-&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ServiceSettings&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ProtectedSettings&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HiddenSetting&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;set&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;VeryHiddenSetting&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;set&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
@@ -548,7 +619,7 @@
 8
 &lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;ConfigureServices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;IServiceCollection&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;services&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;services&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Configure&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ServiceSettings&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Configuration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;GetSection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ServiceSettings&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;options&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;services&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Configure&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ProtectedSettings&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Configuration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;GetSection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ProtectedSettings&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;options&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&amp;gt;&lt;/span&gt;
   &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
       &lt;span class=&quot;n&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BindNonPublicProperties&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
   &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
@@ -556,37 +627,6 @@
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;The option values are now protected later on.&lt;/p&gt;
-
-&lt;h4 id=&quot;file-configuration&quot;&gt;File Configuration&lt;/h4&gt;
-
-&lt;p&gt;When you create a new ASP.Net Core Web App in Visual Studio, it’ll automatically create a configuration file for you named &lt;code class=&quot;code&quot;&gt;appsettings.json&lt;/code&gt;. By default it only contains logging and CORS settings. In this file we can add the sub-options we want to use in our program. The JSON structure in the file needs to mimic the option classes previously created.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-json&quot; data-lang=&quot;json&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;FirstServiceSettings&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;AnotherSetting&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;StringSetting&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;maybe&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;SecondServiceSettings&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;MinRetries&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;MaxRetries&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;40&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;CostPerRetry&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.02&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;...&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Since this JSON file only is one of many possible configuration providers, it’s not needed to include all the settings you need for your option classes. The JSON file might specify some basic values while a secrets manager brings in passwords.&lt;/p&gt;
 
 &lt;h4 id=&quot;configure-options-using-a-delegate&quot;&gt;Configure options using a delegate&lt;/h4&gt;
 
