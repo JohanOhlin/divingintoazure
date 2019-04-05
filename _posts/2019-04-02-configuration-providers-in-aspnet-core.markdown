@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Configuration providers in ASP.NET Core"
-date: 2019-04-01
+date: 2019-04-02
 tags: asp.net-core .net-core
 blog_serie: configuration_aspnet_core
 ---
@@ -13,7 +13,7 @@ blog_serie: configuration_aspnet_core
   page=page
 %}
 
-This post builds upon two previous posts concerning [basic configuration]({{ site.baseurl }}{% post_url 2019-04-06-configuration-in-asp-net-core %}) and [injecting options]({{ site.baseurl }}{% post_url 2019-04-06-injecting-options-in-aspnet-core %}).
+This post builds upon two previous posts concerning [basic configuration]({{ site.baseurl }}{% post_url 2019-03-25-configuration-in-asp-net-core %}) and [injecting options]({{ site.baseurl }}{% post_url 2019-03-31-injecting-options-in-aspnet-core %}).
 
 #### Configuration providers
 
@@ -21,34 +21,54 @@ The configuration can be read from several different providers. These providers 
 
 Provider | Provides configuration from | Applied by default
 --- | --- | ---
-Azure Key Vault Configuration Provider (Security topics) | Azure Key Vault | Yes
+Azure Key Vault Configuration Provider | Azure Key Vault | No
 Command-line Configuration Provider | Command-line parameters | Yes
 Custom configuration provider | Custom source | No
 [Environment Variables Configuration Provider](#environment-variables) | Environment variables | Yes (prefixed only)
 [File Configuration Provider](#file-configuration) | Files (INI, JSON, XML) | Yes
 Key-per-file Configuration Provider | Directory files | No
 Memory Configuration Provider | In-memory collections | No
-User secrets (Secret Manager) (Security topics) | File in the user profile directory | Yes
+User secrets (Secret Manager) | File in the user profile directory | Yes
 
 Not all of these are applied by default. Some has to be manually configured and enabled. You can read more about how that's done [here](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-2.2#environment-variables-configuration-provider){:target="_blank" rel="noopener"}.
 
 When more than one configuration service is enabled, the last configuration source specified wins and sets the configuration value.
 
+#### Hierarchical configurations
+
+Most providers handle configurations as key-value pairs. To mimic the hierarchical structure we have in the internal configuration object, the keys can describe a path instead of just a key. By default <code class="code">:</code> is used to separate levels in hierarchy. However, in some environments a colon has other meanings as well and this can cause issues. It's therefore recommended to use <code class="code">__</code> (duble underscore) instead.
+
+This key example
+
+{% highlight json linenos %}
+Logging__LogLevel__Default=Info
+{% endhighlight %}
+
+Would then map to the following configuration setting
+
+{% highlight json linenos %}
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning"
+    }
+  }
+}
+{% endhighlight %}
+
 #### File Configuration
 
-Read this blog post for examples of how to use this 
+The built in support allows you to import JSON, XML and INI files into your configuration. Read [this blog post]({{ site.baseurl }}{% post_url 2019-03-25-configuration-in-asp-net-core %}) for examples of how to use the standard <code class="code">appsettings.json</code> file for defining your configuration.
 
 ASP.NET Core also searches for a settings file with the current environment in the name, as in <code class="code">appsettings.{Environment}.json</code>. The environment specific configuration file is imported after the generic one and will thus override the generic values.
 
-By default, you have <code class="code">Development</code>, <code class="code">Staging</code> and <code class="code">Production</code> to choose from, but you can specify environments yourself if needed. These environments are written with the first character as upper case and the rest lower case. This is important if you are using the code in case sensitive environments, i.e. Linux.
+The pre-defined environments are <code class="code">Development</code>, <code class="code">Staging</code> and <code class="code">Production</code>, but you can specify environments yourself if needed. These environments are written with the first character as upper case and the rest lower case. This is important if you are using the code in case sensitive environments, i.e. Linux.
 
 #### Environment Variables
 
-Per default, only environment variables prefixed with <code class="code">ASPNETCORE_</code> will be included. The prefix will be removed before the variables are used in the hierarchy. 
+Per default, only environment variables prefixed with <code class="code">ASPNETCORE_</code> will be included. The prefix will be removed before the variables are used in the hierarchy. The prefix can be changed to a custom string if needed (see example [here](#customization)).
 
-The prefix can be changed to a custom string if needed (see example [here](#customization)).
-
-If you're using hierarchies in your configuration (as we used in [this]({{ site.baseurl }}{% post_url 2019-04-06-configuration-in-asp-net-core %}) example) then your keys need to be hierarchical also. To match the content of this appsettings.json file
+To match the content of this appsettings.json file
 
 {% highlight json linenos %}
 {

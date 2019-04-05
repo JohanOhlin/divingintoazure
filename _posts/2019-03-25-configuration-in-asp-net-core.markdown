@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Configuration in ASP.NET Core"
-date: 2019-04-01
+date: 2019-03-25
 tags: asp.net-core .net-core
 blog_serie: configuration_aspnet_core
 ---
@@ -13,13 +13,36 @@ blog_serie: configuration_aspnet_core
   page=page
 %}
 
-ASP.NET Core has a pluggable configuration system where configuration settings can be imported from a number of different sources. These sources are then merged together into one configuration object. I write more about the different configuration providers here. In this post I'll focus on settings in the standard <code class="code">appsettings.json</code> file.
+ASP.NET Core has a pluggable configuration system where configuration settings can be imported from a number of [different sources]({{ site.baseurl }}{% post_url 2019-04-02-configuration-providers-in-aspnet-core %}). These sources are then merged together into one hierarchical configuration object.
+
+When you create a new ASP.Net Core Web App in Visual Studio, it'll automatically create a configuration file for you named <code class="code">appsettings.json</code>. By default it only contains logging and CORS settings but we're free to add any type of hierarchical configuratin that we need.
+
+In this example I've added two extra sections (<i>FirstServiceSettings</i> and <i>SecondServiceSettings</i>) to the file that I'll use as specific option groups for my web app.
+
+{% highlight json linenos %}
+{
+  "FirstServiceSettings": {
+    "AnotherSetting": 14
+  },
+  "SecondServiceSettings": {
+    "MinRetries": 2,
+    "MaxRetries": 40,
+    "CostPerRetry": 0.02
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
+}
+{% endhighlight %}
 
 #### Options pattern
 
 Settings are grouped together as classes in what's called the <i>options pattern</i>. By separating options you can decouple different parts of your app so it only knows the settings it needs to know, in accordance with the theory of [separation of concerns](https://en.wikipedia.org/wiki/Separation_of_concerns){:target="_blank" rel="noopener"}.
 
-It's not mandatory to create options classes for your options but it's something you should consider according to Microsoft. Here's an example of a few settings classes that we'll use in the examples through out this post.
+It's not mandatory to create options classes for your options but it's something you should consider. Here's an example of a few settings classes that we'll use in the examples through out this post.
 
 {% highlight csharp linenos %}
 public class FirstServiceSettings
@@ -35,6 +58,8 @@ public class SecondServiceSettings
   public decimal CostPerRetry { get; set; }
 }
 {% endhighlight %}
+
+Since the JSON file example previously shown only is one of many possible configuration providers, it's not needed to include all the settings you need for your option classes. The JSON file might specify some basic values while a secrets manager brings in passwords.
 
 #### Map classes to configuration
 
@@ -56,7 +81,7 @@ public void ConfigureServices(IServiceCollection services)
 }
 {% endhighlight %}
 
-The option classes are now registered and we can use them in the code. You can read more about how these option classes are used in code in [this blog post]({{ site.baseurl }}{% post_url 2019-04-06-injecting-options-in-aspnet-core %}).
+The option classes are now registered and we can use them in the code by [injecting them using dependency injection]({{ site.baseurl }}{% post_url 2019-03-31-injecting-options-in-aspnet-core %}).
 
 #### Make options read-only
 
@@ -65,7 +90,7 @@ One problem with these option classes is that they are not read-only and can be 
 In this option class example below, both the public property with a private setter as well as the private property will be set with the values from the configuration settings.
 
 {% highlight csharp linenos %}
-public class ServiceSettings
+public class ProtectedSettings
 {
   public string HiddenSetting { get; private set; }
   private string VeryHiddenSetting { get; set; }
@@ -77,7 +102,7 @@ The default behaviour is to not change private properties, but by specifying the
 {% highlight csharp linenos %}
 public void ConfigureServices(IServiceCollection services)
 {
-  services.Configure<ServiceSettings>(Configuration.GetSection("ServiceSettings"), options =>
+  services.Configure<ProtectedSettings>(Configuration.GetSection("ProtectedSettings"), options =>
   {
       options.BindNonPublicProperties = true;
   });
@@ -86,27 +111,6 @@ public void ConfigureServices(IServiceCollection services)
 {% endhighlight %}
 
 The option values are now protected later on.
-
-#### File Configuration
-
-When you create a new ASP.Net Core Web App in Visual Studio, it'll automatically create a configuration file for you named <code class="code">appsettings.json</code>. By default it only contains logging and CORS settings. In this file we can add the sub-options we want to use in our program. The JSON structure in the file needs to mimic the option classes previously created.
-
-{% highlight json linenos %}
-{
-  "FirstServiceSettings": {
-    "AnotherSetting": 14,
-    "StringSetting": "maybe"
-  },
-  "SecondServiceSettings": {
-    "MinRetries": 2,
-    "MaxRetries": 40,
-    "CostPerRetry": 0.02
-  },
-  ...
-}
-{% endhighlight %}
-
-Since this JSON file only is one of many possible configuration providers, it's not needed to include all the settings you need for your option classes. The JSON file might specify some basic values while a secrets manager brings in passwords.
 
 #### Configure options using a delegate
 

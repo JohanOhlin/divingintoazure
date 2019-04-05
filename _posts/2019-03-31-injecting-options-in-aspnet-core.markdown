@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Injecting Options in ASP.NET Core"
-date: 2019-04-01
+date: 2019-03-31
 tags: asp.net-core
 blog_serie: configuration_aspnet_core
 ---
@@ -13,7 +13,7 @@ blog_serie: configuration_aspnet_core
   page=page
 %}
 
-In a [previous post]({{ site.baseurl }}{% post_url 2019-04-06-configuration-in-asp-net-core %}) I wrote the basics about how to configure options in ASP.NET Core. If you're not familiar with this topic then I suggest you read through that blog first.
+In a [previous post]({{ site.baseurl }}{% post_url 2019-03-25-configuration-in-asp-net-core %}) I wrote the basics about how to configure options in ASP.NET Core. If you're not familiar with this topic then I suggest you read through that blog first.
 
 #### Comparison
 
@@ -27,7 +27,7 @@ IOption Snapshot | Yes (re-calculated for each call) | No
 
 #### IOption
 
-If your options change seldom and you're OK with restarting your app when you change your app then this should be your choice. Options are read at startup and there's no overhead for re-reading the file or watching for changes for every request.
+If your options change seldom and you're OK with restarting your app (or application pool) when you change your app settings then this could be your choice. Options are read at startup and there's no overhead for re-reading the file or watching for changes for every request.
 
 {% highlight csharp linenos %}
 public class MyService
@@ -43,7 +43,7 @@ public class MyService
 
 #### IOptionMonitor
 
-This option keeps an eye on the file and calls <code class="code">OnChange</code> when the file is changed. This makes it possible for you to make changes to your <code class="code">application.json</code> file without having to reload the app. 
+This option keeps an eye on the file and calls <code class="code">OnChange</code> when the file is changed. This makes it possible for you to make changes to your <code class="code">application.json</code> file without having to reload the app.
 
 {% highlight csharp linenos %}
 public class MyService
@@ -63,9 +63,11 @@ public class MyService
 }
 {% endhighlight %}
 
+<code class="code">IOptionsMonitor</code> has a caching layer behind the scenes that stores the values. You can interact with this caching layer to clear the cache, forcing an update, but also to inject new values if needed. This will then trigger the <code class="code">OnChange</code> event to be triggered in code where used.
+
 #### IOptionSnapshot
 
-The last option gives us the possibility to re-read the settings file for every time the dependency injection is executed. No need to handle change requests since you'll always have a new file.
+The last option gives us the possibility to re-read the settings file for every new request. No need to handle change requests since you'll always have a new file.
 
 This is a scoped service and can't be accessed from a singleton service. This might not be a problem to you, but it's good to keep in mind. <code class="code">IOptionMonitor</code> works just fine in a singleton.
 
@@ -99,3 +101,9 @@ public class HomeController : Controller
 {% endhighlight %}
 
 This is not recommended since it'll break the separation of concerns that you should only have the options available that you need.
+
+#### Which one to choose
+
+If you read [Microsoft's documentation](https://docs.microsoft.com/en-gb/aspnet/core/fundamentals/configuration/options?view=aspnetcore-2.2#options-interfaces){:target="_blank" rel="noopener"} you can see that most focus is being put on the <code class="code">IOptionMonitor</code> alternative. This is probably due to the interaction possibilities you have with it. However it comes with the need to write a few extra lines of code to make use of the change requests.
+
+<code class="code">IOption</code> and <code class="code">IOptionSnapshot</code> are also good options but they offer less functionality, which still might be good enough for your needs.
