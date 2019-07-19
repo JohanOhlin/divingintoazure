@@ -10,3 +10,9 @@ git add .
 git commit
 git push origin master
 </code>
+
+To just view the blog locally you run
+
+jekyll serve
+
+And then browse to the URL that is displayed in output window

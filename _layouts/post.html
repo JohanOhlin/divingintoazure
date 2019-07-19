@@ -22,6 +22,12 @@ layout: default
 
   {{ content }}
 
+  <div style="display:flex; justify-content: space-around;">
+    <div style="margin-bottom: 1rem;">
+      {% include share-buttons.html %}
+    </div>
+  </div>
+  
   <!-- POST NAVIGATION -->
   <div class="postNav clearfix">
     {% if page.previous.url %}
