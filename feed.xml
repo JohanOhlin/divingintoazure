@@ -5,9 +5,93 @@
     <description>Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects.</description>
     <link>https://www.johanohlin.com/</link>
     <atom:link href="https://www.johanohlin.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 12 Apr 2019 06:55:17 +0100</pubDate>
-    <lastBuildDate>Fri, 12 Apr 2019 06:55:17 +0100</lastBuildDate>
+    <pubDate>Fri, 19 Jul 2019 17:19:30 +0100</pubDate>
+    <lastBuildDate>Fri, 19 Jul 2019 17:19:30 +0100</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
+    
+      
+      <item>
+        <title>Develop with CosmosDB in Docker</title>
+        <description>&lt;p class=&quot;intro&quot;&gt;&lt;span class=&quot;dropcap&quot;&gt;M&lt;/span&gt;icro services are increasingly more popular in new development project. In this post I'll show you how to connect to a CosmosDB emulator from your docker app.&lt;/p&gt;
+
+&lt;h3 id=&quot;cosmosdb-emulator-on-host&quot;&gt;CosmosDB emulator on host&lt;/h3&gt;
+
+&lt;p&gt;The CosmosDB emulator is locked down to localhost by default. To allow calls from within the docker cluster you need to open up for network access. This is done by adding the &lt;code class=&quot;highlighter-rouge&quot;&gt;AllowNetworkAccess&lt;/code&gt; parameter at startup. You also need to specify a new access key. The key needs to be a Base64 encoded 64 character long string, like &lt;a href=&quot;https://www.base64encode.org/enc/abcdefghijklmnopqrstabcdefghijklmnopqrstabcdefghijklmnopqrstabcd/&quot;&gt;this one&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;A custom startup script for the CosmosDB emulator could look like this:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;s2&quot;&gt;&quot;c:&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\P&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;rogram Files&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\A&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;zure Cosmos DB Emulator&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\C&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;osmosDB.Emulator.exe&quot;&lt;/span&gt; /AllowNetworkAccess /Key&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;YWJjZGVmZ2hpamtsbW5vcHFyc3RhYmNkZWZnaGlqa2xtbm9wcXJzdGFiY2RlZmdoaWprbG1ub3BxcnN0YWJjZA&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;To connect to the CosmosDB emulator from your docker app you can’t use &lt;code class=&quot;code&quot;&gt;localhost:8081&lt;/code&gt; anymore since that refers to your docker instance and not the host machine. Instead, if you’re using a newer version of docker, then you can use &lt;code class=&quot;code&quot;&gt;https://host.docker.internal:8081&lt;/code&gt; to connect to CosmosDB.&lt;/p&gt;
+
+&lt;p&gt;If you have an older version of docker then you’ll need to connect by IP which works just as fine.&lt;/p&gt;
+
+&lt;h3 id=&quot;cosmosdb-emulator-as-docker-container&quot;&gt;CosmosDB emulator as docker container&lt;/h3&gt;
+
+&lt;p&gt;Another way to run the CosmosDB emulator locally is to run it as a container and Microsoft is providing a prepared solution for this. There are different ways to configure your container and you can find more information about it on the &lt;a href=&quot;https://hub.docker.com/r/microsoft/azure-cosmosdb-emulator/&quot;&gt;docker image page&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;For a basic scenario you can run the following commands to setup a container.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;cmd
+&lt;span class=&quot;nb&quot;&gt;set &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;containerName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;azure-cosmosdb-emulator
+&lt;span class=&quot;nb&quot;&gt;set &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;hostDirectory&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;%LOCALAPPDATA%&lt;span class=&quot;se&quot;&gt;\a&lt;/span&gt;zure-cosmosdb-emulator.hostd
+md %hostDirectory% 2&amp;gt;nul
+docker run &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; %containerName% &lt;span class=&quot;nt&quot;&gt;--memory&lt;/span&gt; 2GB &lt;span class=&quot;nt&quot;&gt;--mount&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;type=bind,source=%hostDirectory%,destination=C:&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\C&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;osmosDB.Emulator&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\b&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;ind-mount&quot;&lt;/span&gt;  &lt;span class=&quot;nt&quot;&gt;--interactive&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--tty&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 8081:8081 &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 8900:8900 &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 8901:8901 &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 8979:8979 &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 10250:10250 &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 10251:10251 &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 10252:10252 &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 10253:10253 &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 10254:10254 &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 10255:10255 &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 10256:10256 &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 10350:10350 microsoft/azure-cosmosdb-emulator&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;This will download an image of around 10Gb in size so make sure you have a good internet connection. A few things to note for this setup:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;It will bind the ports used by CosmosDB from the container to your host machine. This means that you shouldn’t try to run the emulator on the host itself.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;CosmosDB emulator will generate a certificate to a local folder. The command binds that local folder to &lt;code class=&quot;code&quot;&gt;%LOCALAPPDATA%\azure-cosmosdb-emulator.hostd&lt;/code&gt;. From your host machine you’ll be able to access this new certificate together with a powershell script to help you import this certificate.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;A container named &lt;code class=&quot;code&quot;&gt;azure-cosmosdb-emulator&lt;/code&gt; will be created. If you try to run the last command a second time you’ll get an error. Instead, use the commands &lt;code class=&quot;code&quot;&gt;docker start azure-cosmosdb-emulator&lt;/code&gt; and &lt;code class=&quot;code&quot;&gt;docker stop azure-cosmosdb-emulator&lt;/code&gt; to handle your container.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;browsing-to-the-emulator-explorer&quot;&gt;Browsing to the emulator explorer&lt;/h4&gt;
+
+&lt;p&gt;Since we linked port 8081 when starting the emulator container earlier on, we can now browse the emulator explorer just like we would when running the emulator on the host machine using the address &lt;code class=&quot;code&quot;&gt;https://localhost:8081/_explorer/index.html&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h4 id=&quot;using-the-right-windows-container-version&quot;&gt;Using the right Windows container version&lt;/h4&gt;
+
+&lt;p&gt;When I started to build this solution my Windows host only supported Windows containers of version 1803. This turned out to be a problem due to a bug which in some situations set the UTC time to be UTC-8 hours (Redmond time, hmmm?). In my case it caused the CosmosDB emulator (or maybe the client) to fail all calls since it only allows a time skew of 15 minutes. There was apparently quite some written on Internet about this (always nice to know you’re not the first one encountering this problem) and the solution was either to change how &lt;code class=&quot;code&quot;&gt;docker run&lt;/code&gt; executes the container or to upgrade Windows to higher version. The former solution would prevent me from using Visual Studio Docker tools and wasn’t a preferred option. I therefore opted for a Windows upgrade.&lt;/p&gt;
+
+&lt;p&gt;The current windows container being used in these examples is &lt;code class=&quot;code&quot;&gt;mcr.microsoft.com/dotnet/core/aspnet:2.2-nanoserver-1903&lt;/code&gt; and the time bug has been fixed here.&lt;/p&gt;
+
+&lt;h4 id=&quot;conclusions&quot;&gt;Conclusions&lt;/h4&gt;
+
+&lt;p&gt;Installing the docker image for CosmosDB Emulator includes a lot of fuss. It works just fine to connect to a standard Windows installation from the docker app so my recommendation is therefore to keep it simple.&lt;/p&gt;
+</description>
+        
+          <description>&lt;p class=&quot;intro&quot;&gt;&lt;span class=&quot;dropcap&quot;&gt;M&lt;/span&gt;icro services are increasingly more popular in new development project. In this post I'll show you how to connect to a CosmosDB emulator from your docker app.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Fri, 05 Jul 2019 00:00:00 +0100</pubDate>
+        <link>https://www.johanohlin.com/blog/develop-with-cosmosdb-in-docker/</link>
+        <guid isPermaLink="true">https://www.johanohlin.com/blog/develop-with-cosmosdb-in-docker/</guid>
+        
+        <category>asp.net-core</category>
+        
+        <category>.net-core</category>
+        
+        <category>cosmosdb</category>
+        
+        <category>docker</category>
+        
+        
+      </item>
+      
     
       
       <item>
@@ -18,6 +102,8 @@
   &lt;div class=&quot;blog_serie&quot;&gt;
     &lt;div class=&quot;blog_serie_title&quot;&gt;Other articles in this serie&lt;/div&gt;
     &lt;ul&gt;
+      
+        
       
         
           
@@ -250,6 +336,8 @@
     &lt;ul&gt;
       
         
+      
+        
           
             &lt;li&gt;&lt;a href=&quot;/blog/configuration-providers-in-aspnet-core/&quot;&gt;Configuration providers in ASP.NET Core&lt;/a&gt;&lt;/li&gt;          
           
@@ -454,6 +542,8 @@
   &lt;div class=&quot;blog_serie&quot;&gt;
     &lt;div class=&quot;blog_serie_title&quot;&gt;Other articles in this serie&lt;/div&gt;
     &lt;ul&gt;
+      
+        
       
         
           

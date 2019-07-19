@@ -9,12 +9,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects.">
-    <title>Injecting Options in ASP.NET Core</title>
+    <title>Develop with CosmosDB in Docker</title>
 
     <!-- Open Graph Meta -->
     <meta content="Diving into Azure" property="og:site_name">
     
-      <meta content="Injecting Options in ASP.NET Core" property="og:title">
+      <meta content="Develop with CosmosDB in Docker" property="og:title">
     
     
       <meta content="article" property="og:type">
@@ -23,10 +23,10 @@
       <meta content="Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects." property="og:description">
     
     
-      <meta content="https://www.johanohlin.com/blog/injecting-options-in-aspnet-core/" property="og:url">
+      <meta content="https://www.johanohlin.com/blog/develop-with-cosmosdb-in-docker/" property="og:url">
     
     
-      <meta content="2019-03-31T00:00:00+00:00" property="article:published_time">
+      <meta content="2019-07-05T00:00:00+01:00" property="article:published_time">
       <meta content="https://www.johanohlin.com/about/" property="article:author">
     
     
@@ -38,10 +38,10 @@
     <meta name="twitter:site" content="@ohlinjohan">
     <meta name="twitter:creator" content="@ohlinjohan">
     
-      <meta name="twitter:title" content="Injecting Options in ASP.NET Core">
+      <meta name="twitter:title" content="Develop with CosmosDB in Docker">
     
     
-      <meta name="twitter:url" content="https://www.johanohlin.com/blog/injecting-options-in-aspnet-core/">
+      <meta name="twitter:url" content="https://www.johanohlin.com/blog/develop-with-cosmosdb-in-docker/">
     
     
       <meta name="twitter:description" content="Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects.">
@@ -60,7 +60,7 @@
     <!-- Stylesheet -->
     <link rel="stylesheet" href="/assets/css/style.css">
     <!--[if IE 8]><link rel="stylesheet" href="/assets/css/ie.css"><![endif]-->
-    <link rel="canonical" href="https://www.johanohlin.com/blog/injecting-options-in-aspnet-core/">
+    <link rel="canonical" href="https://www.johanohlin.com/blog/develop-with-cosmosdb-in-docker/">
 
     <!-- Modernizr -->
     <script src="/assets/js/modernizr.custom.15390.js" type="text/javascript"></script>
@@ -106,202 +106,72 @@ ga('send', 'pageview');
       <div class="container">
          <div class="post">
   
-  <h1 class="postTitle">Injecting Options in ASP.NET Core</h1>
+  <h1 class="postTitle">Develop with CosmosDB in Docker</h1>
   <p class="meta">
-    March 31, 2019 |
+    July 05, 2019 |
     <span class="time">4</span>
     Minute Read
   </p>
 
-  <p class="intro"><span class="dropcap">I</span>n ASP.NET Core there are some very interesting ways of handling and injecting options into classes. In this post I compare some of the different options you have at your disposal.</p>
+  <p class="intro"><span class="dropcap">M</span>icro services are increasingly more popular in new development project. In this post I'll show you how to connect to a CosmosDB emulator from your docker app.</p>
 
-<div class="narrow blog_serie">
-  <div class="blog_serie">
-    <div class="blog_serie_title">Other articles in this serie</div>
-    <ul>
-      
-        
-      
-        
-          
-            <li><a href="/blog/configuration-providers-in-aspnet-core/">Configuration providers in ASP.NET Core</a></li>          
-          
-        
-      
-        
-          
-        
-      
-        
-          
-            <li><a href="/blog/configuration-in-asp-net-core/">Configuration in ASP.NET Core</a></li>          
-          
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    </ul>    
-  </div>
-</div>
+<h3 id="cosmosdb-emulator-on-host">CosmosDB emulator on host</h3>
 
-<p>In a <a href="/blog/configuration-in-asp-net-core/">previous post</a> I wrote the basics about how to configure options in ASP.NET Core. If you’re not familiar with this topic then I suggest you read through that blog first.</p>
+<p>The CosmosDB emulator is locked down to localhost by default. To allow calls from within the docker cluster you need to open up for network access. This is done by adding the <code class="highlighter-rouge">AllowNetworkAccess</code> parameter at startup. You also need to specify a new access key. The key needs to be a Base64 encoded 64 character long string, like <a href="https://www.base64encode.org/enc/abcdefghijklmnopqrstabcdefghijklmnopqrstabcdefghijklmnopqrstabcd/">this one</a>.</p>
 
-<h4 id="comparison">Comparison</h4>
+<p>A custom startup script for the CosmosDB emulator could look like this:</p>
 
-<p>There are a few different ways to handle option injection in your classes. They are all quite straight forward to use.</p>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+</pre></td><td class="code"><pre><span class="s2">"c:</span><span class="se">\P</span><span class="s2">rogram Files</span><span class="se">\A</span><span class="s2">zure Cosmos DB Emulator</span><span class="se">\C</span><span class="s2">osmosDB.Emulator.exe"</span> /AllowNetworkAccess /Key<span class="o">=</span><span class="nv">YWJjZGVmZ2hpamtsbW5vcHFyc3RhYmNkZWZnaGlqa2xtbm9wcXJzdGFiY2RlZmdoaWprbG1ub3BxcnN0YWJjZA</span><span class="o">==</span></pre></td></tr></tbody></table></code></pre></figure>
 
-<table>
-  <thead>
-    <tr>
-      <th>Interface</th>
-      <th>Automatic reloading</th>
-      <th>Works in a singleton service</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>IOption</td>
-      <td>No</td>
-      <td>Yes</td>
-    </tr>
-    <tr>
-      <td>IOption Monitor</td>
-      <td>Yes (but you have to hook into change event)</td>
-      <td>Yes</td>
-    </tr>
-    <tr>
-      <td>IOption Snapshot</td>
-      <td>Yes (re-calculated for each call)</td>
-      <td>No</td>
-    </tr>
-  </tbody>
-</table>
+<p>To connect to the CosmosDB emulator from your docker app you can’t use <code class="code">localhost:8081</code> anymore since that refers to your docker instance and not the host machine. Instead, if you’re using a newer version of docker, then you can use <code class="code">https://host.docker.internal:8081</code> to connect to CosmosDB.</p>
 
-<h4 id="ioption">IOption</h4>
+<p>If you have an older version of docker then you’ll need to connect by IP which works just as fine.</p>
 
-<p>If your options change seldom and you’re OK with restarting your app (or application pool) when you change your app settings then this could be your choice. Options are read at startup and there’s no overhead for re-reading the file or watching for changes for every request.</p>
+<h3 id="cosmosdb-emulator-as-docker-container">CosmosDB emulator as docker container</h3>
 
-<figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+<p>Another way to run the CosmosDB emulator locally is to run it as a container and Microsoft is providing a prepared solution for this. There are different ways to configure your container and you can find more information about it on the <a href="https://hub.docker.com/r/microsoft/azure-cosmosdb-emulator/">docker image page</a>.</p>
+
+<p>For a basic scenario you can run the following commands to setup a container.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
 2
 3
 4
 5
-6
-7
-8
-9
-</pre></td><td class="code"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">MyService</span>
-<span class="p">{</span>
-  <span class="k">private</span> <span class="k">readonly</span> <span class="n">MyServiceSettings</span> <span class="n">settings</span><span class="p">;</span>
+</pre></td><td class="code"><pre>cmd
+<span class="nb">set </span><span class="nv">containerName</span><span class="o">=</span>azure-cosmosdb-emulator
+<span class="nb">set </span><span class="nv">hostDirectory</span><span class="o">=</span>%LOCALAPPDATA%<span class="se">\a</span>zure-cosmosdb-emulator.hostd
+md %hostDirectory% 2&gt;nul
+docker run <span class="nt">--name</span> %containerName% <span class="nt">--memory</span> 2GB <span class="nt">--mount</span> <span class="s2">"type=bind,source=%hostDirectory%,destination=C:</span><span class="se">\C</span><span class="s2">osmosDB.Emulator</span><span class="se">\b</span><span class="s2">ind-mount"</span>  <span class="nt">--interactive</span> <span class="nt">--tty</span> <span class="nt">-p</span> 8081:8081 <span class="nt">-p</span> 8900:8900 <span class="nt">-p</span> 8901:8901 <span class="nt">-p</span> 8979:8979 <span class="nt">-p</span> 10250:10250 <span class="nt">-p</span> 10251:10251 <span class="nt">-p</span> 10252:10252 <span class="nt">-p</span> 10253:10253 <span class="nt">-p</span> 10254:10254 <span class="nt">-p</span> 10255:10255 <span class="nt">-p</span> 10256:10256 <span class="nt">-p</span> 10350:10350 microsoft/azure-cosmosdb-emulator</pre></td></tr></tbody></table></code></pre></figure>
 
-  <span class="k">public</span> <span class="nf">MyService</span><span class="p">(</span><span class="n">IOptions</span><span class="p">&lt;</span><span class="n">MyServiceSettings</span><span class="p">&gt;</span> <span class="n">options</span><span class="p">)</span>
-  <span class="p">{</span>
-    <span class="n">settings</span> <span class="p">=</span> <span class="n">options</span><span class="p">.</span><span class="n">Value</span><span class="p">;</span>
-  <span class="p">}</span>
-<span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
+<p>This will download an image of around 10Gb in size so make sure you have a good internet connection. A few things to note for this setup:</p>
 
-<h4 id="ioptionmonitor">IOptionMonitor</h4>
+<ul>
+  <li>
+    <p>It will bind the ports used by CosmosDB from the container to your host machine. This means that you shouldn’t try to run the emulator on the host itself.</p>
+  </li>
+  <li>
+    <p>CosmosDB emulator will generate a certificate to a local folder. The command binds that local folder to <code class="code">%LOCALAPPDATA%\azure-cosmosdb-emulator.hostd</code>. From your host machine you’ll be able to access this new certificate together with a powershell script to help you import this certificate.</p>
+  </li>
+  <li>
+    <p>A container named <code class="code">azure-cosmosdb-emulator</code> will be created. If you try to run the last command a second time you’ll get an error. Instead, use the commands <code class="code">docker start azure-cosmosdb-emulator</code> and <code class="code">docker stop azure-cosmosdb-emulator</code> to handle your container.</p>
+  </li>
+</ul>
 
-<p>This option keeps an eye on the file and calls <code class="code">OnChange</code> when the file is changed. This makes it possible for you to make changes to your <code class="code">application.json</code> file without having to reload the app.</p>
+<h4 id="browsing-to-the-emulator-explorer">Browsing to the emulator explorer</h4>
 
-<figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-</pre></td><td class="code"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">MyService</span>
-<span class="p">{</span>
-  <span class="k">private</span> <span class="n">MyServiceSettings</span> <span class="n">settings</span><span class="p">;</span>
+<p>Since we linked port 8081 when starting the emulator container earlier on, we can now browse the emulator explorer just like we would when running the emulator on the host machine using the address <code class="code">https://localhost:8081/_explorer/index.html</code>.</p>
 
-  <span class="k">public</span> <span class="nf">MyService</span><span class="p">(</span><span class="n">IOptionsMonitor</span><span class="p">&lt;</span><span class="n">MyServiceSettings</span><span class="p">&gt;</span> <span class="n">options</span><span class="p">)</span>
-  <span class="p">{</span>
-    <span class="n">settings</span> <span class="p">=</span> <span class="n">options</span><span class="p">.</span><span class="n">CurrentValue</span><span class="p">;</span>
-    <span class="n">options</span><span class="p">.</span><span class="nf">OnChange</span><span class="p">(</span><span class="n">OnSettingsChange</span><span class="p">);</span>
-  <span class="p">}</span>
+<h4 id="using-the-right-windows-container-version">Using the right Windows container version</h4>
 
-  <span class="k">private</span> <span class="k">void</span> <span class="nf">OnSettingsChange</span><span class="p">(</span><span class="n">MyServiceSettings</span> <span class="n">settings</span><span class="p">)</span>
-  <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="n">settings</span> <span class="p">=</span> <span class="n">settings</span><span class="p">;</span>
-  <span class="p">}</span>
-<span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
+<p>When I started to build this solution my Windows host only supported Windows containers of version 1803. This turned out to be a problem due to a bug which in some situations set the UTC time to be UTC-8 hours (Redmond time, hmmm?). In my case it caused the CosmosDB emulator (or maybe the client) to fail all calls since it only allows a time skew of 15 minutes. There was apparently quite some written on Internet about this (always nice to know you’re not the first one encountering this problem) and the solution was either to change how <code class="code">docker run</code> executes the container or to upgrade Windows to higher version. The former solution would prevent me from using Visual Studio Docker tools and wasn’t a preferred option. I therefore opted for a Windows upgrade.</p>
 
-<p><code class="code">IOptionsMonitor</code> has a caching layer behind the scenes that stores the values. You can interact with this caching layer to clear the cache, forcing an update, but also to inject new values if needed. This will then trigger the <code class="code">OnChange</code> event to be triggered in code where used.</p>
+<p>The current windows container being used in these examples is <code class="code">mcr.microsoft.com/dotnet/core/aspnet:2.2-nanoserver-1903</code> and the time bug has been fixed here.</p>
 
-<h4 id="ioptionsnapshot">IOptionSnapshot</h4>
+<h4 id="conclusions">Conclusions</h4>
 
-<p>The last option gives us the possibility to re-read the settings file for every new request. No need to handle change requests since you’ll always have a new file.</p>
-
-<p>This is a scoped service and can’t be accessed from a singleton service. This might not be a problem to you, but it’s good to keep in mind. <code class="code">IOptionMonitor</code> works just fine in a singleton.</p>
-
-<figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-</pre></td><td class="code"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">MyService</span>
-<span class="p">{</span>
-  <span class="k">private</span> <span class="k">readonly</span> <span class="n">MyServiceSettings</span> <span class="n">settings</span><span class="p">;</span>
-
-  <span class="k">public</span> <span class="nf">MyService</span><span class="p">(</span><span class="n">IOptionsSnapshot</span><span class="p">&lt;</span><span class="n">MyServiceSettings</span><span class="p">&gt;</span> <span class="n">options</span><span class="p">)</span>
-  <span class="p">{</span>
-    <span class="n">settings</span> <span class="p">=</span> <span class="n">options</span><span class="p">.</span><span class="n">Value</span><span class="p">;</span>
-  <span class="p">}</span>
-<span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
-
-<h4 id="iconfiguration">IConfiguration</h4>
-
-<p>It’s also possible to inject the whole configuration object into your class.</p>
-
-<figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-</pre></td><td class="code"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">HomeController</span> <span class="p">:</span> <span class="n">Controller</span>
-<span class="p">{</span>
-  <span class="k">private</span> <span class="k">readonly</span> <span class="n">SecondServiceSettings</span> <span class="n">_settings</span><span class="p">;</span>
-
-  <span class="k">public</span> <span class="nf">HomeController</span><span class="p">(</span><span class="n">IConfiguration</span> <span class="n">configuration</span><span class="p">)</span>
-  <span class="p">{</span>
-    <span class="n">_settings</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">SecondServiceSettings</span><span class="p">();</span>
-    <span class="n">configuration</span><span class="p">.</span><span class="nf">Bind</span><span class="p">(</span><span class="s">"SecondServiceSettings"</span><span class="p">,</span> <span class="n">_settings</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
-
-<p>This is not recommended since it’ll break the separation of concerns that you should only have the options available that you need.</p>
-
-<h4 id="which-one-to-choose">Which one to choose</h4>
-
-<p>If you read <a href="https://docs.microsoft.com/en-gb/aspnet/core/fundamentals/configuration/options?view=aspnetcore-2.2#options-interfaces" target="_blank" rel="noopener">Microsoft’s documentation</a> you can see that most focus is being put on the <code class="code">IOptionMonitor</code> alternative. This is probably due to the interaction possibilities you have with it. However it comes with the need to write a few extra lines of code to make use of the change requests.</p>
-
-<p><code class="code">IOption</code> and <code class="code">IOptionSnapshot</code> are also good options but they offer less functionality, which still might be good enough for your needs.</p>
+<p>Installing the docker image for CosmosDB Emulator includes a lot of fuss. It works just fine to connect to a standard Windows installation from the docker app so my recommendation is therefore to keep it simple.</p>
 
 
   <div style="display:flex; justify-content: space-around;">
@@ -337,12 +207,12 @@ ga('send', 'pageview');
 </style>
 
 <span style="color: silver;">Share on: </span><div id="share-buttons">
-    <div class="facebook" title="Share this on Facebook" onclick="window.open('http://www.facebook.com/share.php?u=https://www.johanohlin.com/blog/injecting-options-in-aspnet-core/');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1343 12v264h-157q-86 0-116 36t-30 108v189h293l-39 296h-254v759h-306v-759h-255v-296h255v-218q0-186 104-288.5t277-102.5q147 0 228 12z"/></svg></div>
-    <div class="twitter" title="Share this on Twitter" onclick="window.open('http://twitter.com/home?status=https://www.johanohlin.com/blog/injecting-options-in-aspnet-core/');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1684 408q-67 98-162 167 1 14 1 42 0 130-38 259.5t-115.5 248.5-184.5 210.5-258 146-323 54.5q-271 0-496-145 35 4 78 4 225 0 401-138-105-2-188-64.5t-114-159.5q33 5 61 5 43 0 85-11-112-23-185.5-111.5t-73.5-205.5v-4q68 38 146 41-66-44-105-115t-39-154q0-88 44-163 121 149 294.5 238.5t371.5 99.5q-8-38-8-74 0-134 94.5-228.5t228.5-94.5q140 0 236 102 109-21 205-78-37 115-142 178 93-10 186-50z"/></svg></div>
-    <div class="linkedin" title="Share this on Linkedin" onclick="window.open('https://www.linkedin.com/shareArticle?mini=true&url=https://www.johanohlin.com/blog/injecting-options-in-aspnet-core/&title=&summary=&source=');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M477 625v991h-330v-991h330zm21-306q1 73-50.5 122t-135.5 49h-2q-82 0-132-49t-50-122q0-74 51.5-122.5t134.5-48.5 133 48.5 51 122.5zm1166 729v568h-329v-530q0-105-40.5-164.5t-126.5-59.5q-63 0-105.5 34.5t-63.5 85.5q-11 30-11 81v553h-329q2-399 2-647t-1-296l-1-48h329v144h-2q20-32 41-56t56.5-52 87-43.5 114.5-15.5q171 0 275 113.5t104 332.5z"/></svg></div>
+    <div class="facebook" title="Share this on Facebook" onclick="window.open('http://www.facebook.com/share.php?u=https://www.johanohlin.com/blog/develop-with-cosmosdb-in-docker/');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1343 12v264h-157q-86 0-116 36t-30 108v189h293l-39 296h-254v759h-306v-759h-255v-296h255v-218q0-186 104-288.5t277-102.5q147 0 228 12z"/></svg></div>
+    <div class="twitter" title="Share this on Twitter" onclick="window.open('http://twitter.com/home?status=https://www.johanohlin.com/blog/develop-with-cosmosdb-in-docker/');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1684 408q-67 98-162 167 1 14 1 42 0 130-38 259.5t-115.5 248.5-184.5 210.5-258 146-323 54.5q-271 0-496-145 35 4 78 4 225 0 401-138-105-2-188-64.5t-114-159.5q33 5 61 5 43 0 85-11-112-23-185.5-111.5t-73.5-205.5v-4q68 38 146 41-66-44-105-115t-39-154q0-88 44-163 121 149 294.5 238.5t371.5 99.5q-8-38-8-74 0-134 94.5-228.5t228.5-94.5q140 0 236 102 109-21 205-78-37 115-142 178 93-10 186-50z"/></svg></div>
+    <div class="linkedin" title="Share this on Linkedin" onclick="window.open('https://www.linkedin.com/shareArticle?mini=true&url=https://www.johanohlin.com/blog/develop-with-cosmosdb-in-docker/&title=&summary=&source=');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M477 625v991h-330v-991h330zm21-306q1 73-50.5 122t-135.5 49h-2q-82 0-132-49t-50-122q0-74 51.5-122.5t134.5-48.5 133 48.5 51 122.5zm1166 729v568h-329v-530q0-105-40.5-164.5t-126.5-59.5q-63 0-105.5 34.5t-63.5 85.5q-11 30-11 81v553h-329q2-399 2-647t-1-296l-1-48h329v144h-2q20-32 41-56t56.5-52 87-43.5 114.5-15.5q171 0 275 113.5t104 332.5z"/></svg></div>
     
-    <div class="gplus" title="Share this on Google Plus" onclick="window.open('https://plus.google.com/share?url=https://www.johanohlin.com/blog/injecting-options-in-aspnet-core/');"><svg viewBox="0 0 2304 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1437 913q0 208-87 370.5t-248 254-369 91.5q-149 0-285-58t-234-156-156-234-58-285 58-285 156-234 234-156 285-58q286 0 491 192l-199 191q-117-113-292-113-123 0-227.5 62t-165.5 168.5-61 232.5 61 232.5 165.5 168.5 227.5 62q83 0 152.5-23t114.5-57.5 78.5-78.5 49-83 21.5-74h-416v-252h692q12 63 12 122zm867-122v210h-209v209h-210v-209h-209v-210h209v-209h210v209h209z"/></svg></div>
-    <div class="mail" title="Share this through Email" onclick="window.open('mailto:?&body=https://www.johanohlin.com/blog/injecting-options-in-aspnet-core/');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1792 710v794q0 66-47 113t-113 47h-1472q-66 0-113-47t-47-113v-794q44 49 101 87 362 246 497 345 57 42 92.5 65.5t94.5 48 110 24.5h2q51 0 110-24.5t94.5-48 92.5-65.5q170-123 498-345 57-39 100-87zm0-294q0 79-49 151t-122 123q-376 261-468 325-10 7-42.5 30.5t-54 38-52 32.5-57.5 27-50 9h-2q-23 0-50-9t-57.5-27-52-32.5-54-38-42.5-30.5q-91-64-262-182.5t-205-142.5q-62-42-117-115.5t-55-136.5q0-78 41.5-130t118.5-52h1472q65 0 112.5 47t47.5 113z"/></svg></div>
+    <div class="gplus" title="Share this on Google Plus" onclick="window.open('https://plus.google.com/share?url=https://www.johanohlin.com/blog/develop-with-cosmosdb-in-docker/');"><svg viewBox="0 0 2304 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1437 913q0 208-87 370.5t-248 254-369 91.5q-149 0-285-58t-234-156-156-234-58-285 58-285 156-234 234-156 285-58q286 0 491 192l-199 191q-117-113-292-113-123 0-227.5 62t-165.5 168.5-61 232.5 61 232.5 165.5 168.5 227.5 62q83 0 152.5-23t114.5-57.5 78.5-78.5 49-83 21.5-74h-416v-252h692q12 63 12 122zm867-122v210h-209v209h-210v-209h-209v-210h209v-209h210v209h209z"/></svg></div>
+    <div class="mail" title="Share this through Email" onclick="window.open('mailto:?&body=https://www.johanohlin.com/blog/develop-with-cosmosdb-in-docker/');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1792 710v794q0 66-47 113t-113 47h-1472q-66 0-113-47t-47-113v-794q44 49 101 87 362 246 497 345 57 42 92.5 65.5t94.5 48 110 24.5h2q51 0 110-24.5t94.5-48 92.5-65.5q170-123 498-345 57-39 100-87zm0-294q0 79-49 151t-122 123q-376 261-468 325-10 7-42.5 30.5t-54 38-52 32.5-57.5 27-50 9h-2q-23 0-50-9t-57.5-27-52-32.5-54-38-42.5-30.5q-91-64-262-182.5t-205-142.5q-62-42-117-115.5t-55-136.5q0-78 41.5-130t118.5-52h1472q65 0 112.5 47t47.5 113z"/></svg></div>
 </div>
     </div>
   </div>
@@ -352,18 +222,11 @@ ga('send', 'pageview');
     
     <a
       class="prev"
-      href="/blog/configuration-in-asp-net-core/"
-      ><span>&laquo;&nbsp;Configuration in ASP.NET Core</span>
+      href="/blog/configuration-providers-in-aspnet-core/"
+      ><span>&laquo;&nbsp;Configuration providers in ASP.NET Core</span>
       
     </a>
      
-    <a
-      class="next"
-      href="/blog/configuration-providers-in-aspnet-core/"
-      ><span>Configuration providers in ASP.NET Core&nbsp;&raquo;</span>
-      
-    </a>
-    
   </div>
   <div style="margin-bottom:2rem;">
       <div style="clear:both; padding-top:2rem;" class="container">
@@ -469,8 +332,8 @@ ga('send', 'pageview');
 <div id="disqus_thread"></div>
 <script>
   var disqus_config = function() {
-    this.page.url = "https://www.johanohlin.com/blog/injecting-options-in-aspnet-core/";
-    this.page.identifier = "https://www.johanohlin.com/blog/injecting-options-in-aspnet-core/";
+    this.page.url = "https://www.johanohlin.com/blog/develop-with-cosmosdb-in-docker/";
+    this.page.identifier = "https://www.johanohlin.com/blog/develop-with-cosmosdb-in-docker/";
   };
   (function() {
     // DON'T EDIT BELOW THIS LINE
