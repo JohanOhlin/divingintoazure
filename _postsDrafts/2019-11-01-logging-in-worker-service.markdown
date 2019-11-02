@@ -9,13 +9,13 @@ tags: c# azure .net-core worker-service
 
 ### Create the app and configure logging
 
-<p>Create a new app and add NuGet packages needed</p>
+Create a new app and add NuGet packages needed
 
 {% highlight bash linenos %}
 dotnet new worker -o MyWorker
 {% endhighlight %}
 
-<p>Open the project file and add a reference to Application Insights for Worker Service.</p>
+Open the project file and add a reference to Application Insights for Worker Service.
 
 {% highlight xml linenos %}
   <ItemGroup>
@@ -23,13 +23,13 @@ dotnet new worker -o MyWorker
   </ItemGroup>
 {% endhighlight %}
 
-<p>Install new NuGet packages</p>
+Install new NuGet packages
 
 {% highlight bash linenos %}
   dotnet restore
 {% endhighlight %}
 
-<p>Add the intrumentation key to the <code class="code">appsettings.json</code> file. If you don't have one then you need to create a new Application Insight service in Azure.</p>
+Add the intrumentation key to the `appsettings.json` file. If you don't have one then you need to create a new Application Insight service in Azure.
 
 {% highlight json linenos %}
   "ApplicationInsights": {
@@ -37,9 +37,9 @@ dotnet new worker -o MyWorker
   }
 {% endhighlight %}
 
-<p>The instrumentation key can be replaced in the deployment process by setting <code class="code">APPINSIGHTS_INSTRUMENTATIONKEY</code> or <code class="code">ApplicationInsights:InstrumentationKey</code> as environment variables</p>
+The instrumentation key can be replaced in the deployment process by setting `APPINSIGHTS_INSTRUMENTATIONKEY` or `ApplicationInsights:InstrumentationKey` as environment variables
 
-<p>Add <code class="code">AddApplicationInsightsTelemetryWorkerService</code> to the <code class="code">ConfigureServices</code> section as shows in this example</p>
+Add `AddApplicationInsightsTelemetryWorkerService` to the `ConfigureServices` section as shows in this example
 
 {% highlight bash linenos %}
 public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -51,14 +51,14 @@ public static IHostBuilder CreateHostBuilder(string[] args) =>
       });
 {% endhighlight %}
 
-<p>Logging is now completely setup in your worker service. To use it you have two options:</p>
+Logging is now completely setup in your worker service. To use it you have two options:
 
 <ul>
   <li><b>Standard .NET Core logging using the ILogger framework</b> - all the logged events with severity above the configured threshold will be forwarded to application insights.</li>
   <li><b>TelemetryClient</b> - this native Application Insight client gives you more control over the logging if you want to use non-standard log events. This is also useful when you want to write a successful event to the log while the standard logging is set to only report on warnings and higher.</li>
 </ul>
 
-<p>The TelemetryClient and ILogger are setup as per below</p>
+The TelemetryClient and ILogger are setup as per below
 
 {% highlight csharp linenos %}
 public class Worker : BackgroundService
@@ -74,7 +74,7 @@ public class Worker : BackgroundService
 }
 {% endhighlight %}
 
-<p>You can read more about using logging together with Azure Monitor in this article</p>
+You can read more about using logging together with Azure Monitor in this article
 
 ### Processing a queue
 

@@ -15,7 +15,7 @@ blog_serie: logging_with_azure_monitor
 
 ### What data do you need?
 
-<p>There are many logging frameworks available to choose from.</p>
+There are many logging frameworks available to choose from.
 
 ### Application Insights
 
@@ -23,9 +23,9 @@ If you want to log all the data and traces from the app as well as from the inst
 
 #### Using operations
 
-<p>By wrapping your code in telemetry operations you can group all logging and trace calls by operation name and link different types of events. All events has to be triggered inside the operation scope. If an exception is thrown inside of an operation but is caught outside of it, then the error logging will be without the operation information</p>
+By wrapping your code in telemetry operations you can group all logging and trace calls by operation name and link different types of events. All events has to be triggered inside the operation scope. If an exception is thrown inside of an operation but is caught outside of it, then the error logging will be without the operation information
 
-<p>In the example below we start an operation and make two log calls</p>
+In the example below we start an operation and make two log calls
 
 {% highlight csharp linenos %}
 using (_telemetryClient.StartOperation<RequestTelemetry>("Create invoice for customer"))
@@ -35,13 +35,13 @@ using (_telemetryClient.StartOperation<RequestTelemetry>("Create invoice for cus
 }
 {% endhighlight %}
 
-<p>You can't wrap several operations inside one another. If you do, the inner ones won't be used.</p>
+You can't wrap several operations inside one another. If you do, the inner ones won't be used.
 
 ### Azure Monitor
 
-<p>All the events from Application Insights can be found in the Azure Monitor Logs section. Data here is searched using the Kusto Query Language (KQL) which is somewhat similar to SQL, but also has a lot of unique features to make searches easier.</p>
+All the events from Application Insights can be found in the Azure Monitor Logs section. Data here is searched using the Kusto Query Language (KQL) which is somewhat similar to SQL, but also has a lot of unique features to make searches easier.
 
-<p>When you expand the worker node you'll find a number of data sets containing your data:</p>
+When you expand the worker node you'll find a number of data sets containing your data:
 
 <table>
 <thead>
@@ -58,7 +58,7 @@ using (_telemetryClient.StartOperation<RequestTelemetry>("Create invoice for cus
 </tbody>
 </table>
 
-<p>Un-caught exceptions are not reported back to Application Insights so you need to catch and log them yourself.</p>
+Un-caught exceptions are not reported back to Application Insights so you need to catch and log them yourself.
 
 {% highlight csharp linenos %}
 try {
@@ -68,15 +68,15 @@ try {
 }
 {% endhighlight %}
 
-<p></p>
+
 
 {% highlight bash linenos %}
 
 {% endhighlight %}
 
-<p>KQL is the query language you use to extract data from all the logs being added to Azure Monitor Logs. It has some similarities to SQL, but also allows you to divide your queries into sections in a very easy way.</p>
+KQL is the query language you use to extract data from all the logs being added to Azure Monitor Logs. It has some similarities to SQL, but also allows you to divide your queries into sections in a very easy way.
 
-<p>This example KQL script fetches data from three sources (customEvents, traces and exceptions) and counts the severity events per hour</p>
+This example KQL script fetches data from three sources (customEvents, traces and exceptions) and counts the severity events per hour
 
 {% highlight kql linenos %}
 let selectedAppName = "WorkerService";
@@ -106,7 +106,7 @@ union kind=outer customEventsData, traceData, exceptionData
 | sort by hourOfDay asc
 {% endhighlight %}
 
-<p>The different severity levels have a pivot applied to them so they become columns. The end result looks something like this:</p>
+The different severity levels have a pivot applied to them so they become columns. The end result looks something like this:
 
 <table>
 <thead><tr><th>hourOfDay</th><th>Warning</th><th>Info</th><th>Error</th></tr></thead>
@@ -122,21 +122,21 @@ union kind=outer customEventsData, traceData, exceptionData
 
 ### Structured logging
 
-<p>Azure Monitor can harvest huge amounts of data from many different sources. This is great! But also a big pain point if you can't find the relevant data due to vast amount of non-relevant data. Structured logging is not a new concept but has been around for a number of years. It basically gives you the option to add metadata to your logging, metadata that then can be searched on in Azure Monitor.</p>
+Azure Monitor can harvest huge amounts of data from many different sources. This is great! But also a big pain point if you can't find the relevant data due to vast amount of non-relevant data. Structured logging is not a new concept but has been around for a number of years. It basically gives you the option to add metadata to your logging, metadata that then can be searched on in Azure Monitor.
 
-<p>Take this simple example</p>
+Take this simple example
 
 {% highlight csharp linenos %}
 _logger.LogWarning($"Customer {Customer.Id} has several unpaid invoices");
 {% endhighlight %}
 
-<p>In this example, the customerId field will be replaced with the id of the customer and the new processed string will be sent to the logging framework. But with structured logging we can send both the unformatted string and the property separately. The logging framework will format the string correctly and also store the property as metadata. We do that by simply changing the logging line above to something like this:</p>
+In this example, the customerId field will be replaced with the id of the customer and the new processed string will be sent to the logging framework. But with structured logging we can send both the unformatted string and the property separately. The logging framework will format the string correctly and also store the property as metadata. We do that by simply changing the logging line above to something like this:
 
 {% highlight csharp linenos %}
 _logger.LogWarning("Customer {customerId} has several unpaid invoices", Customer.Id);
 {% endhighlight %}
 
-<p>Notice how we removed the leading <code class="code">$</code> before the string. The result in Azure Monitor is an object named <code class="code">customDimensions</code> next to the rest of the logging data, structured like this.</p>
+Notice how we removed the leading `$` before the string. The result in Azure Monitor is an object named `customDimensions` next to the rest of the logging data, structured like this.
 
 {% highlight json linenos %}
 {
@@ -145,7 +145,7 @@ _logger.LogWarning("Customer {customerId} has several unpaid invoices", Customer
 }
 {% endhighlight %}
 
-<p>We can then change in the previous KQL query to filter by a single customer</p>
+We can then change in the previous KQL query to filter by a single customer
 
 {% highlight kql linenos %}
 let selectedAppName = "WorkerService";

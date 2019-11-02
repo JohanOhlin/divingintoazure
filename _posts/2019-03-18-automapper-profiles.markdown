@@ -37,7 +37,7 @@ public class SubscriptionViewModelProfile : Profile
 }
 {% endhighlight %}
 
-But the <code>SubscriptionLevelId</code> property needs custom code to be mapped - a resolver. Here are two different approaches to how that can be solved.
+But the `SubscriptionLevelId` property needs custom code to be mapped - a resolver. Here are two different approaches to how that can be solved.
 
 #### Resolving a static list
 
@@ -167,7 +167,7 @@ namespace AutoMapper
 }
 {% endhighlight %}
 
-The extension is added to the <code>AutoMapper</code> namespace so it'll be available each time you use the <code>Map</code> function. This is how you now can call the function, and it even comes up as one of the suggested ways.
+The extension is added to the `AutoMapper` namespace so it'll be available each time you use the `Map` function. This is how you now can call the function, and it even comes up as one of the suggested ways.
 
 {% highlight csharp %}
 var subscriptionViewModel = _mapper.Map<SubscriptionViewModel>(

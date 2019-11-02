@@ -15,7 +15,7 @@ blog_serie: configuration_aspnet_core
 
 ASP.NET Core has a pluggable configuration system where configuration settings can be imported from a number of [different sources]({{ site.baseurl }}{% post_url 2019-04-02-configuration-providers-in-aspnet-core %}). These sources are then merged together into one hierarchical configuration object.
 
-When you create a new ASP.Net Core Web App in Visual Studio, it'll automatically create a configuration file for you named <code class="code">appsettings.json</code>. By default it only contains logging and CORS settings but we're free to add any type of hierarchical configuratin that we need.
+When you create a new ASP.Net Core Web App in Visual Studio, it'll automatically create a configuration file for you named `appsettings.json`. By default it only contains logging and CORS settings but we're free to add any type of hierarchical configuratin that we need.
 
 In this example I've added two extra sections (<i>FirstServiceSettings</i> and <i>SecondServiceSettings</i>) to the file that I'll use as specific option groups for my web app.
 
@@ -63,7 +63,7 @@ Since the JSON file example previously shown only is one of many possible config
 
 #### Map classes to configuration
 
-In the merged configuration settings, each option group that match a class is seen as a sub-option in the main hierarchy. In <code class="code">Startup.cs</code> we therefore need to map a path to each of the option classes.
+In the merged configuration settings, each option group that match a class is seen as a sub-option in the main hierarchy. In `Startup.cs` we therefore need to map a path to each of the option classes.
 
 {% highlight csharp linenos %}
 public Startup(IConfiguration configuration)
@@ -97,7 +97,7 @@ public class ProtectedSettings
 }
 {% endhighlight %}
 
-The default behaviour is to not change private properties, but by specifying the <code class="code">BindNonPublicProperties</code> option you can override this behaviour.
+The default behaviour is to not change private properties, but by specifying the `BindNonPublicProperties` option you can override this behaviour.
 
 {% highlight csharp linenos %}
 public void ConfigureServices(IServiceCollection services)

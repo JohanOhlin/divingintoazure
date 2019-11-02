@@ -36,7 +36,7 @@ When more than one configuration service is enabled, the last configuration sour
 
 #### Hierarchical configurations
 
-Most providers handle configurations as key-value pairs. To mimic the hierarchical structure we have in the internal configuration object, the keys can describe a path instead of just a key. By default <code class="code">:</code> is used to separate levels in hierarchy. However, in some environments a colon has other meanings as well and this can cause issues. It's therefore recommended to use <code class="code">__</code> (duble underscore) instead.
+Most providers handle configurations as key-value pairs. To mimic the hierarchical structure we have in the internal configuration object, the keys can describe a path instead of just a key. By default `:` is used to separate levels in hierarchy. However, in some environments a colon has other meanings as well and this can cause issues. It's therefore recommended to use `__` (duble underscore) instead.
 
 This key example
 
@@ -58,15 +58,15 @@ Would then map to the following configuration setting
 
 #### File Configuration
 
-The built in support allows you to import JSON, XML and INI files into your configuration. Read [this blog post]({{ site.baseurl }}{% post_url 2019-03-25-configuration-in-asp-net-core %}) for examples of how to use the standard <code class="code">appsettings.json</code> file for defining your configuration.
+The built in support allows you to import JSON, XML and INI files into your configuration. Read [this blog post]({{ site.baseurl }}{% post_url 2019-03-25-configuration-in-asp-net-core %}) for examples of how to use the standard `appsettings.json` file for defining your configuration.
 
-ASP.NET Core also searches for a settings file with the current environment in the name, as in <code class="code">appsettings.{Environment}.json</code>. The environment specific configuration file is imported after the generic one and will thus override the generic values.
+ASP.NET Core also searches for a settings file with the current environment in the name, as in `appsettings.{Environment}.json`. The environment specific configuration file is imported after the generic one and will thus override the generic values.
 
-The pre-defined environments are <code class="code">Development</code>, <code class="code">Staging</code> and <code class="code">Production</code>, but you can specify environments yourself if needed. These environments are written with the first character as upper case and the rest lower case. This is important if you are using the code in case sensitive environments, i.e. Linux.
+The pre-defined environments are `Development`, `Staging` and `Production`, but you can specify environments yourself if needed. These environments are written with the first character as upper case and the rest lower case. This is important if you are using the code in case sensitive environments, i.e. Linux.
 
 #### Environment Variables
 
-Per default, only environment variables prefixed with <code class="code">ASPNETCORE_</code> will be included. The prefix will be removed before the variables are used in the hierarchy. The prefix can be changed to a custom string if needed (see example [here](#customization)).
+Per default, only environment variables prefixed with `ASPNETCORE_` will be included. The prefix will be removed before the variables are used in the hierarchy. The prefix can be changed to a custom string if needed (see example [here](#customization)).
 
 To match the content of this appsettings.json file
 
@@ -89,7 +89,7 @@ If you use Azure and specify app settings for your web app then these will be in
 
 #### Customization
 
-If you need to customize the orders in which the providers are processed (since an imported value will override any previously imported values) then you can change this in the <code class="code">Program.cs</code> file. The following example shows how you can override and reconfigure the existing configuration.
+If you need to customize the orders in which the providers are processed (since an imported value will override any previously imported values) then you can change this in the `Program.cs` file. The following example shows how you can override and reconfigure the existing configuration.
 
 {% highlight csharp linenos %}
 public class Program

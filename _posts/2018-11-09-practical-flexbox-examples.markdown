@@ -20,7 +20,7 @@ In the initial examples below I'll assume the following HTML snippet as a base.
 
 #### Basic flexbox layout
 
-Use <code class="code">flex-direction</code> to swap between row and column. This indicates direction of items.
+Use `flex-direction` to swap between row and column. This indicates direction of items.
 
 {% highlight csharp linenos %}
 .sectionWrapper {
@@ -36,7 +36,7 @@ Use <code class="code">flex-direction</code> to swap between row and column. Thi
   description=""
 %}
 
-If you line up container divs (i.e. rows in a grid) then you need to think to opposite - the attribute <code class="code">column</code> means your container becomes rows, one of top of the other, in a column.
+If you line up container divs (i.e. rows in a grid) then you need to think to opposite - the attribute `column` means your container becomes rows, one of top of the other, in a column.
 
 {%
   include image.html
@@ -47,7 +47,7 @@ If you line up container divs (i.e. rows in a grid) then you need to think to op
 
 #### Fill space
 
-As seen in the previous example, the divs are not filling up the whole row. This can be solved by increasing the space between the items using <code class="code">justify-content</code>.
+As seen in the previous example, the divs are not filling up the whole row. This can be solved by increasing the space between the items using `justify-content`.
 
 {% highlight css linenos %}
 .sectionWrapper {
@@ -65,9 +65,9 @@ The result would look like this
   description=""
 %}
 
-Other options instead of <code class="code">space-between</code> are <code class="code">space-evenly</code>, <code class="code">space-around</code>, <code class="code">flex-start</code> and <code class="code">flex-end</code>
+Other options instead of `space-between` are `space-evenly`, `space-around`, `flex-start` and `flex-end`
 
-Another way to fill the row is to increase the size of the divs which can be done by adding the <code class="code">flex-grow</code> property.
+Another way to fill the row is to increase the size of the divs which can be done by adding the `flex-grow` property.
 
 {% highlight css linenos %}
 .sectionContent {
@@ -93,7 +93,7 @@ In a practical example we simulate four lists with drag-and-drop behaviour where
   description=""
 %}
 
-By adding <code class="code">flex-grow: 1</code> for the purple droppable div, we solve this problem.
+By adding `flex-grow: 1` for the purple droppable div, we solve this problem.
 
 {%
   include image.html
@@ -102,7 +102,7 @@ By adding <code class="code">flex-grow: 1</code> for the purple droppable div, w
   description=""
 %}
 
-The same technique can be used to push a footer at the bottom of a page, or a card. Simply let the middle content of the item have <code class="code">flex-grow:1</code> and the footer will be pushed down to the bottom
+The same technique can be used to push a footer at the bottom of a page, or a card. Simply let the middle content of the item have `flex-grow:1` and the footer will be pushed down to the bottom
 
 {%
   include image.html
@@ -113,7 +113,7 @@ The same technique can be used to push a footer at the bottom of a page, or a ca
 
 #### Fill space with same size for all divs
 
-By default, <code class="code">flex-basis</code> is set to auto to adjust for the different size of the elements inside, as can be seen here.</p> 
+By default, `flex-basis` is set to auto to adjust for the different size of the elements inside, as can be seen here. 
 
 {%
   include image.html
@@ -122,7 +122,7 @@ By default, <code class="code">flex-basis</code> is set to auto to adjust for th
   description=""
 %}
 
-To make all columns have the same width we need to set the <code class="code">flex-basis</code>, forcing all columns to have the same base.
+To make all columns have the same width we need to set the `flex-basis`, forcing all columns to have the same base.
 
 {% highlight css linenos %}
 .sectionContent {
@@ -180,7 +180,7 @@ Normally, the divs are separated by the same amount of space. But by tweaking th
 
 #### Divs overflowing on next row
 
-By default, when <code class="code">flex-direction</code> is set to row then all items are displayed on a single row. To wrap items on several rows, use the <code class="code">flex-wrap</code> setting.
+By default, when `flex-direction` is set to row then all items are displayed on a single row. To wrap items on several rows, use the `flex-wrap` setting.
 
 {% highlight css linenos %}
 .overflowingList{

@@ -9,7 +9,7 @@ tags: azure azure-functions sendgrid
 
 #### Create function
 
-Create a new C# function with an HTTP trigger. Authorization level can be specified to <code class="code">function</code> so it's protected from unwanted calls. The function is also protected by HTTPS by default.
+Create a new C# function with an HTTP trigger. Authorization level can be specified to `function` so it's protected from unwanted calls. The function is also protected by HTTPS by default.
 
 Replace the default code with the following snippet.
 
@@ -70,7 +70,7 @@ public class EmailStructure
 
 #### Update bindings
 
-Click on <code class="code">View Files</code> to the right and open the <code class="code">function.json</code> file. Update the bindings to include the SendGrid configuration as in the example below. Note that the field <code class="code">apiKey</code> should contain the text <code class="code">SendGridAttribute.ApiKey</code> because it's referring to an app setting for the function rather than the actual api key itself.
+Click on `View Files` to the right and open the `function.json` file. Update the bindings to include the SendGrid configuration as in the example below. Note that the field `apiKey` should contain the text `SendGridAttribute.ApiKey` because it's referring to an app setting for the function rather than the actual api key itself.
 
 {% highlight csharp %}
 {
@@ -103,15 +103,15 @@ Click on <code class="code">View Files</code> to the right and open the <code cl
 
 #### Configure SendGrid
 
-Configure a SendGrid service in Azure. The free tier allows you to send 25 000 emails a months which is more than enough for this sample application. After you've setup SendGrid in Azure you need to login to the SendGrid portal to create an API key. You can access this portal by clicking on the <code class="code">Manage</code> button inside your newly created Azure SendGrid account.
+Configure a SendGrid service in Azure. The free tier allows you to send 25 000 emails a months which is more than enough for this sample application. After you've setup SendGrid in Azure you need to login to the SendGrid portal to create an API key. You can access this portal by clicking on the `Manage` button inside your newly created Azure SendGrid account.
 
 #### Add application setting
 
-Open Application Settings for the Function App (not the individual function, since many functions can run in a Function App). Add the application setting <code class="code">SendGridAttribute.ApiKey</code> with the key you've created in the SendGrid system. 
+Open Application Settings for the Function App (not the individual function, since many functions can run in a Function App). Add the application setting `SendGridAttribute.ApiKey` with the key you've created in the SendGrid system. 
 
 #### Get URL and send test email
 
-Open the newly created Azure function and click on the <code class="code">Get function URL</code> button. Select <code class="code">Function key</code> and copy the URL created. Now you can send POST message with the following JSON data structure.
+Open the newly created Azure function and click on the `Get function URL` button. Select `Function key` and copy the URL created. Now you can send POST message with the following JSON data structure.
 
 {% highlight csharp %}
 {

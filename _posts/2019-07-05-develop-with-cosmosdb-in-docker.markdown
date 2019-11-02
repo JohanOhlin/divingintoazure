@@ -17,7 +17,7 @@ A custom startup script for the CosmosDB emulator could look like this:
 "c:\Program Files\Azure Cosmos DB Emulator\CosmosDB.Emulator.exe" /AllowNetworkAccess /Key=YWJjZGVmZ2hpamtsbW5vcHFyc3RhYmNkZWZnaGlqa2xtbm9wcXJzdGFiY2RlZmdoaWprbG1ub3BxcnN0YWJjZA==
 {% endhighlight %}
 
-To connect to the CosmosDB emulator from your docker app you can't use <code class="code">localhost:8081</code> anymore since that refers to your docker instance and not the host machine. Instead, if you're using a newer version of docker, then you can use <code class="code">https://host.docker.internal:8081</code> to connect to CosmosDB.
+To connect to the CosmosDB emulator from your docker app you can't use `localhost:8081` anymore since that refers to your docker instance and not the host machine. Instead, if you're using a newer version of docker, then you can use `https://host.docker.internal:8081` to connect to CosmosDB.
 
 If you have an older version of docker then you'll need to connect by IP which works just as fine.
 
@@ -39,19 +39,19 @@ This will download an image of around 10Gb in size so make sure you have a good 
 
 - It will bind the ports used by CosmosDB from the container to your host machine. This means that you shouldn't try to run the emulator on the host itself.
 
-- CosmosDB emulator will generate a certificate to a local folder. The command binds that local folder to <code class="code">%LOCALAPPDATA%\azure-cosmosdb-emulator.hostd</code>. From your host machine you'll be able to access this new certificate together with a powershell script to help you import this certificate.
+- CosmosDB emulator will generate a certificate to a local folder. The command binds that local folder to `%LOCALAPPDATA%\azure-cosmosdb-emulator.hostd`. From your host machine you'll be able to access this new certificate together with a powershell script to help you import this certificate.
 
-- A container named <code class="code">azure-cosmosdb-emulator</code> will be created. If you try to run the last command a second time you'll get an error. Instead, use the commands <code class="code">docker start azure-cosmosdb-emulator</code> and <code class="code">docker stop azure-cosmosdb-emulator</code> to handle your container.
+- A container named `azure-cosmosdb-emulator` will be created. If you try to run the last command a second time you'll get an error. Instead, use the commands `docker start azure-cosmosdb-emulator` and `docker stop azure-cosmosdb-emulator` to handle your container.
 
 #### Browsing to the emulator explorer
 
-Since we linked port 8081 when starting the emulator container earlier on, we can now browse the emulator explorer just like we would when running the emulator on the host machine using the address <code class="code">https://localhost:8081/_explorer/index.html</code>.
+Since we linked port 8081 when starting the emulator container earlier on, we can now browse the emulator explorer just like we would when running the emulator on the host machine using the address `https://localhost:8081/_explorer/index.html`.
 
 #### Using the right Windows container version
 
-When I started to build this solution my Windows host only supported Windows containers of version 1803. This turned out to be a problem due to a bug which in some situations set the UTC time to be UTC-8 hours (Redmond time, hmmm?). In my case it caused the CosmosDB emulator (or maybe the client) to fail all calls since it only allows a time skew of 15 minutes. There was apparently quite some written on Internet about this (always nice to know you're not the first one encountering this problem) and the solution was either to change how <code class="code">docker run</code> executes the container or to upgrade Windows to higher version. The former solution would prevent me from using Visual Studio Docker tools and wasn't a preferred option. I therefore opted for a Windows upgrade.
+When I started to build this solution my Windows host only supported Windows containers of version 1803. This turned out to be a problem due to a bug which in some situations set the UTC time to be UTC-8 hours (Redmond time, hmmm?). In my case it caused the CosmosDB emulator (or maybe the client) to fail all calls since it only allows a time skew of 15 minutes. There was apparently quite some written on Internet about this (always nice to know you're not the first one encountering this problem) and the solution was either to change how `docker run` executes the container or to upgrade Windows to higher version. The former solution would prevent me from using Visual Studio Docker tools and wasn't a preferred option. I therefore opted for a Windows upgrade.
 
-The current windows container being used in these examples is <code class="code">mcr.microsoft.com/dotnet/core/aspnet:2.2-nanoserver-1903</code> and the time bug has been fixed here.
+The current windows container being used in these examples is `mcr.microsoft.com/dotnet/core/aspnet:2.2-nanoserver-1903` and the time bug has been fixed here.
 
 #### Conclusions
 

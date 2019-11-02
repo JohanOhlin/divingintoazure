@@ -58,7 +58,7 @@ class App extends React.Component {
 export default App;
 {% endhighlight %}
 
-One important step here is that <code class="code">getTheme()</code> is called inside a component. It doesn't necessarily have to, but the order in which things are called make a difference and <code class="code">loadTheme()</code> has to be called before you call <code class="code">getTheme()</code>. When all files are merged together, it's not easy to know in what order things are being loaded. But when you put the call inside the component, then you know for sure it'll happen after <code class="code">loadTheme()</code> has been called.
+One important step here is that `getTheme()` is called inside a component. It doesn't necessarily have to, but the order in which things are called make a difference and `loadTheme()` has to be called before you call `getTheme()`. When all files are merged together, it's not easy to know in what order things are being loaded. But when you put the call inside the component, then you know for sure it'll happen after `loadTheme()` has been called.
 
 These theme details, including other Office UI Fabric configurations, can then also be used if you need to integrate with styling frameworks like [Glamor](https://github.com/threepointone/glamor) or [Aphrodite](https://github.com/Khan/aphrodite).
 
@@ -95,4 +95,4 @@ export class HeaderComponent extends React.Component {
 }
 {% endhighlight %}
 
-There are many ways to structure your embedded CSS styles. By creating a separate <code class="code">createStyles()</code> function you can easily separate it into its own style file, if you prefer such structure.
+There are many ways to structure your embedded CSS styles. By creating a separate `createStyles()` function you can easily separate it into its own style file, if you prefer such structure.
