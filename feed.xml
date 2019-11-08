@@ -5,8 +5,8 @@
     <description>Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects.</description>
     <link>https://www.johanohlin.com/</link>
     <atom:link href="https://www.johanohlin.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 08 Nov 2019 08:32:05 +0000</pubDate>
-    <lastBuildDate>Fri, 08 Nov 2019 08:32:05 +0000</lastBuildDate>
+    <pubDate>Fri, 08 Nov 2019 09:35:18 +0000</pubDate>
+    <lastBuildDate>Fri, 08 Nov 2019 09:35:18 +0000</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       
@@ -384,6 +384,53 @@
       <item>
         <title>Using Azure App Configuration in a Worker Service</title>
         <description>&lt;p class=&quot;intro&quot;&gt;&lt;span class=&quot;dropcap&quot;&gt;W&lt;/span&gt;ith .NET Core 3 we were introduced to the new Worker Service template for running continuous jobs. In this article, I'll show you how to setup the service and also to make use of the new Azure App Configuration service that centralizes the management of app settings.&lt;/p&gt;
+
+&lt;div class=&quot;narrow blog_serie&quot;&gt;
+  &lt;div class=&quot;blog_serie&quot;&gt;
+    &lt;div class=&quot;blog_serie_title&quot;&gt;Other articles in this serie&lt;/div&gt;
+    &lt;ul&gt;
+      
+        
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+          
+            &lt;li&gt;&lt;a href=&quot;/blog/configuration-providers-in-aspnet-core/&quot;&gt;Configuration providers in ASP.NET Core&lt;/a&gt;&lt;/li&gt;          
+          
+        
+      
+        
+          
+            &lt;li&gt;&lt;a href=&quot;/blog/injecting-options-in-aspnet-core/&quot;&gt;Injecting Options in ASP.NET Core&lt;/a&gt;&lt;/li&gt;          
+          
+        
+      
+        
+          
+            &lt;li&gt;&lt;a href=&quot;/blog/configuration-in-asp-net-core/&quot;&gt;Configuration in ASP.NET Core&lt;/a&gt;&lt;/li&gt;          
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    &lt;/ul&gt;    
+  &lt;/div&gt;
+&lt;/div&gt;
 
 &lt;p&gt;The Worker Service is simple to use and easy to understand - just create an app with the template and run it. However, it lacks some of the features the classing web job had (timers, queue handling etc) and instead you must wire up this functionality yourself. When you create a new Worker Service template you’re presented with a list page currently only having one option - the basic temple, so we can probably expect more Worker Service templates coming here in the future. Time will tell if that assumption is correct or not.&lt;/p&gt;
 
@@ -1041,6 +1088,10 @@ docker run &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; %containerName% 
         
       
         
+          
+            &lt;li&gt;&lt;a href=&quot;/blog/using-azure-app-config-in-a-worker-service/&quot;&gt;Using Azure App Configuration in a Worker Service&lt;/a&gt;&lt;/li&gt;          
+          
+        
       
         
       
@@ -1279,6 +1330,10 @@ docker run &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; %containerName% 
         
       
         
+          
+            &lt;li&gt;&lt;a href=&quot;/blog/using-azure-app-config-in-a-worker-service/&quot;&gt;Using Azure App Configuration in a Worker Service&lt;/a&gt;&lt;/li&gt;          
+          
+        
       
         
       
@@ -1492,6 +1547,10 @@ docker run &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; %containerName% 
       
         
       
+        
+          
+            &lt;li&gt;&lt;a href=&quot;/blog/using-azure-app-config-in-a-worker-service/&quot;&gt;Using Azure App Configuration in a Worker Service&lt;/a&gt;&lt;/li&gt;          
+          
         
       
         
