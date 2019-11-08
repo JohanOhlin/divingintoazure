@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Worker services in Kubernetes with health checks"
-date: 2019-10-22
+date: 2019-11-07
 tags: c# azure .net-core worker-service kubernetes
 ---
 
@@ -11,7 +11,7 @@ In the example below, we're creating a .NET Core 3 Worker Service that will thro
 
 ### Setting up the worker service
 
-Per default, the worker service is only thinking about itself, running an internal job, processing a queue or something other less interactive. This is very different from a web service which constantly listens for incoming requests. To implement health checks we need to add web service capabilities to the worker service so Kubernetes can send requests to ask for health updates. There's no Visual Studio template that includes both worker and web service and you can solve this in different ways. In this article, I've started by creating a web service and then I added the functionality for the worker service, but you could do it the other way around also.
+Per default, the worker service is only thinking about itself, running an internal job, processing a queue or something other less interactive. This is very different from a web service which constantly listens for incoming requests. To implement health checks we need to add light-weight web service capabilities to the worker service so Kubernetes can send requests to ask for health updates. There's no Visual Studio template that includes both worker and web service and you can solve this in different ways. In this article, I've started by creating a web service and then I added the functionality for the worker service, but you could do it the other way around also.
 
 Create a new empty project using the `ASP.NET Core Web Application` template. Make sure to use ASP.NET Core 3.0 as framework. If you've installed Visual Studio 2019 (16.3 or higher) then 3.0 will be the default framework when creating new projects.
 
@@ -87,7 +87,7 @@ InvoiceWorkerStatistics.SetProcessTime();
 
 Every 3 seconds, the worker service will now report progress until it crashes out after 10 iterations.
 
-Next we create a health check class that can interpret this statistics and figure out if our worker service is in a healty state or not. The function checks the last time an iteration was running. If it was more than 20 seconds ago then something must have gone wrong and we deem the service to be unhealthy, otherwise it's healthy. You also have the option to report a `Degraded` result if the service temporarily needs a break but soon will be available again. For our worker service scenario, since we don't receive web requests for processing, this is not needed.
+Next we create a health check class that can interpret these statistics and figure out if our worker service is in a healty state or not. The function checks the last time an iteration was running. If it was more than 20 seconds ago then something must have gone wrong and we deem the service to be unhealthy, otherwise it's healthy. You also have the option to report a `Degraded` result if the service temporarily needs a break but soon will be available again. For our worker service scenario, since we don't receive web requests for processing, this is not needed.
 
 {% highlight csharp linenos %}
 public class InvoiceWorkerHealthCheck : IHealthCheck
@@ -115,7 +115,7 @@ public class InvoiceWorkerHealthCheck : IHealthCheck
 }
 {% endhighlight %}
 
-So how long should you wait until classifying your worker service as unhealthy? That completely depends on what you're processing. If you have few processes that each take 10 minutes to process then maybe you need to wait 30 minutes until you report an unhealthy status. We'll talk more about how Kubernetes handles these values further down, but if an unhealthy status is reported, then Kubernetes will restart your worker service, so be careful with how you set the values here.
+So how long should you wait until classifying your worker service as unhealthy? That completely depends on what you're processing. If you have few processes that each take 10 minutes to process then maybe you need to wait 30 minutes until you report an unhealthy status. We'll talk more about how Kubernetes handles these values in the next article, but if an unhealthy status is reported, then Kubernetes will restart your worker service, so be careful with how you set the values here.
 
 Configure the health check service in the `ConfigureServices` method
 
@@ -204,7 +204,7 @@ But after a minute, when the exception has been thrown and the timeout has passe
 
 ### Conclusions
 
-It's very neat to be able to get health data from a worker service, or from any service for that matter. Can you always use health checks created this way in a worker service? The simple answer is no. When you process inside the worker service you're blocking the thread and no calls can be made to the health endpoint. If you have a long running process that never uses any async/await calls then you'll block for a long time and you might get false health results due to timeouts on the health endpoint. 
+It's very neat to be able to get health data from a worker service, or from any service for that matter. Can you always use health checks created this way in a worker service? The simple answer is no. When you process inside the worker service you're blocking the thread and no calls can be made to the health endpoint. If you have a long-running process that never uses any async/await calls then you'll block for a long time and you might get false health results due to timeouts on the health endpoint. 
 
 The key here is if you can use async/await once in a while to free up the thread to process other things, like web requests. This could look something like this.
 
@@ -230,4 +230,4 @@ So, even if the external service used inside the iterator isn't async, we can ma
 
 ### Next article
 
-The worker service is now completely configured for health checks. In the next article we'll continue with deploying the worker service to kubernetes and to configure the usage of the health checks to determine if the pod is functioning or not.
+The worker service is now completely configured for health checks. In the next article (not published yet) we'll continue with deploying the worker service to kubernetes and to configure the usage of the health checks to determine if the pod is functioning or not.
