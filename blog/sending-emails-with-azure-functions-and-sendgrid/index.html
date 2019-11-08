@@ -117,7 +117,7 @@ ga('send', 'pageview');
 
 <h4 id="create-function">Create function</h4>
 
-<p>Create a new C# function with an HTTP trigger. Authorization level can be specified to <code class="code">function</code> so it’s protected from unwanted calls. The function is also protected by HTTPS by default.</p>
+<p>Create a new C# function with an HTTP trigger. Authorization level can be specified to <code class="highlighter-rouge">function</code> so it’s protected from unwanted calls. The function is also protected by HTTPS by default.</p>
 
 <p>Replace the default code with the following snippet.</p>
 
@@ -228,7 +228,7 @@ ga('send', 'pageview');
 
 <h4 id="update-bindings">Update bindings</h4>
 
-<p>Click on <code class="code">View Files</code> to the right and open the <code class="code">function.json</code> file. Update the bindings to include the SendGrid configuration as in the example below. Note that the field <code class="code">apiKey</code> should contain the text <code class="code">SendGridAttribute.ApiKey</code> because it’s referring to an app setting for the function rather than the actual api key itself.</p>
+<p>Click on <code class="highlighter-rouge">View Files</code> to the right and open the <code class="highlighter-rouge">function.json</code> file. Update the bindings to include the SendGrid configuration as in the example below. Note that the field <code class="highlighter-rouge">apiKey</code> should contain the text <code class="highlighter-rouge">SendGridAttribute.ApiKey</code> because it’s referring to an app setting for the function rather than the actual api key itself.</p>
 
 <figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><span class="p">{</span>
   <span class="s">"disabled"</span><span class="p">:</span> <span class="k">false</span><span class="p">,</span>
@@ -259,15 +259,15 @@ ga('send', 'pageview');
 
 <h4 id="configure-sendgrid">Configure SendGrid</h4>
 
-<p>Configure a SendGrid service in Azure. The free tier allows you to send 25 000 emails a months which is more than enough for this sample application. After you’ve setup SendGrid in Azure you need to login to the SendGrid portal to create an API key. You can access this portal by clicking on the <code class="code">Manage</code> button inside your newly created Azure SendGrid account.</p>
+<p>Configure a SendGrid service in Azure. The free tier allows you to send 25 000 emails a months which is more than enough for this sample application. After you’ve setup SendGrid in Azure you need to login to the SendGrid portal to create an API key. You can access this portal by clicking on the <code class="highlighter-rouge">Manage</code> button inside your newly created Azure SendGrid account.</p>
 
 <h4 id="add-application-setting">Add application setting</h4>
 
-<p>Open Application Settings for the Function App (not the individual function, since many functions can run in a Function App). Add the application setting <code class="code">SendGridAttribute.ApiKey</code> with the key you’ve created in the SendGrid system.</p>
+<p>Open Application Settings for the Function App (not the individual function, since many functions can run in a Function App). Add the application setting <code class="highlighter-rouge">SendGridAttribute.ApiKey</code> with the key you’ve created in the SendGrid system.</p>
 
 <h4 id="get-url-and-send-test-email">Get URL and send test email</h4>
 
-<p>Open the newly created Azure function and click on the <code class="code">Get function URL</code> button. Select <code class="code">Function key</code> and copy the URL created. Now you can send POST message with the following JSON data structure.</p>
+<p>Open the newly created Azure function and click on the <code class="highlighter-rouge">Get function URL</code> button. Select <code class="highlighter-rouge">Function key</code> and copy the URL created. Now you can send POST message with the following JSON data structure.</p>
 
 <figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><span class="p">{</span>
     <span class="s">"To"</span><span class="p">:</span> <span class="s">"some.person@some.email.com"</span><span class="p">,</span>
@@ -363,7 +363,7 @@ ga('send', 'pageview');
     <span>&nbsp;</span>
   
     <a href="/tag/azure/"
-    style="font-size: 30px; line-height:70%; text-decoration:none;">
+    style="font-size: 36px; line-height:70%; text-decoration:none;">
         azure
     </a>
     <span>&nbsp;</span>
@@ -417,7 +417,7 @@ ga('send', 'pageview');
     <span>&nbsp;</span>
   
     <a href="/tag/asp.net-core/"
-    style="font-size: 50px; line-height:70%; text-decoration:none;">
+    style="font-size: 44px; line-height:70%; text-decoration:none;">
         asp.net-core
     </a>
     <span>&nbsp;</span>
@@ -435,13 +435,13 @@ ga('send', 'pageview');
     <span>&nbsp;</span>
   
     <a href="/tag/c#/"
-    style="font-size: 30px; line-height:70%; text-decoration:none;">
+    style="font-size: 36px; line-height:70%; text-decoration:none;">
         c#
     </a>
     <span>&nbsp;</span>
   
     <a href="/tag/worker-service/"
-    style="font-size: 20px; line-height:70%; text-decoration:none;">
+    style="font-size: 28px; line-height:70%; text-decoration:none;">
         worker-service
     </a>
     <span>&nbsp;</span>
@@ -449,6 +449,12 @@ ga('send', 'pageview');
     <a href="/tag/app-configuration/"
     style="font-size: 20px; line-height:70%; text-decoration:none;">
         app-configuration
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/kubernetes/"
+    style="font-size: 20px; line-height:70%; text-decoration:none;">
+        kubernetes
     </a>
     <span>&nbsp;</span>
   

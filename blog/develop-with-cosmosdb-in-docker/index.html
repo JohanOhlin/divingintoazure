@@ -124,7 +124,7 @@ ga('send', 'pageview');
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
 </pre></td><td class="code"><pre><span class="s2">"c:</span><span class="se">\P</span><span class="s2">rogram Files</span><span class="se">\A</span><span class="s2">zure Cosmos DB Emulator</span><span class="se">\C</span><span class="s2">osmosDB.Emulator.exe"</span> /AllowNetworkAccess /Key<span class="o">=</span><span class="nv">YWJjZGVmZ2hpamtsbW5vcHFyc3RhYmNkZWZnaGlqa2xtbm9wcXJzdGFiY2RlZmdoaWprbG1ub3BxcnN0YWJjZA</span><span class="o">==</span></pre></td></tr></tbody></table></code></pre></figure>
 
-<p>To connect to the CosmosDB emulator from your docker app you can’t use <code class="code">localhost:8081</code> anymore since that refers to your docker instance and not the host machine. Instead, if you’re using a newer version of docker, then you can use <code class="code">https://host.docker.internal:8081</code> to connect to CosmosDB.</p>
+<p>To connect to the CosmosDB emulator from your docker app you can’t use <code class="highlighter-rouge">localhost:8081</code> anymore since that refers to your docker instance and not the host machine. Instead, if you’re using a newer version of docker, then you can use <code class="highlighter-rouge">https://host.docker.internal:8081</code> to connect to CosmosDB.</p>
 
 <p>If you have an older version of docker then you’ll need to connect by IP which works just as fine.</p>
 
@@ -152,22 +152,22 @@ docker run <span class="nt">--name</span> %containerName% <span class="nt">--mem
     <p>It will bind the ports used by CosmosDB from the container to your host machine. This means that you shouldn’t try to run the emulator on the host itself.</p>
   </li>
   <li>
-    <p>CosmosDB emulator will generate a certificate to a local folder. The command binds that local folder to <code class="code">%LOCALAPPDATA%\azure-cosmosdb-emulator.hostd</code>. From your host machine you’ll be able to access this new certificate together with a powershell script to help you import this certificate.</p>
+    <p>CosmosDB emulator will generate a certificate to a local folder. The command binds that local folder to <code class="highlighter-rouge">%LOCALAPPDATA%\azure-cosmosdb-emulator.hostd</code>. From your host machine you’ll be able to access this new certificate together with a powershell script to help you import this certificate.</p>
   </li>
   <li>
-    <p>A container named <code class="code">azure-cosmosdb-emulator</code> will be created. If you try to run the last command a second time you’ll get an error. Instead, use the commands <code class="code">docker start azure-cosmosdb-emulator</code> and <code class="code">docker stop azure-cosmosdb-emulator</code> to handle your container.</p>
+    <p>A container named <code class="highlighter-rouge">azure-cosmosdb-emulator</code> will be created. If you try to run the last command a second time you’ll get an error. Instead, use the commands <code class="highlighter-rouge">docker start azure-cosmosdb-emulator</code> and <code class="highlighter-rouge">docker stop azure-cosmosdb-emulator</code> to handle your container.</p>
   </li>
 </ul>
 
 <h4 id="browsing-to-the-emulator-explorer">Browsing to the emulator explorer</h4>
 
-<p>Since we linked port 8081 when starting the emulator container earlier on, we can now browse the emulator explorer just like we would when running the emulator on the host machine using the address <code class="code">https://localhost:8081/_explorer/index.html</code>.</p>
+<p>Since we linked port 8081 when starting the emulator container earlier on, we can now browse the emulator explorer just like we would when running the emulator on the host machine using the address <code class="highlighter-rouge">https://localhost:8081/_explorer/index.html</code>.</p>
 
 <h4 id="using-the-right-windows-container-version">Using the right Windows container version</h4>
 
-<p>When I started to build this solution my Windows host only supported Windows containers of version 1803. This turned out to be a problem due to a bug which in some situations set the UTC time to be UTC-8 hours (Redmond time, hmmm?). In my case it caused the CosmosDB emulator (or maybe the client) to fail all calls since it only allows a time skew of 15 minutes. There was apparently quite some written on Internet about this (always nice to know you’re not the first one encountering this problem) and the solution was either to change how <code class="code">docker run</code> executes the container or to upgrade Windows to higher version. The former solution would prevent me from using Visual Studio Docker tools and wasn’t a preferred option. I therefore opted for a Windows upgrade.</p>
+<p>When I started to build this solution my Windows host only supported Windows containers of version 1803. This turned out to be a problem due to a bug which in some situations set the UTC time to be UTC-8 hours (Redmond time, hmmm?). In my case it caused the CosmosDB emulator (or maybe the client) to fail all calls since it only allows a time skew of 15 minutes. There was apparently quite some written on Internet about this (always nice to know you’re not the first one encountering this problem) and the solution was either to change how <code class="highlighter-rouge">docker run</code> executes the container or to upgrade Windows to higher version. The former solution would prevent me from using Visual Studio Docker tools and wasn’t a preferred option. I therefore opted for a Windows upgrade.</p>
 
-<p>The current windows container being used in these examples is <code class="code">mcr.microsoft.com/dotnet/core/aspnet:2.2-nanoserver-1903</code> and the time bug has been fixed here.</p>
+<p>The current windows container being used in these examples is <code class="highlighter-rouge">mcr.microsoft.com/dotnet/core/aspnet:2.2-nanoserver-1903</code> and the time bug has been fixed here.</p>
 
 <h4 id="conclusions">Conclusions</h4>
 
@@ -260,7 +260,7 @@ docker run <span class="nt">--name</span> %containerName% <span class="nt">--mem
     <span>&nbsp;</span>
   
     <a href="/tag/azure/"
-    style="font-size: 30px; line-height:70%; text-decoration:none;">
+    style="font-size: 36px; line-height:70%; text-decoration:none;">
         azure
     </a>
     <span>&nbsp;</span>
@@ -314,7 +314,7 @@ docker run <span class="nt">--name</span> %containerName% <span class="nt">--mem
     <span>&nbsp;</span>
   
     <a href="/tag/asp.net-core/"
-    style="font-size: 50px; line-height:70%; text-decoration:none;">
+    style="font-size: 44px; line-height:70%; text-decoration:none;">
         asp.net-core
     </a>
     <span>&nbsp;</span>
@@ -332,13 +332,13 @@ docker run <span class="nt">--name</span> %containerName% <span class="nt">--mem
     <span>&nbsp;</span>
   
     <a href="/tag/c#/"
-    style="font-size: 30px; line-height:70%; text-decoration:none;">
+    style="font-size: 36px; line-height:70%; text-decoration:none;">
         c#
     </a>
     <span>&nbsp;</span>
   
     <a href="/tag/worker-service/"
-    style="font-size: 20px; line-height:70%; text-decoration:none;">
+    style="font-size: 28px; line-height:70%; text-decoration:none;">
         worker-service
     </a>
     <span>&nbsp;</span>
@@ -346,6 +346,12 @@ docker run <span class="nt">--name</span> %containerName% <span class="nt">--mem
     <a href="/tag/app-configuration/"
     style="font-size: 20px; line-height:70%; text-decoration:none;">
         app-configuration
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/kubernetes/"
+    style="font-size: 20px; line-height:70%; text-decoration:none;">
+        kubernetes
     </a>
     <span>&nbsp;</span>
   

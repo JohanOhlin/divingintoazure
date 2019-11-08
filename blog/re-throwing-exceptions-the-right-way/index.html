@@ -117,7 +117,7 @@ ga('send', 'pageview');
 
 <p>The questions looks something like this:</p>
 
-<p><i>In the code for <code class="code">MyBrokenFunction</code> below, three different ways to re-throw an exception are shown. Explain the difference between the three different options, what we'll see in the catch section in the <code class="code">Main</code> function, and which one is the best to use.</i></p>
+<p><i>In the code for <code class="highlighter-rouge">MyBrokenFunction</code> below, three different ways to re-throw an exception are shown. Explain the difference between the three different options, what we’ll see in the catch section in the <code class="highlighter-rouge">Main</code> function, and which one is the best to use.</i></p>
 
 <figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
 2
@@ -214,7 +214,7 @@ ga('send', 'pageview');
     <span class="p">}</span>
 <span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
 
-<p>Do you know which one you would choose? Well, let's go through the different options one by one.</p>
+<p>Do you know which one you would choose? Well, let’s go through the different options one by one.</p>
 
 <h3 id="option-1">Option 1</h3>
 
@@ -239,14 +239,14 @@ ga('send', 'pageview');
   <span class="k">throw</span> <span class="n">ex</span><span class="p">;</span>
 <span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
 
-<p>It looks straight forward, but it has a major drawback. Re-throwing the same exception object resets the stack trace so we won't be able to see the original error.</p>
+<p>It looks straight forward, but it has a major drawback. Re-throwing the same exception object resets the stack trace so we won’t be able to see the original error.</p>
 
 <figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
 2
 </pre></td><td class="code"><pre><span class="n">at</span> <span class="n">ThrowErrorExample</span><span class="p">.</span><span class="n">Program</span><span class="p">.</span><span class="nf">MyImportantFunction</span><span class="p">()</span> <span class="k">in</span> <span class="n">C</span><span class="p">:</span><span class="err">\</span><span class="n">Users</span><span class="err">\</span><span class="n">me</span><span class="err">\</span><span class="n">ThrowErrorExample</span><span class="err">\</span><span class="n">Program</span><span class="p">.</span><span class="n">cs</span><span class="p">:</span><span class="n">line</span> <span class="m">32</span>
 <span class="n">at</span> <span class="n">ThrowErrorExample</span><span class="p">.</span><span class="n">Program</span><span class="p">.</span><span class="nf">Main</span><span class="p">(</span><span class="n">String</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span> <span class="k">in</span> <span class="n">C</span><span class="p">:</span><span class="err">\</span><span class="n">Users</span><span class="err">\</span><span class="n">me</span><span class="err">\</span><span class="n">ThrowErrorExample</span><span class="err">\</span><span class="n">Program</span><span class="p">.</span><span class="n">cs</span><span class="p">:</span><span class="n">line</span> <span class="m">12</span></pre></td></tr></tbody></table></code></pre></figure>
 
-<p>By looking at the StackTrace, it looks like the exception started on line 32 and we have no information about earlier problems. The error message is "Attempted to divide by zero" which is absolutely correct, but the message is somewhat confusing since we have no direct code that is making any divisions.</p>
+<p>By looking at the StackTrace, it looks like the exception started on line 32 and we have no information about earlier problems. The error message is “Attempted to divide by zero” which is absolutely correct, but the message is somewhat confusing since we have no direct code that is making any divisions.</p>
 
 <p>This example is quite easy, but if you have a complex hierarchy with many layers of code, then you might have lost valuable information about where the problem was caused.</p>
 
@@ -282,7 +282,7 @@ ga('send', 'pageview');
 <span class="n">at</span> <span class="n">ThrowErrorExample</span><span class="p">.</span><span class="n">Program</span><span class="p">.</span><span class="nf">MyImportantFunction</span><span class="p">()</span> <span class="k">in</span> <span class="n">C</span><span class="p">:</span><span class="err">\</span><span class="n">Users</span><span class="err">\</span><span class="n">me</span><span class="err">\</span><span class="n">ThrowErrorExample</span><span class="err">\</span><span class="n">Program</span><span class="p">.</span><span class="n">cs</span><span class="p">:</span><span class="n">line</span> <span class="m">25</span>
 <span class="n">at</span> <span class="n">ThrowErrorExample</span><span class="p">.</span><span class="n">Program</span><span class="p">.</span><span class="nf">Main</span><span class="p">(</span><span class="n">String</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span> <span class="k">in</span> <span class="n">C</span><span class="p">:</span><span class="err">\</span><span class="n">Users</span><span class="err">\</span><span class="n">me</span><span class="err">\</span><span class="n">ThrowErrorExample</span><span class="err">\</span><span class="n">Program</span><span class="p">.</span><span class="n">cs</span><span class="p">:</span><span class="n">line</span> <span class="m">12</span></pre></td></tr></tbody></table></code></pre></figure>
 
-<p>Instead we see the full stack trace back to the line where the original problem occurred. As in the previous option, the error message is "Attempted to divide by zero", and here it makes more sense if we also look at the stack trace.</p>
+<p>Instead we see the full stack trace back to the line where the original problem occurred. As in the previous option, the error message is “Attempted to divide by zero”, and here it makes more sense if we also look at the stack trace.</p>
 
 <h3 id="option-3">Option 3</h3>
 
@@ -327,9 +327,9 @@ ga('send', 'pageview');
 
 <h3 id="conclusions">Conclusions</h3>
 
-<p>Looking at the examples above, it's quite clear that option 2 is the preferred choice and option 1 should be avoided. Option 2 is also the default expression when you use the existing code snippets in Visual Studio.</p>
+<p>Looking at the examples above, it’s quite clear that option 2 is the preferred choice and option 1 should be avoided. Option 2 is also the default expression when you use the existing code snippets in Visual Studio.</p>
 
-<p>Most developers we interviewed picked option 1 as their primary choice and option 2 as their second. If it's something I've learned from these interviews then it's that guessing based upon logic won't always take you in the right direction.</p>
+<p>Most developers we interviewed picked option 1 as their primary choice and option 2 as their second. If it’s something I’ve learned from these interviews then it’s that guessing based upon logic won’t always take you in the right direction.</p>
 
 
   <div style="display:flex; justify-content: space-around;">
@@ -418,7 +418,7 @@ ga('send', 'pageview');
     <span>&nbsp;</span>
   
     <a href="/tag/azure/"
-    style="font-size: 30px; line-height:70%; text-decoration:none;">
+    style="font-size: 36px; line-height:70%; text-decoration:none;">
         azure
     </a>
     <span>&nbsp;</span>
@@ -472,7 +472,7 @@ ga('send', 'pageview');
     <span>&nbsp;</span>
   
     <a href="/tag/asp.net-core/"
-    style="font-size: 50px; line-height:70%; text-decoration:none;">
+    style="font-size: 44px; line-height:70%; text-decoration:none;">
         asp.net-core
     </a>
     <span>&nbsp;</span>
@@ -490,13 +490,13 @@ ga('send', 'pageview');
     <span>&nbsp;</span>
   
     <a href="/tag/c#/"
-    style="font-size: 30px; line-height:70%; text-decoration:none;">
+    style="font-size: 36px; line-height:70%; text-decoration:none;">
         c#
     </a>
     <span>&nbsp;</span>
   
     <a href="/tag/worker-service/"
-    style="font-size: 20px; line-height:70%; text-decoration:none;">
+    style="font-size: 28px; line-height:70%; text-decoration:none;">
         worker-service
     </a>
     <span>&nbsp;</span>
@@ -504,6 +504,12 @@ ga('send', 'pageview');
     <a href="/tag/app-configuration/"
     style="font-size: 20px; line-height:70%; text-decoration:none;">
         app-configuration
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/kubernetes/"
+    style="font-size: 20px; line-height:70%; text-decoration:none;">
+        kubernetes
     </a>
     <span>&nbsp;</span>
   

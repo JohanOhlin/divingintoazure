@@ -127,6 +127,8 @@ ga('send', 'pageview');
         
       
         
+      
+        
           
             <li><a href="/blog/configuration-providers-in-aspnet-core/">Configuration providers in ASP.NET Core</a></li>          
           
@@ -158,7 +160,7 @@ ga('send', 'pageview');
 
 <p>ASP.NET Core has a pluggable configuration system where configuration settings can be imported from a number of <a href="/blog/configuration-providers-in-aspnet-core/">different sources</a>. These sources are then merged together into one hierarchical configuration object.</p>
 
-<p>When you create a new ASP.Net Core Web App in Visual Studio, it’ll automatically create a configuration file for you named <code class="code">appsettings.json</code>. By default it only contains logging and CORS settings but we’re free to add any type of hierarchical configuratin that we need.</p>
+<p>When you create a new ASP.Net Core Web App in Visual Studio, it’ll automatically create a configuration file for you named <code class="highlighter-rouge">appsettings.json</code>. By default it only contains logging and CORS settings but we’re free to add any type of hierarchical configuratin that we need.</p>
 
 <p>In this example I’ve added two extra sections (<i>FirstServiceSettings</i> and <i>SecondServiceSettings</i>) to the file that I’ll use as specific option groups for my web app.</p>
 
@@ -230,7 +232,7 @@ ga('send', 'pageview');
 
 <h4 id="map-classes-to-configuration">Map classes to configuration</h4>
 
-<p>In the merged configuration settings, each option group that match a class is seen as a sub-option in the main hierarchy. In <code class="code">Startup.cs</code> we therefore need to map a path to each of the option classes.</p>
+<p>In the merged configuration settings, each option group that match a class is seen as a sub-option in the main hierarchy. In <code class="highlighter-rouge">Startup.cs</code> we therefore need to map a path to each of the option classes.</p>
 
 <figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
 2
@@ -278,7 +280,7 @@ ga('send', 'pageview');
   <span class="k">private</span> <span class="kt">string</span> <span class="n">VeryHiddenSetting</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
 <span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
 
-<p>The default behaviour is to not change private properties, but by specifying the <code class="code">BindNonPublicProperties</code> option you can override this behaviour.</p>
+<p>The default behaviour is to not change private properties, but by specifying the <code class="highlighter-rouge">BindNonPublicProperties</code> option you can override this behaviour.</p>
 
 <figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
 2
@@ -457,7 +459,7 @@ ga('send', 'pageview');
     <span>&nbsp;</span>
   
     <a href="/tag/azure/"
-    style="font-size: 30px; line-height:70%; text-decoration:none;">
+    style="font-size: 36px; line-height:70%; text-decoration:none;">
         azure
     </a>
     <span>&nbsp;</span>
@@ -511,7 +513,7 @@ ga('send', 'pageview');
     <span>&nbsp;</span>
   
     <a href="/tag/asp.net-core/"
-    style="font-size: 50px; line-height:70%; text-decoration:none;">
+    style="font-size: 44px; line-height:70%; text-decoration:none;">
         asp.net-core
     </a>
     <span>&nbsp;</span>
@@ -529,13 +531,13 @@ ga('send', 'pageview');
     <span>&nbsp;</span>
   
     <a href="/tag/c#/"
-    style="font-size: 30px; line-height:70%; text-decoration:none;">
+    style="font-size: 36px; line-height:70%; text-decoration:none;">
         c#
     </a>
     <span>&nbsp;</span>
   
     <a href="/tag/worker-service/"
-    style="font-size: 20px; line-height:70%; text-decoration:none;">
+    style="font-size: 28px; line-height:70%; text-decoration:none;">
         worker-service
     </a>
     <span>&nbsp;</span>
@@ -543,6 +545,12 @@ ga('send', 'pageview');
     <a href="/tag/app-configuration/"
     style="font-size: 20px; line-height:70%; text-decoration:none;">
         app-configuration
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/kubernetes/"
+    style="font-size: 20px; line-height:70%; text-decoration:none;">
+        kubernetes
     </a>
     <span>&nbsp;</span>
   
