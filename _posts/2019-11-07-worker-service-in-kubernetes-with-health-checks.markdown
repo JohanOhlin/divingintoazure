@@ -23,7 +23,7 @@ dotnet new web -n WorkerServiceWithHealthChecks
 
 Add the NuGet package `Microsoft.Extensions.Hosting` to your project.
 
-Create a worker service as shown below. This code will run for 30 seconds and then throw an unhandled exception which will cause the service to fail, but the app will still be running.
+Create a worker service as shown below. This code will run for 10 minutes and then throw an unhandled exception which will cause the service to fail, but the app will still be running.
 
 {% highlight csharp linenos %}
 public class InvoiceWorker : BackgroundService
@@ -36,7 +36,7 @@ public class InvoiceWorker : BackgroundService
             if (ticks++ > 10) throw new Exception("Ups...");
 
             Console.WriteLine("Processing an invoice");
-            await Task.Delay(3000, stoppingToken);
+            await Task.Delay(60 * 1000, stoppingToken);
         }
     }
 }
@@ -87,7 +87,7 @@ InvoiceWorkerStatistics.SetProcessTime();
 
 Every 3 seconds, the worker service will now report progress until it crashes out after 10 iterations.
 
-Next we create a health check class that can interpret these statistics and figure out if our worker service is in a healty state or not. The function checks the last time an iteration was running. If it was more than 20 seconds ago then something must have gone wrong and we deem the service to be unhealthy, otherwise it's healthy. You also have the option to report a `Degraded` result if the service temporarily needs a break but soon will be available again. For our worker service scenario, since we don't receive web requests for processing, this is not needed.
+Next we create a health check class that can interpret these statistics and figure out if our worker service is in a healty state or not. The function checks the last time an iteration was running. If it was more than 90 seconds ago then something must have gone wrong and we deem the service to be unhealthy, otherwise it's healthy. You also have the option to report a `Degraded` result if the service temporarily needs a break but soon will be available again. For our worker service scenario, since we don't receive web requests for processing, this is not needed.
 
 {% highlight csharp linenos %}
 public class InvoiceWorkerHealthCheck : IHealthCheck
@@ -103,7 +103,7 @@ public class InvoiceWorkerHealthCheck : IHealthCheck
             { "Time ago", timeAgo }
         } as IReadOnlyDictionary<string,object>;
 
-        if (lastProcess > DateTime.UtcNow.AddSeconds(-20))
+        if (lastProcess > DateTime.UtcNow.AddSeconds(-90))
         {
             return Task.FromResult(
                 HealthCheckResult.Healthy("Processing as much as we can", data));
@@ -220,7 +220,7 @@ public class InvoiceWorker : BackgroundService
                 externalService.ProcessNonAsyncCall();
                 await Task.Delay(1, stoppingToken);
             }
-            await Task.Delay(5000, stoppingToken);
+            await Task.Delay(60 * 1000, stoppingToken);
         }
     }
 }

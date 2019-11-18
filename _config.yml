@@ -38,6 +38,8 @@ navigation:
     url: /index.html
   - title: About
     url: /about
+  - title: Privacy
+    url: /privacy
 
 social:
   github: johanohlin

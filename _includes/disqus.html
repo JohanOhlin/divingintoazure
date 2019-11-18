@@ -5,13 +5,16 @@
     this.page.url = "{{ page.url | absolute_url }}";
     this.page.identifier = "{{ page.url | absolute_url }}";
   };
+
   (function() {
-    // DON'T EDIT BELOW THIS LINE
-    var d = document,
-      s = d.createElement("script");
-    s.src = "https://diving-into-azure.disqus.com/embed.js";
-    s.setAttribute("data-timestamp", +new Date());
-    (d.head || d.body).appendChild(s);
+    if(readCookie('cookie-notice-dismissed')=='true') {
+      // DON'T EDIT BELOW THIS LINE
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://diving-into-azure.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    }
   })();
 </script>
 <noscript
