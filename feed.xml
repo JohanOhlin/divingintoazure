@@ -5,9 +5,340 @@
     <description>Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects.</description>
     <link>https://www.johanohlin.com/</link>
     <atom:link href="https://www.johanohlin.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 18 Nov 2019 08:21:22 +0000</pubDate>
-    <lastBuildDate>Mon, 18 Nov 2019 08:21:22 +0000</lastBuildDate>
+    <pubDate>Wed, 20 Nov 2019 08:20:45 +0000</pubDate>
+    <lastBuildDate>Wed, 20 Nov 2019 08:20:45 +0000</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
+    
+      
+      <item>
+        <title>Deploying a worker service to Kubernetes</title>
+        <description>&lt;p class=&quot;intro&quot;&gt;&lt;span class=&quot;dropcap&quot;&gt;O&lt;/span&gt;nce you have the worker service configured with health checks it's time to get it deployed. In this article I'll show you how to deploy the service to AKS (Kubernetes) using ACR and Helm.&lt;/p&gt;
+
+&lt;p&gt;This article is based on a &lt;a href=&quot;/blog/worker-service-in-kubernetes-with-health-checks/&quot;&gt;previous article&lt;/a&gt; where we created a Worker Service in .NET Core 3 with health checks endpoints enabled.&lt;/p&gt;
+
+&lt;p&gt;In a real world scenario you would set up complete CI/CD pipelines doing some of these steps for you. However, in this article I’ll do all the steps manually to show a bit more in detail how it’s being done.&lt;/p&gt;
+
+&lt;h3 id=&quot;create-docker-image&quot;&gt;Create docker image&lt;/h3&gt;
+
+&lt;p&gt;If you created your project with docker support, then you should have a docker file in your project root. If not, then you can create a new one by right-clicking the project and selecting &lt;code class=&quot;highlighter-rouge&quot;&gt;Add&lt;/code&gt; -&amp;gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;Docker Support&lt;/code&gt;. You’ll be asked what &lt;code class=&quot;highlighter-rouge&quot;&gt;Target OS&lt;/code&gt; to create the dockerfile for, either Linux or Windows. This is not the OS on your machine but rather what OS the container will be running on and you can use both Linux and Windows on a Windows computer.&lt;/p&gt;
+
+&lt;p&gt;The dockerfile might differ depending on what version of Visual Studio you’re using. But it should look something like this.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-docker&quot; data-lang=&quot;docker&quot;&gt;&lt;span class=&quot;k&quot;&gt;FROM&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; mcr.microsoft.com/dotnet/core/aspnet:3.0-buster-slim AS base&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;WORKDIR&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; /app&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;EXPOSE&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; 80&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;FROM&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; mcr.microsoft.com/dotnet/core/sdk:3.0-buster AS build&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;WORKDIR&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; /src&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;COPY&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; [&quot;WorkerServiceWithHealthChecks/WorkerServiceWithHealthChecks.csproj&quot;, &quot;WorkerServiceWithHealthChecks/&quot;]&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;RUN &lt;/span&gt;dotnet restore &lt;span class=&quot;s2&quot;&gt;&quot;WorkerServiceWithHealthChecks/WorkerServiceWithHealthChecks.csproj&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;COPY&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; . .&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;WORKDIR&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; &quot;/src/WorkerServiceWithHealthChecks&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;RUN &lt;/span&gt;dotnet build &lt;span class=&quot;s2&quot;&gt;&quot;WorkerServiceWithHealthChecks.csproj&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; Release &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; /app/build
+
+&lt;span class=&quot;k&quot;&gt;FROM&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; build AS publish&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;RUN &lt;/span&gt;dotnet publish &lt;span class=&quot;s2&quot;&gt;&quot;WorkerServiceWithHealthChecks.csproj&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; Release &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; /app/publish
+
+&lt;span class=&quot;k&quot;&gt;FROM&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; base AS final&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;WORKDIR&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; /app&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;COPY&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; --from=publish /app/publish .&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;ENTRYPOINT&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; [&quot;dotnet&quot;, &quot;WorkerServiceWithHealthChecks.dll&quot;]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;To build a docker image from your dockerfile you need to have docker running on the build machine, which is the local dev machine for me. I have &lt;a href=&quot;https://www.docker.com/products/docker-desktop&quot;&gt;Docker Desktop&lt;/a&gt; installed, running Linux containers.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;FROM&lt;/code&gt; line in the dockerfile above tells what source to use. &lt;code class=&quot;highlighter-rouge&quot;&gt;aspnet:3.0-buster-slim&lt;/code&gt; is a Debian Linux source containing ASP.NET 3.0. More possible sources can be found &lt;a href=&quot;https://hub.docker.com/_/microsoft-dotnet-core-aspnet/&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;In Visual Studio, right-click on a dockerfile and select &lt;code class=&quot;highlighter-rouge&quot;&gt;Build Docker image&lt;/code&gt; to build it. You can also build a Docker image using the command line&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;docker build &lt;span class=&quot;nt&quot;&gt;--rm&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Dockerfile&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; workerservicewithhealthchecks:latest .&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;push-docker-image-to-a-container-registry&quot;&gt;Push docker image to a container registry&lt;/h3&gt;
+
+&lt;p&gt;A container registry is like a code repository on internet, but for container images. These images can then easily be pulled later on by different resources that need them. In this example, I’ll use Azure Container Registry (ACR) to store the built images.&lt;/p&gt;
+
+&lt;p&gt;For the purpose of this article, I’ve setup a basic container registry named &lt;code class=&quot;highlighter-rouge&quot;&gt;blogacrtest&lt;/code&gt;, accessible through the URI &lt;code class=&quot;highlighter-rouge&quot;&gt;blogacrtest.azurecr.io&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;To push an image to ACR from your command prompt you need to first have &lt;a href=&quot;https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest&quot;&gt;Azure CLI&lt;/a&gt; installed. When it’s installed you can login to ACR this way:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;az login
+az acr login &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; blogacrtest&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;If you have created an ACR instance separately from the AKS instance then they need to be linked together for AKS to have permissions to pull images. There are different ways of doing it. One of the newer options is to use the update command for AKS. It’s currently in preview mode so you need to enable preview features before you can use it. This might not be an option for you if you’re running your cluster in production. This way of linking only works if they are in the same subscription.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;az aks update &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; myAKSCluster &lt;span class=&quot;nt&quot;&gt;-g&lt;/span&gt; myResourceGroup &lt;span class=&quot;nt&quot;&gt;--attach-acr&lt;/span&gt; blogacrtest&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Run the following command to view all the existing images you’ve created. Your recent image &lt;code class=&quot;highlighter-rouge&quot;&gt;myworkerservice&lt;/code&gt; should be there in the list with the tag &lt;code class=&quot;highlighter-rouge&quot;&gt;latest&lt;/code&gt;.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;docker image list&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;We need to create a tag target for the new container registry that refers to the local image.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;docker tag workerservicewithhealthchecks blogacrtest.azurecr.io/workerservicewithhealthchecks:0.0.1&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;When we now list all images we’ll see how both images point to the same image id.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;REPOSITORY                                             TAG                 IMAGE ID            CREATED             SIZE
+blogacrtest.azurecr.io/workerservicewithhealthchecks   0.0.1               59aa0a033cb6        4 minutes ago       210MB
+workerservicewithhealthchecks                          latest              59aa0a033cb6        4 minutes ago       210MB&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;And then finally we can push the image.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;docker push blogacrtest.azurecr.io/workerservicewithhealthchecks:0.0.1&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;This will take some time when we do it for the first time.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;The push refers to repository &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;blogacrtest.azurecr.io/workerservicewithhealthchecks]
+58d48a1xxxxx: Pushed
+ce65098xxxxx: Pushed
+0a37aeexxxxx: Pushing &lt;span class=&quot;o&quot;&gt;[================&amp;gt;&lt;/span&gt;                                  &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;  25.78MB/76.45MB
+1c7781dxxxxx: Pushed
+00672cbxxxxx: Pushing &lt;span class=&quot;o&quot;&gt;[===========================&amp;gt;&lt;/span&gt;                       &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;  23.01MB/41.34MB
+2db44bcxxxxx: Pushing &lt;span class=&quot;o&quot;&gt;[=======&amp;gt;&lt;/span&gt;                                           &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;  10.32MB/69.21MB&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;I won’t go into detail how a docker image is built up, but basically it’s split up into separate layers, out of which your code only is one of them. The other layers are related to the framework your code is running on. When you make changes to your code and push anew then only that layer needs to be pushed, the others stay as they are. The subsequent pushes will therefore go much quicker, unless you change the source part in your docker file.&lt;/p&gt;
+
+&lt;p&gt;In Azure Container Registry it should now look like this.&lt;/p&gt;
+
+&lt;figure class=&quot;image&quot;&gt;
+  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-400by194-658e8d.webp 400w, /assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-800by388-658e8d.webp 800w, /assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-1200by582-658e8d.webp 1200w, /assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-1600by775-658e8d.webp 1600w&quot; type=&quot;image/webp&quot; /&gt;
+  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-400by194-658e8d.png 400w, /assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-800by388-658e8d.png 800w, /assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-1200by582-658e8d.png 1200w, /assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-1600by775-658e8d.png 1600w&quot; type=&quot;image/png&quot; /&gt;
+  &lt;img class=&quot;some-other-class&quot; alt=&quot;Docker images in Azure Container Registry after being pushed&quot; src=&quot;/assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-800by388-658e8d.png&quot; /&gt;
+&lt;/picture&gt;
+
+  &lt;figcaption&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;h3 id=&quot;creating-a-helm-chart-for-deployment&quot;&gt;Creating a Helm chart for deployment&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://v3.helm.sh/&quot;&gt;Helm&lt;/a&gt; is a package manager for Kubernetes that abstracts away many of the complexities of a deployment using the native yaml files, something you otherwise would have to use. Helm 3 has recently reached release candidate level so I’ll use that version here instead of the stable Helm 2. The main reason is that Helm 3 has ditched the &lt;a href=&quot;https://helm.sh/docs/glossary/#tiller&quot;&gt;tiller&lt;/a&gt; component that Helm 2 forced you to install in your kubernetes cluster with way to high access rights. Now with that &lt;a href=&quot;https://engineering.bitnami.com/articles/running-helm-in-production.html&quot;&gt;security issue&lt;/a&gt; gone we should stick to Helm 3.&lt;/p&gt;
+
+&lt;p&gt;A &lt;a href=&quot;https://helm.sh/docs/developing_charts/#charts&quot;&gt;Helm chart&lt;/a&gt; is the package that bundles your docker image file into a deployable unit. Helm has a lot of features to offer, including defining dependencies between several different Helm charts and also, once you’ve installed a Helm chart in Kubernetes, the ability to rollback to a previous version of your chart.&lt;/p&gt;
+
+&lt;p&gt;The official way to create a Helm chart in Visual Studio is still using Helm version 2. Right-click on your &lt;code class=&quot;highlighter-rouge&quot;&gt;project&lt;/code&gt; and select &lt;code class=&quot;highlighter-rouge&quot;&gt;Add&lt;/code&gt; -&amp;gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;Container Orchestration Support&lt;/code&gt;. In the dialog that comes up, select &lt;code class=&quot;highlighter-rouge&quot;&gt;Kubernetes/Helm&lt;/code&gt;. This will create a chart for your project and setup a connection to Azure Dev Spaces (a really cool feature that I’ll write more about another time).&lt;/p&gt;
+
+&lt;p&gt;But if you want to use Helm 3 you have to do a bit more manual work. Installing Helm in Windows is done by using chocolatey, but that has currently also only Helm 2 to offer. Keep an eye on &lt;a href=&quot;https://chocolatey.org/packages/kubernetes-helm&quot;&gt;this page&lt;/a&gt; for what Helm versions being supported.&lt;/p&gt;
+
+&lt;p&gt;The current way to install Helm 3 is to download it from the &lt;a href=&quot;https://github.com/helm/helm/releases&quot;&gt;releases page&lt;/a&gt; and add the folder with the binary to the path environment variable. If you run &lt;code class=&quot;highlighter-rouge&quot;&gt;helm version&lt;/code&gt; you should see the current client version being printed on screen.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; helm version
+version.BuildInfo&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;Version:&lt;span class=&quot;s2&quot;&gt;&quot;v3.0.0-rc.3&quot;&lt;/span&gt;, GitCommit:&lt;span class=&quot;s2&quot;&gt;&quot;...&quot;&lt;/span&gt;, GitTreeState:&lt;span class=&quot;s2&quot;&gt;&quot;clean&quot;&lt;/span&gt;, GoVersion:&lt;span class=&quot;s2&quot;&gt;&quot;go1.13.4&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;If you have Helm 2 installed you’ll see two lines here, the client and tiller in the cluster. If tiller isn’t configured, you’ll see an error, as in the example below.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; helm version
+Client: &amp;amp;version.Version&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;SemVer:&lt;span class=&quot;s2&quot;&gt;&quot;v2.16.0&quot;&lt;/span&gt;, GitCommit:&lt;span class=&quot;s2&quot;&gt;&quot;...&quot;&lt;/span&gt;, GitTreeState:&lt;span class=&quot;s2&quot;&gt;&quot;clean&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+Error: could not find tiller&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Inside your code project, create a folder named charts. Inside that folder, run the following command to create a Helm chart for your docker image. It’s important to write the chart name in lower case or you’ll end up with errors later on during deployment.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;helm create workerservicewithhealthchecks&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;When the Helm chart is created, it creates templates for deployment (pods), service and ingress. However, the worker service, that we’re trying to deploy here, only needs a deployment since there’s no inbound traffic. The health check endpoint on the worker service is accessed directly on each pod by Kubernetes and for that, the deployment is just enough. You can therefore delete the files &lt;code class=&quot;highlighter-rouge&quot;&gt;ingress.yaml&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;service.yaml&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;serviceaccount.yaml&lt;/code&gt; from your chart.&lt;/p&gt;
+
+&lt;p&gt;In the file &lt;code class=&quot;highlighter-rouge&quot;&gt;values.yaml&lt;/code&gt; you can remove the section &lt;code class=&quot;highlighter-rouge&quot;&gt;service:&lt;/code&gt;. Also change &lt;code class=&quot;highlighter-rouge&quot;&gt;ingress&lt;/code&gt; to have &lt;code class=&quot;highlighter-rouge&quot;&gt;enabled: false&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;serviceAccount:&lt;/code&gt; to have &lt;code class=&quot;highlighter-rouge&quot;&gt;create: false&lt;/code&gt;. Change the section &lt;code class=&quot;highlighter-rouge&quot;&gt;image:&lt;/code&gt; to link to our new repository. These sections in the file should then look like this:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yaml&quot; data-lang=&quot;yaml&quot;&gt;&lt;span class=&quot;na&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;repository&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;blogacrtest.azurecr.io/workerservicewithhealthchecks&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;pullPolicy&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;IfNotPresent&lt;/span&gt;
+
+&lt;span class=&quot;na&quot;&gt;ingress&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;enabled&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;false&lt;/span&gt;
+
+&lt;span class=&quot;na&quot;&gt;serviceAccount&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;create&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;false&lt;/span&gt;
+
+&lt;span class=&quot;nn&quot;&gt;...&lt;/span&gt; &lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;In the file &lt;code class=&quot;highlighter-rouge&quot;&gt;Chart.yaml&lt;/code&gt; we have a setting &lt;code class=&quot;highlighter-rouge&quot;&gt;appVersion&lt;/code&gt; that needs to reflect the tag we’ve assigned to the image. In the example above we set the value to &lt;code class=&quot;highlighter-rouge&quot;&gt;0.0.1&lt;/code&gt; so that’s the value we need to change the app version to. Don’t confuse this setting with &lt;code class=&quot;highlighter-rouge&quot;&gt;version&lt;/code&gt; which is the setting of the chart that you’re creating. If you change anything in the chart settings, but not in the app code, then you bump &lt;code class=&quot;highlighter-rouge&quot;&gt;version&lt;/code&gt;. If you make changes in your app code then you bump both &lt;code class=&quot;highlighter-rouge&quot;&gt;version&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;appVersion&lt;/code&gt;. The &lt;code class=&quot;highlighter-rouge&quot;&gt;Chart.yaml&lt;/code&gt; file now looks like this:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yaml&quot; data-lang=&quot;yaml&quot;&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v2&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;workerservicewithhealthchecks&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;description&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Worker Service with Health Checks&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;application&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;version&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;0.0.1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;appVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;0.0.1&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The file &lt;code class=&quot;highlighter-rouge&quot;&gt;NOTES.txt&lt;/code&gt; contains information about the new installation that will be written out on the screen after the installation is successful. Since we won’t have a service running, we need to make some alternations here. This sample explains how to setup a proxy to view the health endpoint without running a complete kubernetes service and ingress. Just paste this text into the file and save it.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yaml&quot; data-lang=&quot;yaml&quot;&gt;&lt;span class=&quot;s&quot;&gt;For testing purposes, you can now create a proxy on your local machine to access the service.&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;Run these commands and then navigate to http://127.0.0.1:8080/health to view the health status endpoint&lt;/span&gt;
+
+&lt;span class=&quot;s&quot;&gt;export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l &quot;app.kubernetes.io/name={{ include &quot;workerservicewithhealthchecks.name&quot; . }},app.kubernetes.io/instance={{ .Release.Name }}&quot; -o jsonpath=&quot;{.items[0].metadata.name}&quot;)&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:80&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Finally, the chart has installed a test to see that the service is up and running. Since we’re not using a service, we can remove the &lt;code class=&quot;highlighter-rouge&quot;&gt;tests&lt;/code&gt; folder.&lt;/p&gt;
+
+&lt;p&gt;We’re almost done with the helm chart, but first we need to tweak the deployment template to work with health checks.&lt;/p&gt;
+
+&lt;h3 id=&quot;kubernetes-health-checks&quot;&gt;Kubernetes health checks&lt;/h3&gt;
+
+&lt;p&gt;In the &lt;a href=&quot;/blog/worker-service-in-kubernetes-with-health-checks/&quot;&gt;previous article&lt;/a&gt;, we created a worker service with health checks enabled. Here, we’ll hook it up to the infrastructure so Kubernetes can be made aware of the status of the worker service.&lt;/p&gt;
+
+&lt;p&gt;Kubernetes has two functionalities for checking the health of a pod:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Readiness&lt;/strong&gt; - checks if pod has started up and is ready to receive requests. Since we have a worker service, we don’t need to think about this one.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Liveness&lt;/strong&gt; - checks if pod is alive and working as it should. This is the check we can hook into.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If we open up the &lt;code class=&quot;highlighter-rouge&quot;&gt;deployment.yaml&lt;/code&gt; file from the Helm chart, we find a section inside the &lt;code class=&quot;highlighter-rouge&quot;&gt;containers:&lt;/code&gt; looking like this:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-csharp&quot; data-lang=&quot;csharp&quot;&gt;&lt;span class=&quot;n&quot;&gt;livenessProbe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;httpGet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;/&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;http&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;readinessProbe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;httpGet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;/&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;http&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;We need to make some changes here, but first we need to take a look at what options we have. There are different ways to make &lt;a href=&quot;https://cloud.google.com/blog/products/gcp/kubernetes-best-practices-setting-up-health-checks-with-readiness-and-liveness-probes&quot;&gt;health checks&lt;/a&gt; in Kubernets:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-a-liveness-command&quot;&gt;Command&lt;/a&gt; - run a command inside pod to figure out its health&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-a-liveness-http-request&quot;&gt;HTTP probe&lt;/a&gt; - a GET call to a specific endpoint&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-a-tcp-liveness-probe&quot;&gt;TCP probe&lt;/a&gt; - call to a specific port&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;In this case, we’ll use the HTTP probe since that’s what we setup in the previous article. A simple HTTP health check can look like this.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-csharp&quot; data-lang=&quot;csharp&quot;&gt;&lt;span class=&quot;n&quot;&gt;livenessProbe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;httpGet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;health&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;80&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;But there are also other &lt;a href=&quot;https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes&quot;&gt;settings&lt;/a&gt; you can use here to configure the probe:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;initialDelaySeconds&lt;/strong&gt; - Number of seconds to wait until starting to check the liveness probe. Default is 0.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;periodSeconds&lt;/strong&gt; - How many seconds between each probe. Default is 10.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;timeoutSeconds&lt;/strong&gt; - Seconds to wait until a timeout is reached. Default is 1.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;successThreshold&lt;/strong&gt; - Number of consecutive successful calls needed after a failed one before it’s classified as successful again. Default is 1 and liveness probe needs 1 to work properly.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;failureThreshold&lt;/strong&gt; - Number of consecutive failed calls needed until it’s classified as failed and Kubernetes will restart the container. Default is 3.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Many of these values are working fine for us by default, but not all. As described in the previous article, a Worker Service is locking the thread until an async/await is reached. During this time, no response will be given on the health endpoint. The value for &lt;code class=&quot;highlighter-rouge&quot;&gt;timeoutSeconds X failureThreshold&lt;/code&gt; needs to be set to a value that is safe considering how often the thread will be released for the health endpoint. This makes these settings highly individual per worker service.&lt;/p&gt;
+
+&lt;p&gt;Another value you might need to adjust is the &lt;code class=&quot;highlighter-rouge&quot;&gt;initialDelaySeconds&lt;/code&gt; in case your worker service takes some time to start up.&lt;/p&gt;
+
+&lt;p&gt;So in the end, our deployment configuration might look something like this:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-csharp&quot; data-lang=&quot;csharp&quot;&gt;&lt;span class=&quot;n&quot;&gt;livenessProbe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;httpGet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;health&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;http&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;failureThreshold&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;6&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;timeoutSeconds&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;5&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;periodSeconds&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;15&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;initialDelaySeconds&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;30&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The key here is that a Worker Service doesn’t need to be as responsive as a Web Service, and thus it’s OK if it takes longer time for Kubernetes to find a stuck pod. Try to aim to cover for up to at least the &lt;a href=&quot;https://www.quora.com/What-is-p99-latency&quot;&gt;99th percentile&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;kubernetes-deployment&quot;&gt;Kubernetes deployment&lt;/h3&gt;
+
+&lt;p&gt;We have now completed setting up the Helm chart for the worker service. If we want to test-run the installation we can do so by navigating to the charts folder and then run the following command. The first name is the name of the installation in Kubernetes and the second name is the chart name.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;helm &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;workerservicewithhealthchecks workerservicewithhealthchecks &lt;span class=&quot;nt&quot;&gt;--dry-run&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--debug&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;If we’re happy with the result we can go ahead and install it for real with this command:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;helm &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;workerservicewithhealthchecks workerservicewithhealthchecks&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The result should then be displayed as:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;Release &lt;span class=&quot;s2&quot;&gt;&quot;workerservicewithhealthchecks&quot;&lt;/span&gt; has been upgraded. Happy Helming!
+NAME: workerservicewithhealthchecks
+LAST DEPLOYED: Wed Nov 20 08:08:55 2019
+NAMESPACE: default
+STATUS: deployed
+REVISION: 5
+NOTES:
+For testing purposes, you can now create a proxy on your &lt;span class=&quot;nb&quot;&gt;local &lt;/span&gt;machine to access the service.
+Run these commands and &lt;span class=&quot;k&quot;&gt;then &lt;/span&gt;navigate to http://127.0.0.1:8080/health to view the health status endpoint
+
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;POD_NAME&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;kubectl get pods &lt;span class=&quot;nt&quot;&gt;--namespace&lt;/span&gt; default &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;app.kubernetes.io/name=workerservicewithhealthchecks,app.kubernetes.io/instance=workerservicewithhealthchecks&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;jsonpath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;{.items[0].metadata.name}&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;
+kubectl &lt;span class=&quot;nt&quot;&gt;--namespace&lt;/span&gt; default port-forward &lt;span class=&quot;nv&quot;&gt;$POD_NAME&lt;/span&gt; 8080:80&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;If you later on want to make an upgrade to your code you’ll need to go through the following steps:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Change code&lt;/li&gt;
+  &lt;li&gt;Build new docker image&lt;/li&gt;
+  &lt;li&gt;Tag docker image with ACR domain and new tag version&lt;/li&gt;
+  &lt;li&gt;Update &lt;code class=&quot;highlighter-rouge&quot;&gt;Charts.yaml&lt;/code&gt; with new version and appVersion&lt;/li&gt;
+  &lt;li&gt;Call &lt;code class=&quot;highlighter-rouge&quot;&gt;helm upgrade&lt;/code&gt; instead of install, as seen below&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;helm upgrade workerservicewithhealthchecks workerservicewithhealthchecks&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;following-the-results-in-kubernetes&quot;&gt;Following the results in Kubernetes&lt;/h3&gt;
+
+&lt;p&gt;To view all the installed pods, run &lt;code class=&quot;highlighter-rouge&quot;&gt;kubectl get pods&lt;/code&gt;. In the result you can see the name of your pod and also how many times Kubernetes has restarted it (remember from the previous article that we deliberately made it crash so Kubernetes would restart it).&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;NAME                                             READY   STATUS    RESTARTS   AGE
+workerservicewithhealthchecks-6c69799695-gxmgv   1/1     Running   3          51m&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;We can now get more detailed information about this pod by running&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;kubectl describe pod workerservicewithhealthchecks-6c69799695-gxmgv&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The result is a long list of data, including information about the health checks we have configured, but at the bottom you’ll find the recent events, including how Kubernetes has been killing and restarting the pod. In the helm chart, we configured that it would take 6 failed health checks before it should be deemed as bad. That’s why the &lt;code class=&quot;highlighter-rouge&quot;&gt;Unhealthy&lt;/code&gt; warning in the event has 6 times as many events as the event &lt;code class=&quot;highlighter-rouge&quot;&gt;Killing&lt;/code&gt;.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;Events:
+  Type     Reason     Age                  From                               Message
+  &lt;span class=&quot;nt&quot;&gt;----&lt;/span&gt;     &lt;span class=&quot;nt&quot;&gt;------&lt;/span&gt;     &lt;span class=&quot;nt&quot;&gt;----&lt;/span&gt;                 &lt;span class=&quot;nt&quot;&gt;----&lt;/span&gt;                               &lt;span class=&quot;nt&quot;&gt;-------&lt;/span&gt;
+  Normal   Scheduled  34m                  default-scheduler                  Successfully assigned default/workerservicewithhealthchecks-6c69799695-gxmgv to aks-nodepool1-abc-0
+  Normal   Pulling    34m                  kubelet, aks-nodepool1-abc-0  Pulling image &lt;span class=&quot;s2&quot;&gt;&quot;ohlin.azurecr.io/workerservicewithhealthchecks:0.0.3&quot;&lt;/span&gt;
+  Normal   Pulled     34m                  kubelet, aks-nodepool1-abc-0  Successfully pulled image &lt;span class=&quot;s2&quot;&gt;&quot;ohlin.azurecr.io/workerservicewithhealthchecks:0.0.3&quot;&lt;/span&gt;
+  Warning  Unhealthy  8m6s &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;x12 over 22m&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;  kubelet, aks-nodepool1-abc-0  Liveness probe failed: HTTP probe failed with statuscode: 503
+  Normal   Killing    8m6s &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;x2 over 21m&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;   kubelet, aks-nodepool1-abc-0  Container workerservicewithhealthchecks failed liveness probe, will be restarted
+  Normal   Created    8m5s &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;x3 over 34m&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;   kubelet, aks-nodepool1-abc-0  Created container workerservicewithhealthchecks
+  Normal   Started    8m5s &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;x3 over 34m&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;   kubelet, aks-nodepool1-abc-0  Started container workerservicewithhealthchecks
+  Normal   Pulled     8m5s &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;x2 over 21m&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;   kubelet, aks-nodepool1-abc-0  Container image &lt;span class=&quot;s2&quot;&gt;&quot;ohlin.azurecr.io/workerservicewithhealthchecks:0.0.3&quot;&lt;/span&gt; already present on machine&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Another way to follow the results of how kubernetes changes the status of the pod as it gets restarted, is to list pods with a watch that updates the list as changes occur.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;kubectl get pods &lt;span class=&quot;nt&quot;&gt;--watch&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;This will result in a list like this where each restart creates a new line&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;NAME                                             READY   STATUS    RESTARTS   AGE
+workerservicewithhealthchecks-6c69799695-gxmgv   1/1     Running   421        3d19h
+workerservicewithhealthchecks-6c69799695-gxmgv   1/1     Running   422        3d19h
+workerservicewithhealthchecks-6c69799695-gxmgv   1/1     Running   423        3d19h
+workerservicewithhealthchecks-6c69799695-gxmgv   1/1     Running   424        3d19h&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;conclusions&quot;&gt;Conclusions&lt;/h3&gt;
+
+&lt;p&gt;In this and the previous article, we’ve created a worker service in .NET Core 3 that mainly works on a timer but also exposes a health endpoint that Kubernetes uses to restart it when needed. We have not configured any service or ingress objects enabling external access and it’s therefore not possible to access the service pod to manually check the health status unless you also setup a proxy using kubectl, but that shouldn’t be used in a production environment.&lt;/p&gt;
+
+&lt;p&gt;In a real world scenario, you would therefore also need hook up logging to a service like Azure Monitor. This can provide a lot of useful and needed telemetry about how the service is processing the jobs it’s expected to do, something we don’t know (or care) about, from a liveness point of view.&lt;/p&gt;
+
+&lt;p&gt;Despite being slightly more fiddly in the setup, adding a health check to a background service gives you a good way to add automatic restart functionality with health rules that you can define for yourself in the code. The possibility is there - why not use it?&lt;/p&gt;
+</description>
+        
+          <description>&lt;p class=&quot;intro&quot;&gt;&lt;span class=&quot;dropcap&quot;&gt;O&lt;/span&gt;nce you have the worker service configured with health checks it's time to get it deployed. In this article I'll show you how to deploy the service to AKS (Kubernetes) using ACR and Helm.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Tue, 19 Nov 2019 00:00:00 +0000</pubDate>
+        <link>https://www.johanohlin.com/blog/deploying-worker-service-to-kubernetes/</link>
+        <guid isPermaLink="true">https://www.johanohlin.com/blog/deploying-worker-service-to-kubernetes/</guid>
+        
+        <category>c#</category>
+        
+        <category>azure</category>
+        
+        <category>.net-core</category>
+        
+        <category>worker-service</category>
+        
+        <category>kubernetes</category>
+        
+        
+      </item>
+      
     
       
       <item>
@@ -355,7 +686,7 @@
 
 &lt;h3 id=&quot;next-article&quot;&gt;Next article&lt;/h3&gt;
 
-&lt;p&gt;The worker service is now completely configured for health checks. In the next article (not published yet) we’ll continue with deploying the worker service to kubernetes and to configure the usage of the health checks to determine if the pod is functioning or not.&lt;/p&gt;
+&lt;p&gt;The worker service is now completely configured for health checks. In the &lt;a href=&quot;/blog/deploying-worker-service-to-kubernetes/&quot;&gt;next article&lt;/a&gt; we’ll continue with deploying the worker service to kubernetes and to configure the usage of the health checks to determine if the pod is functioning or not.&lt;/p&gt;
 </description>
         
           <description>&lt;p class=&quot;intro&quot;&gt;&lt;span class=&quot;dropcap&quot;&gt;O&lt;/span&gt;ne of the key features of Kubernetes is its ability to kick out bad pods and start up new ones. But to be able to do that, Kubernetes needs to communicate with the service to determine its health status.&lt;/p&gt;
@@ -389,6 +720,8 @@
   &lt;div class=&quot;blog_serie&quot;&gt;
     &lt;div class=&quot;blog_serie_title&quot;&gt;Other articles in this serie&lt;/div&gt;
     &lt;ul&gt;
+      
+        
       
         
       
@@ -1088,6 +1421,8 @@ docker run &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; %containerName% 
         
       
         
+      
+        
           
             &lt;li&gt;&lt;a href=&quot;/blog/using-azure-app-config-in-a-worker-service/&quot;&gt;Using Azure App Configuration in a Worker Service&lt;/a&gt;&lt;/li&gt;          
           
@@ -1330,6 +1665,8 @@ docker run &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; %containerName% 
         
       
         
+      
+        
           
             &lt;li&gt;&lt;a href=&quot;/blog/using-azure-app-config-in-a-worker-service/&quot;&gt;Using Azure App Configuration in a Worker Service&lt;/a&gt;&lt;/li&gt;          
           
@@ -1544,6 +1881,8 @@ docker run &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; %containerName% 
   &lt;div class=&quot;blog_serie&quot;&gt;
     &lt;div class=&quot;blog_serie_title&quot;&gt;Other articles in this serie&lt;/div&gt;
     &lt;ul&gt;
+      
+        
       
         
       
@@ -2097,281 +2436,6 @@ docker run &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; %containerName% 
         <guid isPermaLink="true">https://www.johanohlin.com/blog/building-computer-desk-for-treadmill/</guid>
         
         <category>diy</category>
-        
-        
-      </item>
-      
-    
-      
-      <item>
-        <title>Practical flexbox examples</title>
-        <description>&lt;p class=&quot;intro&quot;&gt;&lt;span class=&quot;dropcap&quot;&gt;T&lt;/span&gt;he Flexbox CSS styling of web sites is gaining more and more popularity. This post is not a complete overview of what you can do with flexbox but rather a gathering of different flexbox techniques that I've found useful over the years.&lt;/p&gt;
-
-&lt;p&gt;In the initial examples below I’ll assume the following HTML snippet as a base.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
-2
-3
-4
-5
-6
-&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;sectionWrapper&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;sectionContent&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;Section longer 1&lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;sectionContent&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;Section 2&lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;sectionContent&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;S 3&lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;sectionContent&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;Section 4&lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;h4 id=&quot;basic-flexbox-layout&quot;&gt;Basic flexbox layout&lt;/h4&gt;
-
-&lt;p&gt;Use &lt;code class=&quot;highlighter-rouge&quot;&gt;flex-direction&lt;/code&gt; to swap between row and column. This indicates direction of items.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-csharp&quot; data-lang=&quot;csharp&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
-2
-3
-4
-&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sectionWrapper&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;figure class=&quot;image&quot;&gt;
-  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-in-columns-400by44-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/divs-in-columns-800by87-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/divs-in-columns-1200by131-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/divs-in-columns-1237by135-658e8d.webp 1237w&quot; type=&quot;image/webp&quot; /&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-in-columns-400by44-658e8d.png 400w, /assets/img/2018-11-09-flexbox/divs-in-columns-800by87-658e8d.png 800w, /assets/img/2018-11-09-flexbox/divs-in-columns-1200by131-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/divs-in-columns-1237by135-658e8d.png 1237w&quot; type=&quot;image/png&quot; /&gt;
-  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/divs-in-columns-800by87-658e8d.png&quot; /&gt;
-&lt;/picture&gt;
-
-  &lt;figcaption&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;If you line up container divs (i.e. rows in a grid) then you need to think to opposite - the attribute &lt;code class=&quot;highlighter-rouge&quot;&gt;column&lt;/code&gt; means your container becomes rows, one of top of the other, in a column.&lt;/p&gt;
-
-&lt;figure class=&quot;image&quot;&gt;
-  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-in-rows-400by151-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/divs-in-rows-800by303-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/divs-in-rows-1200by454-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/divs-in-rows-1228by465-658e8d.webp 1228w&quot; type=&quot;image/webp&quot; /&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-in-rows-400by151-658e8d.png 400w, /assets/img/2018-11-09-flexbox/divs-in-rows-800by303-658e8d.png 800w, /assets/img/2018-11-09-flexbox/divs-in-rows-1200by454-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/divs-in-rows-1228by465-658e8d.png 1228w&quot; type=&quot;image/png&quot; /&gt;
-  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/divs-in-rows-800by303-658e8d.png&quot; /&gt;
-&lt;/picture&gt;
-
-  &lt;figcaption&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;h4 id=&quot;fill-space&quot;&gt;Fill space&lt;/h4&gt;
-
-&lt;p&gt;As seen in the previous example, the divs are not filling up the whole row. This can be solved by increasing the space between the items using &lt;code class=&quot;highlighter-rouge&quot;&gt;justify-content&lt;/code&gt;.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
-2
-3
-4
-&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nc&quot;&gt;.sectionWrapper&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;justify-content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;space-between&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;The result would look like this&lt;/p&gt;
-
-&lt;figure class=&quot;image&quot;&gt;
-  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-space-between-400by46-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/divs-on-row-space-between-800by93-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/divs-on-row-space-between-1200by139-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/divs-on-row-space-between-1239by144-658e8d.webp 1239w&quot; type=&quot;image/webp&quot; /&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-space-between-400by46-658e8d.png 400w, /assets/img/2018-11-09-flexbox/divs-on-row-space-between-800by93-658e8d.png 800w, /assets/img/2018-11-09-flexbox/divs-on-row-space-between-1200by139-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/divs-on-row-space-between-1239by144-658e8d.png 1239w&quot; type=&quot;image/png&quot; /&gt;
-  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-space-between-800by93-658e8d.png&quot; /&gt;
-&lt;/picture&gt;
-
-  &lt;figcaption&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Other options instead of &lt;code class=&quot;highlighter-rouge&quot;&gt;space-between&lt;/code&gt; are &lt;code class=&quot;highlighter-rouge&quot;&gt;space-evenly&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;space-around&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;flex-start&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;flex-end&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;Another way to fill the row is to increase the size of the divs which can be done by adding the &lt;code class=&quot;highlighter-rouge&quot;&gt;flex-grow&lt;/code&gt; property.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
-2
-3
-&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nc&quot;&gt;.sectionContent&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;flex-grow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;The divs are now distributed all over the row.&lt;/p&gt;
-
-&lt;figure class=&quot;image&quot;&gt;
-  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-fill-space-400by48-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-800by95-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-1200by143-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-1234by147-658e8d.webp 1234w&quot; type=&quot;image/webp&quot; /&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-fill-space-400by48-658e8d.png 400w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-800by95-658e8d.png 800w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-1200by143-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-1234by147-658e8d.png 1234w&quot; type=&quot;image/png&quot; /&gt;
-  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-fill-space-800by95-658e8d.png&quot; /&gt;
-&lt;/picture&gt;
-
-  &lt;figcaption&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;In a practical example we simulate four lists with drag-and-drop behaviour where the purple sections show the droppable areas. However, by default the divs only fill up the area where you have items inside them, which can make a column like S2 difficult to drop items into.&lt;/p&gt;
-
-&lt;figure class=&quot;image&quot;&gt;
-  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/items-in-dnd-lists-400by176-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-800by352-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-1200by528-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-1232by542-658e8d.webp 1232w&quot; type=&quot;image/webp&quot; /&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/items-in-dnd-lists-400by176-658e8d.png 400w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-800by352-658e8d.png 800w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-1200by528-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-1232by542-658e8d.png 1232w&quot; type=&quot;image/png&quot; /&gt;
-  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/items-in-dnd-lists-800by352-658e8d.png&quot; /&gt;
-&lt;/picture&gt;
-
-  &lt;figcaption&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;By adding &lt;code class=&quot;highlighter-rouge&quot;&gt;flex-grow: 1&lt;/code&gt; for the purple droppable div, we solve this problem.&lt;/p&gt;
-
-&lt;figure class=&quot;image&quot;&gt;
-  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/items-in-dnd-lists-same-height-400by176-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-same-height-800by352-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-same-height-1200by527-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-same-height-1231by541-658e8d.webp 1231w&quot; type=&quot;image/webp&quot; /&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/items-in-dnd-lists-same-height-400by176-658e8d.png 400w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-same-height-800by352-658e8d.png 800w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-same-height-1200by527-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/items-in-dnd-lists-same-height-1231by541-658e8d.png 1231w&quot; type=&quot;image/png&quot; /&gt;
-  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/items-in-dnd-lists-same-height-800by352-658e8d.png&quot; /&gt;
-&lt;/picture&gt;
-
-  &lt;figcaption&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;The same technique can be used to push a footer at the bottom of a page, or a card. Simply let the middle content of the item have &lt;code class=&quot;highlighter-rouge&quot;&gt;flex-grow:1&lt;/code&gt; and the footer will be pushed down to the bottom&lt;/p&gt;
-
-&lt;figure class=&quot;image&quot;&gt;
-  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/flexbox-footer-pushed-down2-400by270-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/flexbox-footer-pushed-down2-800by539-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/flexbox-footer-pushed-down2-1200by809-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/flexbox-footer-pushed-down2-1472by992-658e8d.webp 1472w&quot; type=&quot;image/webp&quot; /&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/flexbox-footer-pushed-down2-400by270-658e8d.png 400w, /assets/img/2018-11-09-flexbox/flexbox-footer-pushed-down2-800by539-658e8d.png 800w, /assets/img/2018-11-09-flexbox/flexbox-footer-pushed-down2-1200by809-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/flexbox-footer-pushed-down2-1472by992-658e8d.png 1472w&quot; type=&quot;image/png&quot; /&gt;
-  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/flexbox-footer-pushed-down2-800by539-658e8d.png&quot; /&gt;
-&lt;/picture&gt;
-
-  &lt;figcaption&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;h4 id=&quot;fill-space-with-same-size-for-all-divs&quot;&gt;Fill space with same size for all divs&lt;/h4&gt;
-
-&lt;p&gt;By default, &lt;code class=&quot;highlighter-rouge&quot;&gt;flex-basis&lt;/code&gt; is set to auto to adjust for the different size of the elements inside, as can be seen here.&lt;/p&gt;
-
-&lt;figure class=&quot;image&quot;&gt;
-  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-fill-space-400by48-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-800by95-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-1200by143-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-1234by147-658e8d.webp 1234w&quot; type=&quot;image/webp&quot; /&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-fill-space-400by48-658e8d.png 400w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-800by95-658e8d.png 800w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-1200by143-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/divs-on-row-fill-space-1234by147-658e8d.png 1234w&quot; type=&quot;image/png&quot; /&gt;
-  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-fill-space-800by95-658e8d.png&quot; /&gt;
-&lt;/picture&gt;
-
-  &lt;figcaption&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;To make all columns have the same width we need to set the &lt;code class=&quot;highlighter-rouge&quot;&gt;flex-basis&lt;/code&gt;, forcing all columns to have the same base.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
-2
-3
-4
-&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nc&quot;&gt;.sectionContent&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;flex-grow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;flex-basis&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;The result will then look like this&lt;/p&gt;
-
-&lt;figure class=&quot;image&quot;&gt;
-  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/sections-with-same-size-400by45-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/sections-with-same-size-800by90-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/sections-with-same-size-1200by136-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/sections-with-same-size-1238by140-658e8d.webp 1238w&quot; type=&quot;image/webp&quot; /&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/sections-with-same-size-400by45-658e8d.png 400w, /assets/img/2018-11-09-flexbox/sections-with-same-size-800by90-658e8d.png 800w, /assets/img/2018-11-09-flexbox/sections-with-same-size-1200by136-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/sections-with-same-size-1238by140-658e8d.png 1238w&quot; type=&quot;image/png&quot; /&gt;
-  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/sections-with-same-size-800by90-658e8d.png&quot; /&gt;
-&lt;/picture&gt;
-
-  &lt;figcaption&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;h4 id=&quot;align-content-in-center&quot;&gt;Align content in center&lt;/h4&gt;
-
-&lt;p&gt;Horizontal alignment has always been easy through auto margin. But vertical alignment has been a pain and always forced me to google it. With flex box style it’s so much easier.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
-2
-3
-4
-5
-&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nc&quot;&gt;.centerContent&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;align-items&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;center&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;justify-content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;center&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;This is how the titles (and other parts) in the above examples got centered in the middle of the divs&lt;/p&gt;
-
-&lt;h4 id=&quot;separate-items&quot;&gt;Separate items&lt;/h4&gt;
-
-&lt;p&gt;Normally, the divs are separated by the same amount of space. But by tweaking the margin, you can change that behaviour.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nc&quot;&gt;.sectionWrapper&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;flex-direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;nc&quot;&gt;.sectionContent&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;nc&quot;&gt;.sectionContent&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;:last-child&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;margin-left&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;auto&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;figure class=&quot;image&quot;&gt;
-  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-last-to-right-400by47-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/divs-on-row-last-to-right-800by94-658e8d.webp 800w, /assets/img/2018-11-09-flexbox/divs-on-row-last-to-right-1200by142-658e8d.webp 1200w, /assets/img/2018-11-09-flexbox/divs-on-row-last-to-right-1238by146-658e8d.webp 1238w&quot; type=&quot;image/webp&quot; /&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-last-to-right-400by47-658e8d.png 400w, /assets/img/2018-11-09-flexbox/divs-on-row-last-to-right-800by94-658e8d.png 800w, /assets/img/2018-11-09-flexbox/divs-on-row-last-to-right-1200by142-658e8d.png 1200w, /assets/img/2018-11-09-flexbox/divs-on-row-last-to-right-1238by146-658e8d.png 1238w&quot; type=&quot;image/png&quot; /&gt;
-  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/divs-on-row-last-to-right-800by94-658e8d.png&quot; /&gt;
-&lt;/picture&gt;
-
-  &lt;figcaption&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;h4 id=&quot;divs-overflowing-on-next-row&quot;&gt;Divs overflowing on next row&lt;/h4&gt;
-
-&lt;p&gt;By default, when &lt;code class=&quot;highlighter-rouge&quot;&gt;flex-direction&lt;/code&gt; is set to row then all items are displayed on a single row. To wrap items on several rows, use the &lt;code class=&quot;highlighter-rouge&quot;&gt;flex-wrap&lt;/code&gt; setting.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
-2
-3
-4
-5
-&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;nc&quot;&gt;.overflowingList&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;flex-direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;flex-wrap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wrap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;figure class=&quot;image&quot;&gt;
-  &lt;picture class=&quot;awesome&quot; data-volume=&quot;11&quot;&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/flex-wrap-400by285-658e8d.webp 400w, /assets/img/2018-11-09-flexbox/flex-wrap-597by425-658e8d.webp 597w&quot; type=&quot;image/webp&quot; /&gt;
-  &lt;source sizes=&quot;(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px&quot; srcset=&quot;/assets/img/2018-11-09-flexbox/flex-wrap-400by285-658e8d.png 400w, /assets/img/2018-11-09-flexbox/flex-wrap-597by425-658e8d.png 597w&quot; type=&quot;image/png&quot; /&gt;
-  &lt;img class=&quot;some-other-class&quot; src=&quot;/assets/img/2018-11-09-flexbox/flex-wrap-597by425-658e8d.png&quot; /&gt;
-&lt;/picture&gt;
-
-  &lt;figcaption&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;h4 id=&quot;any-neat-flexbox-snippets-you-think-i-should-add&quot;&gt;Any neat Flexbox snippets you think I should add?&lt;/h4&gt;
-&lt;p&gt;Do you have any good suggestions of useful Flexbox examples that you think I should have added? Please write them to the comments below.&lt;/p&gt;
-</description>
-        
-          <description>&lt;p class=&quot;intro&quot;&gt;&lt;span class=&quot;dropcap&quot;&gt;T&lt;/span&gt;he Flexbox CSS styling of web sites is gaining more and more popularity. This post is not a complete overview of what you can do with flexbox but rather a gathering of different flexbox techniques that I've found useful over the years.&lt;/p&gt;
-
-</description>
-        
-        <pubDate>Fri, 09 Nov 2018 00:00:00 +0000</pubDate>
-        <link>https://www.johanohlin.com/blog/practical-flexbox-examples/</link>
-        <guid isPermaLink="true">https://www.johanohlin.com/blog/practical-flexbox-examples/</guid>
-        
-        <category>css</category>
-        
-        <category>flexbox</category>
-        
-        <category>html</category>
         
         
       </item>

@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7"><![endif]-->
+<!--[if IE 7]><html class="no-js lt-ie9 lt-ie8" <![endif]-->
+<!--[if IE 8]><html class="no-js lt-ie9" <![endif]-->
+<!--[if gt IE 8]><!--> 
+<html class="no-js" lang="en"> <!--<![endif]-->
+   <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects.">
+    <title>Deploying a worker service to Kubernetes</title>
+
+    <!-- Open Graph Meta -->
+    <meta content="Diving into Azure" property="og:site_name">
+    
+      <meta content="Deploying a worker service to Kubernetes" property="og:title">
+    
+    
+      <meta content="article" property="og:type">
+    
+    
+      <meta content="Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects." property="og:description">
+    
+    
+      <meta content="https://www.johanohlin.com/blog/deploying-worker-service-to-kubernetes/" property="og:url">
+    
+    
+      <meta content="2019-11-19T00:00:00+00:00" property="article:published_time">
+      <meta content="https://www.johanohlin.com/about/" property="article:author">
+    
+    
+      <meta content="https://www.johanohlin.com/assets/img/azure-background.jpg" property="og:image">
+    
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@ohlinjohan">
+    <meta name="twitter:creator" content="@ohlinjohan">
+    
+      <meta name="twitter:title" content="Deploying a worker service to Kubernetes">
+    
+    
+      <meta name="twitter:url" content="https://www.johanohlin.com/blog/deploying-worker-service-to-kubernetes/">
+    
+    
+      <meta name="twitter:description" content="Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects.">
+    
+    
+      <meta name="twitter:image:src" content="https://www.johanohlin.com/assets/img/azure-background.jpg">
+    
+
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/assets/img/favicon.ico" />
+
+    <!-- Come and get me RSS readers -->
+    <link rel="alternate" type="application/rss+xml" title="Diving into Azure" href="https://www.johanohlin.com/feed.xml" />
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <!--[if IE 8]><link rel="stylesheet" href="/assets/css/ie.css"><![endif]-->
+    <link rel="canonical" href="https://www.johanohlin.com/blog/deploying-worker-service-to-kubernetes/">
+
+    <!-- Modernizr -->
+    <script src="/assets/js/modernizr.custom.15390.js" type="text/javascript"></script>
+    <script>
+      function readCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+        return null;
+      }
+    </script>
+    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+<script>
+    if(readCookie('cookie-notice-dismissed')=='true') {
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-33665467-2', 'auto');
+        ga('send', 'pageview');
+    }
+</script>
+
+  </head>
+
+
+   <body>
+
+       <div class="header">
+     <div class="container">
+         <h1 class="logo"><a href="/">Diving into Azure</a></h1>
+         <nav class="nav-collapse">
+             <ul class="noList">
+                 
+                 <li class="element first  ">
+                     <a href="/index.html">Home</a>
+                 </li> 
+                 
+                 <li class="element   ">
+                     <a href="/about">About</a>
+                 </li> 
+                 
+                 <li class="element   last">
+                     <a href="/privacy">Privacy</a>
+                 </li> 
+                 
+             </ul>
+         </nav>
+     </div>
+ </div><!-- end .header -->
+
+
+      <div class="content">
+         <div class="container">
+            <div class="post">
+  
+  <h1 class="postTitle">Deploying a worker service to Kubernetes</h1>
+  <p class="meta">
+    November 19, 2019 |
+    <span class="time">18</span>
+    Minute Read
+  </p>
+
+  <p class="intro"><span class="dropcap">O</span>nce you have the worker service configured with health checks it's time to get it deployed. In this article I'll show you how to deploy the service to AKS (Kubernetes) using ACR and Helm.</p>
+
+<p>This article is based on a <a href="/blog/worker-service-in-kubernetes-with-health-checks/">previous article</a> where we created a Worker Service in .NET Core 3 with health checks endpoints enabled.</p>
+
+<p>In a real world scenario you would set up complete CI/CD pipelines doing some of these steps for you. However, in this article I’ll do all the steps manually to show a bit more in detail how it’s being done.</p>
+
+<h3 id="create-docker-image">Create docker image</h3>
+
+<p>If you created your project with docker support, then you should have a docker file in your project root. If not, then you can create a new one by right-clicking the project and selecting <code class="highlighter-rouge">Add</code> -&gt; <code class="highlighter-rouge">Docker Support</code>. You’ll be asked what <code class="highlighter-rouge">Target OS</code> to create the dockerfile for, either Linux or Windows. This is not the OS on your machine but rather what OS the container will be running on and you can use both Linux and Windows on a Windows computer.</p>
+
+<p>The dockerfile might differ depending on what version of Visual Studio you’re using. But it should look something like this.</p>
+
+<figure class="highlight"><pre><code class="language-docker" data-lang="docker"><span class="k">FROM</span><span class="s"> mcr.microsoft.com/dotnet/core/aspnet:3.0-buster-slim AS base</span>
+<span class="k">WORKDIR</span><span class="s"> /app</span>
+<span class="k">EXPOSE</span><span class="s"> 80</span>
+
+<span class="k">FROM</span><span class="s"> mcr.microsoft.com/dotnet/core/sdk:3.0-buster AS build</span>
+<span class="k">WORKDIR</span><span class="s"> /src</span>
+<span class="k">COPY</span><span class="s"> ["WorkerServiceWithHealthChecks/WorkerServiceWithHealthChecks.csproj", "WorkerServiceWithHealthChecks/"]</span>
+<span class="k">RUN </span>dotnet restore <span class="s2">"WorkerServiceWithHealthChecks/WorkerServiceWithHealthChecks.csproj"</span>
+<span class="k">COPY</span><span class="s"> . .</span>
+<span class="k">WORKDIR</span><span class="s"> "/src/WorkerServiceWithHealthChecks"</span>
+<span class="k">RUN </span>dotnet build <span class="s2">"WorkerServiceWithHealthChecks.csproj"</span> <span class="nt">-c</span> Release <span class="nt">-o</span> /app/build
+
+<span class="k">FROM</span><span class="s"> build AS publish</span>
+<span class="k">RUN </span>dotnet publish <span class="s2">"WorkerServiceWithHealthChecks.csproj"</span> <span class="nt">-c</span> Release <span class="nt">-o</span> /app/publish
+
+<span class="k">FROM</span><span class="s"> base AS final</span>
+<span class="k">WORKDIR</span><span class="s"> /app</span>
+<span class="k">COPY</span><span class="s"> --from=publish /app/publish .</span>
+<span class="k">ENTRYPOINT</span><span class="s"> ["dotnet", "WorkerServiceWithHealthChecks.dll"]</span></code></pre></figure>
+
+<p>To build a docker image from your dockerfile you need to have docker running on the build machine, which is the local dev machine for me. I have <a href="https://www.docker.com/products/docker-desktop">Docker Desktop</a> installed, running Linux containers.</p>
+
+<p>The <code class="highlighter-rouge">FROM</code> line in the dockerfile above tells what source to use. <code class="highlighter-rouge">aspnet:3.0-buster-slim</code> is a Debian Linux source containing ASP.NET 3.0. More possible sources can be found <a href="https://hub.docker.com/_/microsoft-dotnet-core-aspnet/">here</a>.</p>
+
+<p>In Visual Studio, right-click on a dockerfile and select <code class="highlighter-rouge">Build Docker image</code> to build it. You can also build a Docker image using the command line</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">docker build <span class="nt">--rm</span> <span class="nt">-f</span> <span class="s2">"Dockerfile"</span> <span class="nt">-t</span> workerservicewithhealthchecks:latest .</code></pre></figure>
+
+<h3 id="push-docker-image-to-a-container-registry">Push docker image to a container registry</h3>
+
+<p>A container registry is like a code repository on internet, but for container images. These images can then easily be pulled later on by different resources that need them. In this example, I’ll use Azure Container Registry (ACR) to store the built images.</p>
+
+<p>For the purpose of this article, I’ve setup a basic container registry named <code class="highlighter-rouge">blogacrtest</code>, accessible through the URI <code class="highlighter-rouge">blogacrtest.azurecr.io</code>.</p>
+
+<p>To push an image to ACR from your command prompt you need to first have <a href="https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest">Azure CLI</a> installed. When it’s installed you can login to ACR this way:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">az login
+az acr login <span class="nt">-n</span> blogacrtest</code></pre></figure>
+
+<p>If you have created an ACR instance separately from the AKS instance then they need to be linked together for AKS to have permissions to pull images. There are different ways of doing it. One of the newer options is to use the update command for AKS. It’s currently in preview mode so you need to enable preview features before you can use it. This might not be an option for you if you’re running your cluster in production. This way of linking only works if they are in the same subscription.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">az aks update <span class="nt">-n</span> myAKSCluster <span class="nt">-g</span> myResourceGroup <span class="nt">--attach-acr</span> blogacrtest</code></pre></figure>
+
+<p>Run the following command to view all the existing images you’ve created. Your recent image <code class="highlighter-rouge">myworkerservice</code> should be there in the list with the tag <code class="highlighter-rouge">latest</code>.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">docker image list</code></pre></figure>
+
+<p>We need to create a tag target for the new container registry that refers to the local image.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">docker tag workerservicewithhealthchecks blogacrtest.azurecr.io/workerservicewithhealthchecks:0.0.1</code></pre></figure>
+
+<p>When we now list all images we’ll see how both images point to the same image id.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">REPOSITORY                                             TAG                 IMAGE ID            CREATED             SIZE
+blogacrtest.azurecr.io/workerservicewithhealthchecks   0.0.1               59aa0a033cb6        4 minutes ago       210MB
+workerservicewithhealthchecks                          latest              59aa0a033cb6        4 minutes ago       210MB</code></pre></figure>
+
+<p>And then finally we can push the image.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">docker push blogacrtest.azurecr.io/workerservicewithhealthchecks:0.0.1</code></pre></figure>
+
+<p>This will take some time when we do it for the first time.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">The push refers to repository <span class="o">[</span>blogacrtest.azurecr.io/workerservicewithhealthchecks]
+58d48a1xxxxx: Pushed
+ce65098xxxxx: Pushed
+0a37aeexxxxx: Pushing <span class="o">[================&gt;</span>                                  <span class="o">]</span>  25.78MB/76.45MB
+1c7781dxxxxx: Pushed
+00672cbxxxxx: Pushing <span class="o">[===========================&gt;</span>                       <span class="o">]</span>  23.01MB/41.34MB
+2db44bcxxxxx: Pushing <span class="o">[=======&gt;</span>                                           <span class="o">]</span>  10.32MB/69.21MB</code></pre></figure>
+
+<p>I won’t go into detail how a docker image is built up, but basically it’s split up into separate layers, out of which your code only is one of them. The other layers are related to the framework your code is running on. When you make changes to your code and push anew then only that layer needs to be pushed, the others stay as they are. The subsequent pushes will therefore go much quicker, unless you change the source part in your docker file.</p>
+
+<p>In Azure Container Registry it should now look like this.</p>
+
+<figure class="image">
+  <picture class="awesome" data-volume="11">
+  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-400by194-658e8d.webp 400w, /assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-800by388-658e8d.webp 800w, /assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-1200by582-658e8d.webp 1200w, /assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-1600by775-658e8d.webp 1600w" type="image/webp" />
+  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-400by194-658e8d.png 400w, /assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-800by388-658e8d.png 800w, /assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-1200by582-658e8d.png 1200w, /assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-1600by775-658e8d.png 1600w" type="image/png" />
+  <img class="some-other-class" alt="Docker images in Azure Container Registry after being pushed" src="/assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-800by388-658e8d.png" />
+</picture>
+
+  <figcaption></figcaption>
+</figure>
+
+<h3 id="creating-a-helm-chart-for-deployment">Creating a Helm chart for deployment</h3>
+
+<p><a href="https://v3.helm.sh/">Helm</a> is a package manager for Kubernetes that abstracts away many of the complexities of a deployment using the native yaml files, something you otherwise would have to use. Helm 3 has recently reached release candidate level so I’ll use that version here instead of the stable Helm 2. The main reason is that Helm 3 has ditched the <a href="https://helm.sh/docs/glossary/#tiller">tiller</a> component that Helm 2 forced you to install in your kubernetes cluster with way to high access rights. Now with that <a href="https://engineering.bitnami.com/articles/running-helm-in-production.html">security issue</a> gone we should stick to Helm 3.</p>
+
+<p>A <a href="https://helm.sh/docs/developing_charts/#charts">Helm chart</a> is the package that bundles your docker image file into a deployable unit. Helm has a lot of features to offer, including defining dependencies between several different Helm charts and also, once you’ve installed a Helm chart in Kubernetes, the ability to rollback to a previous version of your chart.</p>
+
+<p>The official way to create a Helm chart in Visual Studio is still using Helm version 2. Right-click on your <code class="highlighter-rouge">project</code> and select <code class="highlighter-rouge">Add</code> -&gt; <code class="highlighter-rouge">Container Orchestration Support</code>. In the dialog that comes up, select <code class="highlighter-rouge">Kubernetes/Helm</code>. This will create a chart for your project and setup a connection to Azure Dev Spaces (a really cool feature that I’ll write more about another time).</p>
+
+<p>But if you want to use Helm 3 you have to do a bit more manual work. Installing Helm in Windows is done by using chocolatey, but that has currently also only Helm 2 to offer. Keep an eye on <a href="https://chocolatey.org/packages/kubernetes-helm">this page</a> for what Helm versions being supported.</p>
+
+<p>The current way to install Helm 3 is to download it from the <a href="https://github.com/helm/helm/releases">releases page</a> and add the folder with the binary to the path environment variable. If you run <code class="highlighter-rouge">helm version</code> you should see the current client version being printed on screen.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="o">&gt;</span> helm version
+version.BuildInfo<span class="o">{</span>Version:<span class="s2">"v3.0.0-rc.3"</span>, GitCommit:<span class="s2">"..."</span>, GitTreeState:<span class="s2">"clean"</span>, GoVersion:<span class="s2">"go1.13.4"</span><span class="o">}</span></code></pre></figure>
+
+<p>If you have Helm 2 installed you’ll see two lines here, the client and tiller in the cluster. If tiller isn’t configured, you’ll see an error, as in the example below.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="o">&gt;</span> helm version
+Client: &amp;version.Version<span class="o">{</span>SemVer:<span class="s2">"v2.16.0"</span>, GitCommit:<span class="s2">"..."</span>, GitTreeState:<span class="s2">"clean"</span><span class="o">}</span>
+Error: could not find tiller</code></pre></figure>
+
+<p>Inside your code project, create a folder named charts. Inside that folder, run the following command to create a Helm chart for your docker image. It’s important to write the chart name in lower case or you’ll end up with errors later on during deployment.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">helm create workerservicewithhealthchecks</code></pre></figure>
+
+<p>When the Helm chart is created, it creates templates for deployment (pods), service and ingress. However, the worker service, that we’re trying to deploy here, only needs a deployment since there’s no inbound traffic. The health check endpoint on the worker service is accessed directly on each pod by Kubernetes and for that, the deployment is just enough. You can therefore delete the files <code class="highlighter-rouge">ingress.yaml</code>, <code class="highlighter-rouge">service.yaml</code> and <code class="highlighter-rouge">serviceaccount.yaml</code> from your chart.</p>
+
+<p>In the file <code class="highlighter-rouge">values.yaml</code> you can remove the section <code class="highlighter-rouge">service:</code>. Also change <code class="highlighter-rouge">ingress</code> to have <code class="highlighter-rouge">enabled: false</code> and <code class="highlighter-rouge">serviceAccount:</code> to have <code class="highlighter-rouge">create: false</code>. Change the section <code class="highlighter-rouge">image:</code> to link to our new repository. These sections in the file should then look like this:</p>
+
+<figure class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="na">image</span><span class="pi">:</span>
+  <span class="na">repository</span><span class="pi">:</span> <span class="s">blogacrtest.azurecr.io/workerservicewithhealthchecks</span>
+  <span class="na">pullPolicy</span><span class="pi">:</span> <span class="s">IfNotPresent</span>
+
+<span class="na">ingress</span><span class="pi">:</span>
+  <span class="na">enabled</span><span class="pi">:</span> <span class="no">false</span>
+
+<span class="na">serviceAccount</span><span class="pi">:</span>
+  <span class="na">create</span><span class="pi">:</span> <span class="no">false</span>
+
+<span class="nn">...</span> </code></pre></figure>
+
+<p>In the file <code class="highlighter-rouge">Chart.yaml</code> we have a setting <code class="highlighter-rouge">appVersion</code> that needs to reflect the tag we’ve assigned to the image. In the example above we set the value to <code class="highlighter-rouge">0.0.1</code> so that’s the value we need to change the app version to. Don’t confuse this setting with <code class="highlighter-rouge">version</code> which is the setting of the chart that you’re creating. If you change anything in the chart settings, but not in the app code, then you bump <code class="highlighter-rouge">version</code>. If you make changes in your app code then you bump both <code class="highlighter-rouge">version</code> and <code class="highlighter-rouge">appVersion</code>. The <code class="highlighter-rouge">Chart.yaml</code> file now looks like this:</p>
+
+<figure class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v2</span>
+<span class="na">name</span><span class="pi">:</span> <span class="s">workerservicewithhealthchecks</span>
+<span class="na">description</span><span class="pi">:</span> <span class="s">Worker Service with Health Checks</span>
+<span class="na">type</span><span class="pi">:</span> <span class="s">application</span>
+<span class="na">version</span><span class="pi">:</span> <span class="s">0.0.1</span>
+<span class="na">appVersion</span><span class="pi">:</span> <span class="s">0.0.1</span></code></pre></figure>
+
+<p>The file <code class="highlighter-rouge">NOTES.txt</code> contains information about the new installation that will be written out on the screen after the installation is successful. Since we won’t have a service running, we need to make some alternations here. This sample explains how to setup a proxy to view the health endpoint without running a complete kubernetes service and ingress. Just paste this text into the file and save it.</p>
+
+<figure class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="s">For testing purposes, you can now create a proxy on your local machine to access the service.</span>
+<span class="s">Run these commands and then navigate to http://127.0.0.1:8080/health to view the health status endpoint</span>
+
+<span class="s">export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "workerservicewithhealthchecks.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")</span>
+<span class="s">kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:80</span></code></pre></figure>
+
+<p>Finally, the chart has installed a test to see that the service is up and running. Since we’re not using a service, we can remove the <code class="highlighter-rouge">tests</code> folder.</p>
+
+<p>We’re almost done with the helm chart, but first we need to tweak the deployment template to work with health checks.</p>
+
+<h3 id="kubernetes-health-checks">Kubernetes health checks</h3>
+
+<p>In the <a href="/blog/worker-service-in-kubernetes-with-health-checks/">previous article</a>, we created a worker service with health checks enabled. Here, we’ll hook it up to the infrastructure so Kubernetes can be made aware of the status of the worker service.</p>
+
+<p>Kubernetes has two functionalities for checking the health of a pod:</p>
+
+<ul>
+  <li><strong>Readiness</strong> - checks if pod has started up and is ready to receive requests. Since we have a worker service, we don’t need to think about this one.</li>
+  <li><strong>Liveness</strong> - checks if pod is alive and working as it should. This is the check we can hook into.</li>
+</ul>
+
+<p>If we open up the <code class="highlighter-rouge">deployment.yaml</code> file from the Helm chart, we find a section inside the <code class="highlighter-rouge">containers:</code> looking like this:</p>
+
+<figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><span class="n">livenessProbe</span><span class="p">:</span>
+  <span class="n">httpGet</span><span class="p">:</span>
+    <span class="n">path</span><span class="p">:</span> <span class="p">/</span>
+    <span class="n">port</span><span class="p">:</span> <span class="n">http</span>
+<span class="n">readinessProbe</span><span class="p">:</span>
+  <span class="n">httpGet</span><span class="p">:</span>
+    <span class="n">path</span><span class="p">:</span> <span class="p">/</span>
+    <span class="n">port</span><span class="p">:</span> <span class="n">http</span></code></pre></figure>
+
+<p>We need to make some changes here, but first we need to take a look at what options we have. There are different ways to make <a href="https://cloud.google.com/blog/products/gcp/kubernetes-best-practices-setting-up-health-checks-with-readiness-and-liveness-probes">health checks</a> in Kubernets:</p>
+
+<ul>
+  <li><a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-a-liveness-command">Command</a> - run a command inside pod to figure out its health</li>
+  <li><a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-a-liveness-http-request">HTTP probe</a> - a GET call to a specific endpoint</li>
+  <li><a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-a-tcp-liveness-probe">TCP probe</a> - call to a specific port</li>
+</ul>
+
+<p>In this case, we’ll use the HTTP probe since that’s what we setup in the previous article. A simple HTTP health check can look like this.</p>
+
+<figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><span class="n">livenessProbe</span><span class="p">:</span>
+  <span class="n">httpGet</span><span class="p">:</span>
+    <span class="n">path</span><span class="p">:</span> <span class="p">/</span><span class="n">health</span>
+    <span class="n">port</span><span class="p">:</span> <span class="m">80</span></code></pre></figure>
+
+<p>But there are also other <a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes">settings</a> you can use here to configure the probe:</p>
+
+<ul>
+  <li><strong>initialDelaySeconds</strong> - Number of seconds to wait until starting to check the liveness probe. Default is 0.</li>
+  <li><strong>periodSeconds</strong> - How many seconds between each probe. Default is 10.</li>
+  <li><strong>timeoutSeconds</strong> - Seconds to wait until a timeout is reached. Default is 1.</li>
+  <li><strong>successThreshold</strong> - Number of consecutive successful calls needed after a failed one before it’s classified as successful again. Default is 1 and liveness probe needs 1 to work properly.</li>
+  <li><strong>failureThreshold</strong> - Number of consecutive failed calls needed until it’s classified as failed and Kubernetes will restart the container. Default is 3.</li>
+</ul>
+
+<p>Many of these values are working fine for us by default, but not all. As described in the previous article, a Worker Service is locking the thread until an async/await is reached. During this time, no response will be given on the health endpoint. The value for <code class="highlighter-rouge">timeoutSeconds X failureThreshold</code> needs to be set to a value that is safe considering how often the thread will be released for the health endpoint. This makes these settings highly individual per worker service.</p>
+
+<p>Another value you might need to adjust is the <code class="highlighter-rouge">initialDelaySeconds</code> in case your worker service takes some time to start up.</p>
+
+<p>So in the end, our deployment configuration might look something like this:</p>
+
+<figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><span class="n">livenessProbe</span><span class="p">:</span>
+  <span class="n">httpGet</span><span class="p">:</span>
+    <span class="n">path</span><span class="p">:</span> <span class="p">/</span><span class="n">health</span>
+    <span class="n">port</span><span class="p">:</span> <span class="n">http</span>
+  <span class="n">failureThreshold</span><span class="p">:</span> <span class="m">6</span>
+  <span class="n">timeoutSeconds</span><span class="p">:</span> <span class="m">5</span>
+  <span class="n">periodSeconds</span><span class="p">:</span> <span class="m">15</span>
+  <span class="n">initialDelaySeconds</span><span class="p">:</span> <span class="m">30</span></code></pre></figure>
+
+<p>The key here is that a Worker Service doesn’t need to be as responsive as a Web Service, and thus it’s OK if it takes longer time for Kubernetes to find a stuck pod. Try to aim to cover for up to at least the <a href="https://www.quora.com/What-is-p99-latency">99th percentile</a>.</p>
+
+<h3 id="kubernetes-deployment">Kubernetes deployment</h3>
+
+<p>We have now completed setting up the Helm chart for the worker service. If we want to test-run the installation we can do so by navigating to the charts folder and then run the following command. The first name is the name of the installation in Kubernetes and the second name is the chart name.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">helm <span class="nb">install </span>workerservicewithhealthchecks workerservicewithhealthchecks <span class="nt">--dry-run</span> <span class="nt">--debug</span></code></pre></figure>
+
+<p>If we’re happy with the result we can go ahead and install it for real with this command:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">helm <span class="nb">install </span>workerservicewithhealthchecks workerservicewithhealthchecks</code></pre></figure>
+
+<p>The result should then be displayed as:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">Release <span class="s2">"workerservicewithhealthchecks"</span> has been upgraded. Happy Helming!
+NAME: workerservicewithhealthchecks
+LAST DEPLOYED: Wed Nov 20 08:08:55 2019
+NAMESPACE: default
+STATUS: deployed
+REVISION: 5
+NOTES:
+For testing purposes, you can now create a proxy on your <span class="nb">local </span>machine to access the service.
+Run these commands and <span class="k">then </span>navigate to http://127.0.0.1:8080/health to view the health status endpoint
+
+<span class="nb">export </span><span class="nv">POD_NAME</span><span class="o">=</span><span class="k">$(</span>kubectl get pods <span class="nt">--namespace</span> default <span class="nt">-l</span> <span class="s2">"app.kubernetes.io/name=workerservicewithhealthchecks,app.kubernetes.io/instance=workerservicewithhealthchecks"</span> <span class="nt">-o</span> <span class="nv">jsonpath</span><span class="o">=</span><span class="s2">"{.items[0].metadata.name}"</span><span class="k">)</span>
+kubectl <span class="nt">--namespace</span> default port-forward <span class="nv">$POD_NAME</span> 8080:80</code></pre></figure>
+
+<p>If you later on want to make an upgrade to your code you’ll need to go through the following steps:</p>
+
+<ul>
+  <li>Change code</li>
+  <li>Build new docker image</li>
+  <li>Tag docker image with ACR domain and new tag version</li>
+  <li>Update <code class="highlighter-rouge">Charts.yaml</code> with new version and appVersion</li>
+  <li>Call <code class="highlighter-rouge">helm upgrade</code> instead of install, as seen below</li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">helm upgrade workerservicewithhealthchecks workerservicewithhealthchecks</code></pre></figure>
+
+<h3 id="following-the-results-in-kubernetes">Following the results in Kubernetes</h3>
+
+<p>To view all the installed pods, run <code class="highlighter-rouge">kubectl get pods</code>. In the result you can see the name of your pod and also how many times Kubernetes has restarted it (remember from the previous article that we deliberately made it crash so Kubernetes would restart it).</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">NAME                                             READY   STATUS    RESTARTS   AGE
+workerservicewithhealthchecks-6c69799695-gxmgv   1/1     Running   3          51m</code></pre></figure>
+
+<p>We can now get more detailed information about this pod by running</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">kubectl describe pod workerservicewithhealthchecks-6c69799695-gxmgv</code></pre></figure>
+
+<p>The result is a long list of data, including information about the health checks we have configured, but at the bottom you’ll find the recent events, including how Kubernetes has been killing and restarting the pod. In the helm chart, we configured that it would take 6 failed health checks before it should be deemed as bad. That’s why the <code class="highlighter-rouge">Unhealthy</code> warning in the event has 6 times as many events as the event <code class="highlighter-rouge">Killing</code>.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">Events:
+  Type     Reason     Age                  From                               Message
+  <span class="nt">----</span>     <span class="nt">------</span>     <span class="nt">----</span>                 <span class="nt">----</span>                               <span class="nt">-------</span>
+  Normal   Scheduled  34m                  default-scheduler                  Successfully assigned default/workerservicewithhealthchecks-6c69799695-gxmgv to aks-nodepool1-abc-0
+  Normal   Pulling    34m                  kubelet, aks-nodepool1-abc-0  Pulling image <span class="s2">"ohlin.azurecr.io/workerservicewithhealthchecks:0.0.3"</span>
+  Normal   Pulled     34m                  kubelet, aks-nodepool1-abc-0  Successfully pulled image <span class="s2">"ohlin.azurecr.io/workerservicewithhealthchecks:0.0.3"</span>
+  Warning  Unhealthy  8m6s <span class="o">(</span>x12 over 22m<span class="o">)</span>  kubelet, aks-nodepool1-abc-0  Liveness probe failed: HTTP probe failed with statuscode: 503
+  Normal   Killing    8m6s <span class="o">(</span>x2 over 21m<span class="o">)</span>   kubelet, aks-nodepool1-abc-0  Container workerservicewithhealthchecks failed liveness probe, will be restarted
+  Normal   Created    8m5s <span class="o">(</span>x3 over 34m<span class="o">)</span>   kubelet, aks-nodepool1-abc-0  Created container workerservicewithhealthchecks
+  Normal   Started    8m5s <span class="o">(</span>x3 over 34m<span class="o">)</span>   kubelet, aks-nodepool1-abc-0  Started container workerservicewithhealthchecks
+  Normal   Pulled     8m5s <span class="o">(</span>x2 over 21m<span class="o">)</span>   kubelet, aks-nodepool1-abc-0  Container image <span class="s2">"ohlin.azurecr.io/workerservicewithhealthchecks:0.0.3"</span> already present on machine</code></pre></figure>
+
+<p>Another way to follow the results of how kubernetes changes the status of the pod as it gets restarted, is to list pods with a watch that updates the list as changes occur.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">kubectl get pods <span class="nt">--watch</span></code></pre></figure>
+
+<p>This will result in a list like this where each restart creates a new line</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">NAME                                             READY   STATUS    RESTARTS   AGE
+workerservicewithhealthchecks-6c69799695-gxmgv   1/1     Running   421        3d19h
+workerservicewithhealthchecks-6c69799695-gxmgv   1/1     Running   422        3d19h
+workerservicewithhealthchecks-6c69799695-gxmgv   1/1     Running   423        3d19h
+workerservicewithhealthchecks-6c69799695-gxmgv   1/1     Running   424        3d19h</code></pre></figure>
+
+<h3 id="conclusions">Conclusions</h3>
+
+<p>In this and the previous article, we’ve created a worker service in .NET Core 3 that mainly works on a timer but also exposes a health endpoint that Kubernetes uses to restart it when needed. We have not configured any service or ingress objects enabling external access and it’s therefore not possible to access the service pod to manually check the health status unless you also setup a proxy using kubectl, but that shouldn’t be used in a production environment.</p>
+
+<p>In a real world scenario, you would therefore also need hook up logging to a service like Azure Monitor. This can provide a lot of useful and needed telemetry about how the service is processing the jobs it’s expected to do, something we don’t know (or care) about, from a liveness point of view.</p>
+
+<p>Despite being slightly more fiddly in the setup, adding a health check to a background service gives you a good way to add automatic restart functionality with health rules that you can define for yourself in the code. The possibility is there - why not use it?</p>
+
+
+  <div style="display:flex; justify-content: space-around;">
+    <div style="margin-bottom: 1rem;">
+      
+
+<style>
+#share-buttons {display: inline-block; vertical-align: middle; }
+#share-buttons:after {content: ""; display: block; clear: both;}
+#share-buttons > div {
+    position: relative;
+    text-align: left; 
+    height: 36px; 
+    width: 32px; 
+    float: left; 
+    text-align: center;
+}
+#share-buttons > div > svg {height: 16px; fill: #d5d5d5; margin-top: 10px;}
+#share-buttons > div:hover {cursor: pointer;}
+#share-buttons > div.facebook:hover > svg {fill: #3B5998;}
+#share-buttons > div.twitter:hover > svg {fill: #55ACEE;}
+#share-buttons > div.linkedin:hover > svg {fill: #0077b5;}
+#share-buttons > div.pinterest:hover > svg {fill: #CB2027;}
+#share-buttons > div.gplus:hover > svg {fill: #dd4b39;}
+#share-buttons > div.mail:hover > svg {fill: #7D7D7D;}
+#share-buttons > div.instagram:hover > svg {fill: #C73B92;}
+#share-buttons > div.facebook > svg {height: 18px; margin-top: 9px;}
+#share-buttons > div.twitter > svg {height: 20px; margin-top: 8px;}
+#share-buttons > div.linkedin > svg {height: 19px; margin-top: 7px;}
+#share-buttons > div.pinterest > svg {height: 20px; margin-top: 9px;}
+#share-buttons > div.gplus > svg {height: 17px; margin-top: 9px; position: relative; left: 1px;}
+#share-buttons > div.mail > svg {height: 14px; margin-top: 11px;}
+</style>
+
+<span style="color: silver;">Share on: </span><div id="share-buttons">
+    <div class="facebook" title="Share this on Facebook" onclick="window.open('http://www.facebook.com/share.php?u=https://www.johanohlin.com/blog/deploying-worker-service-to-kubernetes/');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1343 12v264h-157q-86 0-116 36t-30 108v189h293l-39 296h-254v759h-306v-759h-255v-296h255v-218q0-186 104-288.5t277-102.5q147 0 228 12z"/></svg></div>
+    <div class="twitter" title="Share this on Twitter" onclick="window.open('http://twitter.com/home?status=https://www.johanohlin.com/blog/deploying-worker-service-to-kubernetes/');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1684 408q-67 98-162 167 1 14 1 42 0 130-38 259.5t-115.5 248.5-184.5 210.5-258 146-323 54.5q-271 0-496-145 35 4 78 4 225 0 401-138-105-2-188-64.5t-114-159.5q33 5 61 5 43 0 85-11-112-23-185.5-111.5t-73.5-205.5v-4q68 38 146 41-66-44-105-115t-39-154q0-88 44-163 121 149 294.5 238.5t371.5 99.5q-8-38-8-74 0-134 94.5-228.5t228.5-94.5q140 0 236 102 109-21 205-78-37 115-142 178 93-10 186-50z"/></svg></div>
+    <div class="linkedin" title="Share this on Linkedin" onclick="window.open('https://www.linkedin.com/shareArticle?mini=true&url=https://www.johanohlin.com/blog/deploying-worker-service-to-kubernetes/&title=&summary=&source=');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M477 625v991h-330v-991h330zm21-306q1 73-50.5 122t-135.5 49h-2q-82 0-132-49t-50-122q0-74 51.5-122.5t134.5-48.5 133 48.5 51 122.5zm1166 729v568h-329v-530q0-105-40.5-164.5t-126.5-59.5q-63 0-105.5 34.5t-63.5 85.5q-11 30-11 81v553h-329q2-399 2-647t-1-296l-1-48h329v144h-2q20-32 41-56t56.5-52 87-43.5 114.5-15.5q171 0 275 113.5t104 332.5z"/></svg></div>
+    
+    <div class="gplus" title="Share this on Google Plus" onclick="window.open('https://plus.google.com/share?url=https://www.johanohlin.com/blog/deploying-worker-service-to-kubernetes/');"><svg viewBox="0 0 2304 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1437 913q0 208-87 370.5t-248 254-369 91.5q-149 0-285-58t-234-156-156-234-58-285 58-285 156-234 234-156 285-58q286 0 491 192l-199 191q-117-113-292-113-123 0-227.5 62t-165.5 168.5-61 232.5 61 232.5 165.5 168.5 227.5 62q83 0 152.5-23t114.5-57.5 78.5-78.5 49-83 21.5-74h-416v-252h692q12 63 12 122zm867-122v210h-209v209h-210v-209h-209v-210h209v-209h210v209h209z"/></svg></div>
+    <div class="mail" title="Share this through Email" onclick="window.open('mailto:?&body=https://www.johanohlin.com/blog/deploying-worker-service-to-kubernetes/');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1792 710v794q0 66-47 113t-113 47h-1472q-66 0-113-47t-47-113v-794q44 49 101 87 362 246 497 345 57 42 92.5 65.5t94.5 48 110 24.5h2q51 0 110-24.5t94.5-48 92.5-65.5q170-123 498-345 57-39 100-87zm0-294q0 79-49 151t-122 123q-376 261-468 325-10 7-42.5 30.5t-54 38-52 32.5-57.5 27-50 9h-2q-23 0-50-9t-57.5-27-52-32.5-54-38-42.5-30.5q-91-64-262-182.5t-205-142.5q-62-42-117-115.5t-55-136.5q0-78 41.5-130t118.5-52h1472q65 0 112.5 47t47.5 113z"/></svg></div>
+</div>
+    </div>
+  </div>
+  
+  <!-- POST NAVIGATION -->
+  <div class="postNav clearfix">
+    
+    <a
+      class="prev"
+      href="/blog/worker-service-in-kubernetes-with-health-checks/"
+      ><span>&laquo;&nbsp;Worker services in Kubernetes with health checks</span>
+      
+    </a>
+     
+  </div>
+  <div style="margin-bottom:2rem;">
+      <div style="clear:both; padding-top:2rem;" class="container">
+  
+  
+  
+  
+
+  
+  
+  
+  
+  
+    <a href="/tag/react/"
+    style="font-size: 20px; line-height:70%; text-decoration:none;">
+        react
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/office-ui-fabric/"
+    style="font-size: 20px; line-height:70%; text-decoration:none;">
+        office-ui-fabric
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/azure/"
+    style="font-size: 41px; line-height:70%; text-decoration:none;">
+        azure
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/azure-functions/"
+    style="font-size: 20px; line-height:70%; text-decoration:none;">
+        azure-functions
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/sendgrid/"
+    style="font-size: 20px; line-height:70%; text-decoration:none;">
+        sendgrid
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/css/"
+    style="font-size: 20px; line-height:70%; text-decoration:none;">
+        css
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/flexbox/"
+    style="font-size: 20px; line-height:70%; text-decoration:none;">
+        flexbox
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/html/"
+    style="font-size: 20px; line-height:70%; text-decoration:none;">
+        html
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/diy/"
+    style="font-size: 20px; line-height:70%; text-decoration:none;">
+        diy
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/automapper/"
+    style="font-size: 20px; line-height:70%; text-decoration:none;">
+        automapper
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/.net-core/"
+    style="font-size: 62px; line-height:70%; text-decoration:none;">
+        .net-core
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/asp.net-core/"
+    style="font-size: 41px; line-height:70%; text-decoration:none;">
+        asp.net-core
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/cosmosdb/"
+    style="font-size: 20px; line-height:70%; text-decoration:none;">
+        cosmosdb
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/docker/"
+    style="font-size: 20px; line-height:70%; text-decoration:none;">
+        docker
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/c#/"
+    style="font-size: 41px; line-height:70%; text-decoration:none;">
+        c#
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/worker-service/"
+    style="font-size: 34px; line-height:70%; text-decoration:none;">
+        worker-service
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/app-configuration/"
+    style="font-size: 20px; line-height:70%; text-decoration:none;">
+        app-configuration
+    </a>
+    <span>&nbsp;</span>
+  
+    <a href="/tag/kubernetes/"
+    style="font-size: 27px; line-height:70%; text-decoration:none;">
+        kubernetes
+    </a>
+    <span>&nbsp;</span>
+  
+  </div>
+  </div>
+</div>
+
+ 
+<div id="disqus_thread"></div>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://www.johanohlin.com/blog/deploying-worker-service-to-kubernetes/";
+    this.page.identifier = "https://www.johanohlin.com/blog/deploying-worker-service-to-kubernetes/";
+  };
+
+  (function() {
+    if(readCookie('cookie-notice-dismissed')=='true') {
+      // DON'T EDIT BELOW THIS LINE
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://diving-into-azure.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  })();
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+ 
+         </div>
+      </div><!-- end .content -->
+
+      <div class="footer">
+   <div class="container">
+      <p class="copy">&copy; 2019 <a href="https://www.johanohlin.com">Johan Ohlin</a> Powered by <a href="http://jekyllrb.com">Jekyll</a></p>
+
+      <div class="footer-links"> 
+         <ul class="noList"> 
+            
+            <li><a href="https://www.linkedin.com/in/johanohlin" target="_blank" aria-label="Connect to me on Linked In">
+                  <svg id="facebook-square" class="custom-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" style="height: 30px; width: 30px;"><circle class="outer-shape" cx="50" cy="50" r="48" style="opacity: 1;"></circle>
+                  <path class="inner-shape" style="opacity: 1;" transform="translate(25,25) scale(0.5)" d="M82.667,1H17.335C8.351,1,1,8.351,1,17.336v65.329c0,8.99,7.351,16.335,16.334,16.335h65.332 C91.652,99.001,99,91.655,99,82.665V17.337C99,8.353,91.652,1.001,82.667,1L82.667,1z M84.318,50H68.375v42.875H50V50h-8.855V35.973 H50v-9.11c0-12.378,5.339-19.739,19.894-19.739h16.772V22.3H72.967c-4.066-0.007-4.57,2.12-4.57,6.078l-0.023,7.594H86.75 l-2.431,14.027V50z"></path>
+                  </svg>
+            </a></li>
+            
+            
+            
+            <li><a href="https://twitter.com/ohlinjohan" target="_blank"  aria-label="Follow me on twitter">
+                  <svg id="twitter" class="custom-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" style="height: 30px; width: 30px;"><circle class="outer-shape" cx="50" cy="50" r="48" style="opacity: 1;"></circle>
+                  <path class="inner-shape" style="opacity: 1;" transform="translate(25,25) scale(0.5)" d="M99.001,19.428c-3.606,1.608-7.48,2.695-11.547,3.184c4.15-2.503,7.338-6.466,8.841-11.189 c-3.885,2.318-8.187,4-12.768,4.908c-3.667-3.931-8.893-6.387-14.676-6.387c-11.104,0-20.107,9.054-20.107,20.223 c0,1.585,0.177,3.128,0.52,4.609c-16.71-0.845-31.525-8.895-41.442-21.131C6.092,16.633,5.1,20.107,5.1,23.813 c0,7.017,3.55,13.208,8.945,16.834c-3.296-0.104-6.397-1.014-9.106-2.529c-0.002,0.085-0.002,0.17-0.002,0.255 c0,9.799,6.931,17.972,16.129,19.831c-1.688,0.463-3.463,0.71-5.297,0.71c-1.296,0-2.555-0.127-3.783-0.363 c2.559,8.034,9.984,13.882,18.782,14.045c-6.881,5.424-15.551,8.657-24.971,8.657c-1.623,0-3.223-0.096-4.796-0.282 c8.898,5.738,19.467,9.087,30.82,9.087c36.982,0,57.206-30.817,57.206-57.543c0-0.877-0.02-1.748-0.059-2.617 C92.896,27.045,96.305,23.482,99.001,19.428z"></path>
+                  </svg>
+            </a></li>
+            
+            
+            <li><a href="https://github.com/johanohlin" target="_blank"  aria-label="View my projects on git hub">
+                  <svg id="github" class="custom-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" style="height: 30px; width: 30px;"><circle class="outer-shape" cx="50" cy="50" r="48" style="opacity: 1;"></circle>
+                  <path class="inner-shape" style="opacity: 1;" transform="translate(25,25) scale(0.5)" d="M50,1C22.938,1,1,22.938,1,50s21.938,49,49,49s49-21.938,49-49S77.062,1,50,1z M79.099,79.099 c-3.782,3.782-8.184,6.75-13.083,8.823c-1.245,0.526-2.509,0.989-3.79,1.387v-7.344c0-3.86-1.324-6.699-3.972-8.517 c1.659-0.16,3.182-0.383,4.57-0.67c1.388-0.287,2.855-0.702,4.402-1.245c1.547-0.543,2.935-1.189,4.163-1.938 c1.228-0.75,2.409-1.723,3.541-2.919s2.082-2.552,2.847-4.067s1.372-3.334,1.818-5.455c0.446-2.121,0.67-4.458,0.67-7.01 c0-4.945-1.611-9.155-4.833-12.633c1.467-3.828,1.308-7.991-0.478-12.489l-1.197-0.143c-0.829-0.096-2.321,0.255-4.474,1.053 c-2.153,0.798-4.57,2.105-7.249,3.924c-3.797-1.053-7.736-1.579-11.82-1.579c-4.115,0-8.039,0.526-11.772,1.579 c-1.69-1.149-3.294-2.097-4.809-2.847c-1.515-0.75-2.727-1.26-3.637-1.532c-0.909-0.271-1.754-0.439-2.536-0.503 c-0.782-0.064-1.284-0.079-1.507-0.048c-0.223,0.031-0.383,0.064-0.478,0.096c-1.787,4.53-1.946,8.694-0.478,12.489 c-3.222,3.477-4.833,7.688-4.833,12.633c0,2.552,0.223,4.889,0.67,7.01c0.447,2.121,1.053,3.94,1.818,5.455 c0.765,1.515,1.715,2.871,2.847,4.067s2.313,2.169,3.541,2.919c1.228,0.751,2.616,1.396,4.163,1.938 c1.547,0.543,3.014,0.957,4.402,1.245c1.388,0.287,2.911,0.511,4.57,0.67c-2.616,1.787-3.924,4.626-3.924,8.517v7.487 c-1.445-0.43-2.869-0.938-4.268-1.53c-4.899-2.073-9.301-5.041-13.083-8.823c-3.782-3.782-6.75-8.184-8.823-13.083 C9.934,60.948,8.847,55.56,8.847,50s1.087-10.948,3.231-16.016c2.073-4.899,5.041-9.301,8.823-13.083s8.184-6.75,13.083-8.823 C39.052,9.934,44.44,8.847,50,8.847s10.948,1.087,16.016,3.231c4.9,2.073,9.301,5.041,13.083,8.823 c3.782,3.782,6.75,8.184,8.823,13.083c2.143,5.069,3.23,10.457,3.23,16.016s-1.087,10.948-3.231,16.016 C85.848,70.915,82.88,75.317,79.099,79.099L79.099,79.099z"></path>
+                  </svg>
+            </a></li>
+             
+            
+            <li><a href="mailto:johan.ohlin@outlook.com"  aria-label="Send me an email">
+                  <svg id="mail" class="custom-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" style="height: 30px; width: 30px;"><circle class="outer-shape" cx="50" cy="50" r="48" style="opacity: 1;"></circle>
+                  <path class="inner-shape" style="opacity: 1;" transform="translate(25,25) scale(0.5)" d="M50,1C22.938,1,1,22.938,1,50s21.938,49,49,49s49-21.938,49-49S77.062,1,50,1z M25.5,25.5h49 c0.874,0,1.723,0.188,2.502,0.542L50,57.544L22.998,26.041C23.777,25.687,24.626,25.499,25.5,25.5L25.5,25.5z M19.375,68.375v-36.75 c0-0.128,0.005-0.256,0.014-0.383l17.96,20.953L19.587,69.958C19.448,69.447,19.376,68.916,19.375,68.375L19.375,68.375z M74.5,74.5 h-49c-0.541,0-1.072-0.073-1.583-0.212l17.429-17.429L50,66.956l8.653-10.096l17.429,17.429C75.572,74.427,75.041,74.5,74.5,74.5 L74.5,74.5z M80.625,68.375c0,0.541-0.073,1.072-0.211,1.583L62.652,52.195l17.96-20.953c0.008,0.127,0.014,0.255,0.014,0.383 L80.625,68.375L80.625,68.375z"></path>
+                  </svg>
+            </a></li>
+            
+         </ul>
+      </div>
+   </div>
+</div><!-- end .footer -->
+
+
+      <!-- Add jQuery and other scripts -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src=""><\/script>')</script>
+<script src="/assets/js/dropcap.min.js"></script>
+<script src="/assets/js/responsive-nav.min.js"></script>
+<script src="/assets/js/scripts.js"></script>
+
+      <style>
+  #cookie-notice {padding: 0.5rem 1rem; display: none; text-align: center; position: fixed; bottom: 0; 
+  background: #222; color: rgba(255,255,255,0.8);z-index:9999;}
+  #cookie-notice a {display: inline-block; cursor: pointer; margin-left: 0.5rem;}
+  @media (max-width: 767px) {
+      #cookie-notice span {display: block; padding-top: 3px; margin-bottom: 1rem;}
+      #cookie-notice a {position: relative; bottom: 4px;}
+  }
+</style>
+<div id="cookie-notice"><span>We would like to use third party cookies and scripts to improve the functionality of this website.</span><a id="cookie-notice-accept" class="btn btn-primary btn-sm">Approve</a><a href="/privacy" class="btn btn-primary btn-sm">More info</a></div>
+<script>
+  function createCookie(name,value,days) {
+      var expires = "";
+      if (days) {
+          var date = new Date();
+          date.setTime(date.getTime() + (days*24*60*60*1000));
+          expires = "; expires=" + date.toUTCString();
+      }
+      document.cookie = name + "=" + value + expires + "; path=/";
+  }
+  // function readCookie(name) {
+  //     var nameEQ = name + "=";
+  //     var ca = document.cookie.split(';');
+  //     for(var i=0;i < ca.length;i++) {
+  //         var c = ca[i];
+  //         while (c.charAt(0)==' ') c = c.substring(1,c.length);
+  //         if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+  //     }
+  //     return null;
+  // }
+  function eraseCookie(name) {
+      createCookie(name,"",-1);
+  }
+
+  if(readCookie('cookie-notice-dismissed')!='true') {
+      document.getElementById('cookie-notice').style.display = 'block';
+  }
+  document.getElementById('cookie-notice-accept').addEventListener("click",function() {
+      createCookie('cookie-notice-dismissed','true',31);
+      document.getElementById('cookie-notice').style.display = 'none';
+      location.reload();
+  });
+
+</script>
+
+   </body>
+</html>
