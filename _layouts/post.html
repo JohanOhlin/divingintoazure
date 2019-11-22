@@ -21,13 +21,15 @@ layout: default
   </p>
 
   {{ content }}
-
   <div style="display:flex; justify-content: space-around;">
     <div style="margin-bottom: 1rem;">
-      {% include share-buttons.html %}
+      <div style="display:inline-block; position:relative; top:-8px; margin-right:10px;font-weight:bold;color:rgba(0,0,0,0.5);">Share via</div>
+      <div style="display:inline-block; position:relative;">
+        <a href="https://twitter.com/intent/tweet?button_hashtag=&ref_src=twsrc%5Etfw" class="twitter-hashtag-button" data-text="{{page.twitter-title | default: page.title}} {{ site.url }}{{ page.url }} via @OhlinJohan" data-related="ohlinjohan" data-show-count="true" data-size="large"></a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      </div>
     </div>
-  </div>
-  
+  </div> 
+
   <!-- POST NAVIGATION -->
   <div class="postNav clearfix">
     {% if page.previous.url %}

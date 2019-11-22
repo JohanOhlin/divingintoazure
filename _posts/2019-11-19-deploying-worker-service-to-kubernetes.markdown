@@ -1,17 +1,20 @@
 ---
 layout: post
 title: "Deploying a worker service to Kubernetes"
-date: 2019-11-08
+date: 2019-11-19
 tags: c# azure .net-core worker-service kubernetes
+twitter-title: "Deploying a #netcore worker service to #Kubernetes"
 ---
 
 <p class="intro"><span class="dropcap">O</span>nce you have the worker service configured with health checks it's time to get it deployed. In this article I'll show you how to deploy the service to AKS (Kubernetes) using ACR and Helm.</p>
+
+This article is based on a [previous article]({{ site.baseurl }}{% post_url 2019-11-07-worker-service-in-kubernetes-with-health-checks %}) where we created a Worker Service in .NET Core 3 with health checks endpoints enabled.
 
 In a real world scenario you would set up complete CI/CD pipelines doing some of these steps for you. However, in this article I'll do all the steps manually to show a bit more in detail how it's being done.
 
 ### Create docker image
 
-If you created your project with docker support, then you should have a docker file in your project root. If not, then you can create a new one by right-clicking the project and selecting `Add` -> `Docker Support`. You'll be asked what `Target OS` to create the dockerfile for, either Linux or Windows. This is not the OS on your machine but rather what OS the container will be running on and you can use both Linxu and Windows on a Windows computer.
+If you created your project with docker support, then you should have a docker file in your project root. If not, then you can create a new one by right-clicking the project and selecting `Add` -> `Docker Support`. You'll be asked what `Target OS` to create the dockerfile for, either Linux or Windows. This is not the OS on your machine but rather what OS the container will be running on and you can use both Linux and Windows on a Windows computer.
 
 The dockerfile might differ depending on what version of Visual Studio you're using. But it should look something like this.
 
@@ -37,19 +40,21 @@ COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "WorkerServiceWithHealthChecks.dll"]
 {% endhighlight %}
 
-To build a docker image from your dockerfile you need to have docker running on the build machine, which is locally for me. I have [Docker Desktop](https://www.docker.com/products/docker-desktop) installed, running Linux containers. The `FROM` line in the dockerfile tells what source to use. `aspnet:3.0-buster-slim` is a Debian Linux source containing ASP.NET 3. More possible sources can be found [here](https://hub.docker.com/_/microsoft-dotnet-core-aspnet/).
+To build a docker image from your dockerfile you need to have docker running on the build machine, which is the local dev machine for me. I have [Docker Desktop](https://www.docker.com/products/docker-desktop) installed, running Linux containers. 
+
+The `FROM` line in the dockerfile above tells what source to use. `aspnet:3.0-buster-slim` is a Debian Linux source containing ASP.NET 3.0. More possible sources can be found [here](https://hub.docker.com/_/microsoft-dotnet-core-aspnet/).
 
 In Visual Studio, right-click on a dockerfile and select `Build Docker image` to build it. You can also build a Docker image using the command line
 
 {% highlight bash %}
-docker build --rm -f "Dockerfile" -t myworkerservice:latest .
+docker build --rm -f "Dockerfile" -t workerservicewithhealthchecks:latest .
 {% endhighlight %}
 
 ### Push docker image to a container registry
 
-A container registry is like a code repository on internet, but it stores container images. Using a container registry when later on deploying to Kubernetes makes the whole flow easier. In this example, I'll use Azure Container Registry (ACR) to store the built image. 
+A container registry is like a code repository on internet, but for container images. These images can then easily be pulled later on by different resources that need them. In this example, I'll use Azure Container Registry (ACR) to store the built images.
 
-For the purpose of this article, I've setup a basic container registry named `blogacrtest`. The URI for this storage becomes `blogacrtest.azurecr.io`. It's important that you create the ACR in the same subscription as AKS (Azure Kubernetes Service).
+For the purpose of this article, I've setup a basic container registry named `blogacrtest`, accessible through the URI `blogacrtest.azurecr.io`. 
 
 To push an image to ACR from your command prompt you need to first have [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) installed. When it's installed you can login to ACR this way:
 
@@ -58,7 +63,7 @@ az login
 az acr login -n blogacrtest
 {% endhighlight %}
 
-If you have created an ACR instance separately from the AKS instance then they need to be linked together for AKS to have permissions to pull images. There are different ways of doing it. One of the newer options is to use the update command for AKS. It's currently in preview mode so you need to enable preview features before you can use it. This might not be an option for you if you're running your cluster in production.
+If you have created an ACR instance separately from the AKS instance then they need to be linked together for AKS to have permissions to pull images. There are different ways of doing it. One of the newer options is to use the update command for AKS. It's currently in preview mode so you need to enable preview features before you can use it. This might not be an option for you if you're running your cluster in production. This way of linking only works if they are in the same subscription.
 
 {% highlight bash %}
 az aks update -n myAKSCluster -g myResourceGroup --attach-acr blogacrtest
@@ -87,7 +92,7 @@ workerservicewithhealthchecks                          latest              59aa0
 And then finally we can push the image.
 
 {% highlight bash %}
-docker push blogacrtest.azurecr.io/workerservicewithhealthchecks
+docker push blogacrtest.azurecr.io/workerservicewithhealthchecks:0.0.1
 {% endhighlight %}
 
 This will take some time when we do it for the first time.
@@ -102,7 +107,7 @@ ce65098xxxxx: Pushed
 2db44bcxxxxx: Pushing [=======>                                           ]  10.32MB/69.21MB
 {% endhighlight %}
 
-But when you push subsequent times it'll go much quicker. However, if you change source in your dockerfile, then you're back to a long initial push.
+I won't go into detail how a docker image is built up, but basically it's split up into separate layers, out of which your code only is one of them. The other layers are related to the framework your code is running on. When you make changes to your code and push anew then only that layer needs to be pushed, the others stay as they are. The subsequent pushes will therefore go much quicker, unless you change the source part in your docker file.
 
 In Azure Container Registry it should now look like this.
 
@@ -113,7 +118,7 @@ In Azure Container Registry it should now look like this.
   description=""
 %}
 
-### Creating a Helm chart
+### Creating a Helm chart for deployment
 
 [Helm](https://v3.helm.sh/) is a package manager for Kubernetes that abstracts away many of the complexities of a deployment using the native yaml files, something you otherwise would have to use. Helm 3 has recently reached release candidate level so I'll use that version here instead of the stable Helm 2. The main reason is that Helm 3 has ditched the [tiller](https://helm.sh/docs/glossary/#tiller) component that Helm 2 forced you to install in your kubernetes cluster with way to high access rights. Now with that [security issue](https://engineering.bitnami.com/articles/running-helm-in-production.html) gone we should stick to Helm 3.
 
@@ -173,9 +178,17 @@ version: 0.0.1
 appVersion: 0.0.1
 {% endhighlight %}
 
-The file `NOTES.txt` contains information about the new installation that will be written out on the screen after the installation is successful. Since we won't have a service running, we need to make some alternations here.
+The file `NOTES.txt` contains information about the new installation that will be written out on the screen after the installation is successful. Since we won't have a service running, we need to make some alternations here. This sample explains how to setup a proxy to view the health endpoint without running a complete kubernetes service and ingress. Just paste this text into the file and save it.
 
+{% highlight yaml %}
+{% raw %}
+For testing purposes, you can now create a proxy on your local machine to access the service.
+Run these commands and then navigate to http://127.0.0.1:8080/health to view the health status endpoint
 
+export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "workerservicewithhealthchecks.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:80
+{% endraw %}
+{% endhighlight %}
 
 Finally, the chart has installed a test to see that the service is up and running. Since we're not using a service, we can remove the `tests` folder. 
 
@@ -183,7 +196,7 @@ We're almost done with the helm chart, but first we need to tweak the deployment
 
 ### Kubernetes health checks
 
-In the [previous article]({{ site.baseurl }}{% post_url 2019-11-07-worker-service-in-kubernetes-with-health-checks %}), we created a worker service with health checks enabled. Here, we'll hook it up to the infrastructure so kubernetes can be made aware of the status of the worker service.
+In the [previous article]({{ site.baseurl }}{% post_url 2019-11-07-worker-service-in-kubernetes-with-health-checks %}), we created a worker service with health checks enabled. Here, we'll hook it up to the infrastructure so Kubernetes can be made aware of the status of the worker service.
 
 Kubernetes has two functionalities for checking the health of a pod:
 
@@ -226,7 +239,7 @@ But there are also other [settings](https://kubernetes.io/docs/tasks/configure-p
 - **successThreshold** - Number of consecutive successful calls needed after a failed one before it's classified as successful again. Default is 1 and liveness probe needs 1 to work properly.
 - **failureThreshold** - Number of consecutive failed calls needed until it's classified as failed and Kubernetes will restart the container. Default is 3.
 
-Many of these values are working fine for us, but not all. As described in the previous article, a Worker Service is locking the thread until an async/await is reached. During this time, no response will be given on the health endpoint. The value for `timeoutSeconds X failureThreshold` needs to be set to a value that is safe considering how often the thread will be released for the health endpoint. This makes these settings highly individual per worker service.
+Many of these values are working fine for us by default, but not all. As described in the previous article, a Worker Service is locking the thread until an async/await is reached. During this time, no response will be given on the health endpoint. The value for `timeoutSeconds X failureThreshold` needs to be set to a value that is safe considering how often the thread will be released for the health endpoint. This makes these settings highly individual per worker service.
 
 Another value you might need to adjust is the `initialDelaySeconds` in case your worker service takes some time to start up.
 
@@ -238,6 +251,7 @@ livenessProbe:
     path: /health
     port: http
   failureThreshold: 6
+  timeoutSeconds: 5
   periodSeconds: 15
   initialDelaySeconds: 30
 {% endhighlight %}
@@ -261,12 +275,18 @@ helm install workerservicewithhealthchecks workerservicewithhealthchecks
 The result should then be displayed as:
 
 {% highlight bash %}
-NAME: workerservice
-LAST DEPLOYED: Wed Nov 13 18:37:20 2019
+Release "workerservicewithhealthchecks" has been upgraded. Happy Helming!
+NAME: workerservicewithhealthchecks
+LAST DEPLOYED: Wed Nov 20 08:08:55 2019
 NAMESPACE: default
 STATUS: deployed
-REVISION: 1
-TEST SUITE: None
+REVISION: 5
+NOTES:
+For testing purposes, you can now create a proxy on your local machine to access the service.
+Run these commands and then navigate to http://127.0.0.1:8080/health to view the health status endpoint
+
+export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=workerservicewithhealthchecks,app.kubernetes.io/instance=workerservicewithhealthchecks" -o jsonpath="{.items[0].metadata.name}")
+kubectl --namespace default port-forward $POD_NAME 8080:80
 {% endhighlight %}
 
 If you later on want to make an upgrade to your code you'll need to go through the following steps:
@@ -283,7 +303,7 @@ helm upgrade workerservicewithhealthchecks workerservicewithhealthchecks
 
 ### Following the results in Kubernetes
 
-Each time you install or upgrade using helm, your deployment will create a new pod with a new name. To view all the installed pods, run `kubectl get pods`. In the result you can see the name of your pod and also how many times Kubernetes has restarted it (remember from the previous article that we deliberately made it crash so Kubernetes would restart it).
+To view all the installed pods, run `kubectl get pods`. In the result you can see the name of your pod and also how many times Kubernetes has restarted it (remember from the previous article that we deliberately made it crash so Kubernetes would restart it).
 
 {% highlight bash %}
 NAME                                             READY   STATUS    RESTARTS   AGE
@@ -296,7 +316,7 @@ We can now get more detailed information about this pod by running
 kubectl describe pod workerservicewithhealthchecks-6c69799695-gxmgv
 {% endhighlight %}
 
-The result is a long list of data, including information about the health check we configured, but at the bottom you'll find the recent events, including how Kubernetes has been killing and restarting the pod. In the helm chart, we configured that it would take 6 failed health checks before it should be deemed as bad. That's why the `Unhealthy` warning in the event has 6 times as many events as the event `Killing`.
+The result is a long list of data, including information about the health checks we have configured, but at the bottom you'll find the recent events, including how Kubernetes has been killing and restarting the pod. In the helm chart, we configured that it would take 6 failed health checks before it should be deemed as bad. That's why the `Unhealthy` warning in the event has 6 times as many events as the event `Killing`.
 
 {% highlight bash %}
 Events:
@@ -312,12 +332,26 @@ Events:
   Normal   Pulled     8m5s (x2 over 21m)   kubelet, aks-nodepool1-abc-0  Container image "ohlin.azurecr.io/workerservicewithhealthchecks:0.0.3" already present on machine
 {% endhighlight %}
 
-
-{% highlight bash %}
-kubectl get events --sort-by=.metadata.creationTimestamp
-{% endhighlight %}
-
+Another way to follow the results of how kubernetes changes the status of the pod as it gets restarted, is to list pods with a watch that updates the list as changes occur.
 
 {% highlight bash %}
 kubectl get pods --watch
 {% endhighlight %}
+
+This will result in a list like this where each restart creates a new line
+
+{% highlight bash %}
+NAME                                             READY   STATUS    RESTARTS   AGE
+workerservicewithhealthchecks-6c69799695-gxmgv   1/1     Running   421        3d19h
+workerservicewithhealthchecks-6c69799695-gxmgv   1/1     Running   422        3d19h
+workerservicewithhealthchecks-6c69799695-gxmgv   1/1     Running   423        3d19h
+workerservicewithhealthchecks-6c69799695-gxmgv   1/1     Running   424        3d19h
+{% endhighlight %}
+
+### Conclusions
+
+In this and the previous article, we've created a worker service in .NET Core 3 that mainly works on a timer but also exposes a health endpoint that Kubernetes uses to restart it when needed. We have not configured any service or ingress objects enabling external access and it's therefore not possible to access the service pod to manually check the health status unless you also setup a proxy using kubectl, but that shouldn't be used in a production environment.
+
+In a real world scenario, you would therefore also need hook up logging to a service like Azure Monitor. This can provide a lot of useful and needed telemetry about how the service is processing the jobs it's expected to do, something we don't know (or care) about, from a liveness point of view.
+
+Despite being slightly more fiddly in the setup, adding a health check to a background service gives you a good way to add automatic restart functionality with health rules that you can define for yourself in the code. The possibility is there - why not use it?

@@ -230,4 +230,4 @@ So, even if the external service used inside the iterator isn't async, we can ma
 
 ### Next article
 
-The worker service is now completely configured for health checks. In the next article (not published yet) we'll continue with deploying the worker service to kubernetes and to configure the usage of the health checks to determine if the pod is functioning or not.
+The worker service is now completely configured for health checks. In the [next article]({{ site.baseurl }}{% post_url 2019-11-19-deploying-worker-service-to-kubernetes %}) we'll continue with deploying the worker service to kubernetes and to configure the usage of the health checks to determine if the pod is functioning or not.
