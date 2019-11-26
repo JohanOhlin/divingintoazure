@@ -4,6 +4,7 @@ title: "Configuration in ASP.NET Core"
 date: 2019-03-25
 tags: asp.net-core .net-core
 blog_serie: configuration_aspnet_core
+description: "Configuration in your app can sometimes be a pain. Some values are set in code, some are extracted from the environment in which you're running and some are secret and can't be defined anywhere near a repository. ASP.NET Core helps you manage all these settings in a very smooth way"
 ---
 
 <p class="intro"><span class="dropcap">C</span>onfiguration in your app can sometimes be a pain. Some values are set in code, some are extracted from the environment in which you're running and some are secret and can't be defined anywhere near a repository. ASP.NET Core helps you manage all these settings in a very smooth way</p>

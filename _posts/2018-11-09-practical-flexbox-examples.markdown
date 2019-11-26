@@ -3,6 +3,7 @@ layout: post
 title: "Practical flexbox examples"
 date: 2018-11-09
 tags: css flexbox html
+description: "The Flexbox CSS styling of web sites is gaining more and more popularity. This post is not a complete overview of what you can do with flexbox but rather a gathering of different flexbox techniques that I've found useful over the years."
 ---
 
 <p class="intro"><span class="dropcap">T</span>he Flexbox CSS styling of web sites is gaining more and more popularity. This post is not a complete overview of what you can do with flexbox but rather a gathering of different flexbox techniques that I've found useful over the years.</p>

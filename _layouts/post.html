@@ -5,10 +5,12 @@ layout: default
 <div class="post">
   {% if page.image %}
   <div class="featuredImage">
-    <img
-      src="{{ '/assets/img/' | prepend: site.baseurl | append: page.image }}"
-      alt=""
-    />
+      {%
+        include image.html
+        url=page.image
+        alt=""
+        description=""
+      %}
   </div>
   {% endif %}
   <h1 class="postTitle">{{ page.title }}</h1>

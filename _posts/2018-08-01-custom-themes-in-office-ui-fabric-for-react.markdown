@@ -3,6 +3,7 @@ layout: post
 title: "Custom themes in Office UI Fabric for React"
 date: 2018-08-01
 tags: react office-ui-fabric
+description: "In a recent project, I've started to use Office UI Fabric as component library for a React application. This is an interesting piece of Microsoft work - who knew they would ever create open source React components?"
 ---
 <p class="intro"><span class="dropcap">I</span>n a recent project, I've started to use Office UI Fabric as component library for a React application. This is an interesting piece of Microsoft work - who knew they would ever create open source React components?</p>
 

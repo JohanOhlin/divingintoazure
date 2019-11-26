@@ -4,6 +4,7 @@ title: "Injecting Options in ASP.NET Core"
 date: 2019-03-31
 tags: asp.net-core
 blog_serie: configuration_aspnet_core
+description: "In ASP.NET Core there are some very interesting ways of handling and injecting options into classes. In this post I compare some of the different options you have at your disposal."
 ---
  
 <p class="intro"><span class="dropcap">I</span>n ASP.NET Core there are some very interesting ways of handling and injecting options into classes. In this post I compare some of the different options you have at your disposal.</p>

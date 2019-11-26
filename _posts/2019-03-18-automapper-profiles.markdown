@@ -3,6 +3,7 @@ layout: post
 title: "AutoMapper profile injections"
 date: 2019-03-18
 tags: automapper .net-core
+description: "I'm a big fan of Jimmy Bogard's AutoMapper. It helps you focus on solving your problem. But once in a while you encounter mapping scenarios that just are a bit more complex and can't be solved out of the box."
 ---
 
 <p class="intro"><span class="dropcap">I</span> am a big fan of Jimmy Bogard's AutoMapper. It helps you focus on solving your problem. But once in a while you encounter mapping scenarios that just are a bit more complex and can't be solved out of the box.</p>

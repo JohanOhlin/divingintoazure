@@ -4,6 +4,7 @@ title: "Configuration providers in ASP.NET Core"
 date: 2019-04-02
 tags: asp.net-core .net-core
 blog_serie: configuration_aspnet_core
+description: "Configuration providers in ASP.NET Core offers a pluggable architecture for using many different sources for your app settings."
 ---
 
 <p class="intro"><span class="dropcap">C</span>onfiguration providers in ASP.NET Core offers a pluggable architecture for using many different sources for your app settings.</p>

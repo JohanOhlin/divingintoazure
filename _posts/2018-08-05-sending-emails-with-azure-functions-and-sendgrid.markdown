@@ -3,6 +3,7 @@ layout: post
 title: "Sending emails with web hooks in Azure Function and Sendgrid"
 date: 2018-08-05
 tags: azure azure-functions sendgrid
+description: "Sometimes you might need to send emails from an Azure Function, maybe a status email to admin or a notification to a user. In this example, I show you how to create an async function that can send SendGrid emails. By letting the function be triggered by an HTTP call you can easily connect other Azure function or flows and send emails as needed."
 ---
 
 <p class="intro"><span class="dropcap">S</span>ometimes you might need to send emails from an Azure Function, maybe a status email to admin or a notification to a user. In this example, I show you how to create an async function that can send SendGrid emails. By letting the function be triggered by an HTTP call you can easily connect other Azure function or flows and send emails as needed.</p>

@@ -3,11 +3,16 @@ layout: post
 title: "Worker services in Kubernetes with health checks"
 date: 2019-11-07
 tags: c# azure .net-core worker-service kubernetes
+twitter-title: "#NetCore worker service in #Kubernetes with health checks"
+description: "One of the key features of Kubernetes is its ability to kick out bad pods and start up new ones. But to be able to do that, Kubernetes needs to communicate with the service to determine its health status."
+image: 2019-11-07-worker-service-in-kubernetes/health-check.jpg
 ---
 
 <p class="intro"><span class="dropcap">O</span>ne of the key features of Kubernetes is its ability to kick out bad pods and start up new ones. But to be able to do that, Kubernetes needs to communicate with the service to determine its health status.</p>
 
-In the example below, we're creating a .NET Core 3 Worker Service that will throw an unhandled exception after some time causing the worker loop to stop, but the process is still running like before. This is a typical example of when we want Kubernets to remove the bad service and start up a new one instead. How can we achieve this? We do it by adding regular health checks to the service.
+In this first article, we're creating a .NET Core 3 Worker Service with the ability to report it's status and determine if it's good or bad. In the [next article]({{ site.baseurl }}{% post_url 2019-11-19-deploying-worker-service-to-kubernetes %}), we continue with deploying this worker service to AKS, enabling Kubernetes to detect if app is in a bad state and then restart it automatically.
+
+To make a practical example out of this, we'll set the service to always throw an unhandled exception after some time causing the worker loop to stop. This is a typical example of when we want Kubernets to remove the bad service and start up a new one instead.
 
 ### Setting up the worker service
 

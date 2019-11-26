@@ -3,6 +3,7 @@ layout: post
 title: "Building a computer desk for the treadmill"
 date: 2019-01-04
 tags: diy
+description: "Once in a while I have the opportunity to work from home. These days I barely leave the house due to the cold and rainy weather here in UK. It would be great if I could walk and work at the same time!"
 ---
 
 <p class="intro"><span class="dropcap">O</span>nce in a while I have the opportunity to work from home. These days I barely leave the house due to the cold and rainy weather here in UK. It would be great if I could walk and work at the same time!</p>

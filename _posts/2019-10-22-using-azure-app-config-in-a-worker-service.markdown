@@ -4,6 +4,9 @@ title: "Using Azure App Configuration in a Worker Service"
 date: 2019-10-22
 tags: c# azure .net-core worker-service app-configuration
 blog_serie: configuration_aspnet_core
+twitter-title: "Using #Azure app configuration in a #netcore Worker Service"
+description: "With .NET Core 3 we were introduced to the new Worker Service template for running continuous jobs. In this article, I'll show you how to setup the service and also to make use of the new Azure App Configuration service that centralizes the management of app settings."
+image: 2019-11-05-worker-service-app-config/levers.jpg
 ---
 
 <p class="intro"><span class="dropcap">W</span>ith .NET Core 3 we were introduced to the new Worker Service template for running continuous jobs. In this article, I'll show you how to setup the service and also to make use of the new Azure App Configuration service that centralizes the management of app settings.</p>

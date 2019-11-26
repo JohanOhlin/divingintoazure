@@ -4,11 +4,13 @@ title: "Deploying a worker service to Kubernetes"
 date: 2019-11-19
 tags: c# azure .net-core worker-service kubernetes
 twitter-title: "Deploying a #netcore worker service to #Kubernetes"
+description: "Once you have the worker service configured with health checks it's time to get it deployed. In this article I'll show you how to deploy the service to AKS (Kubernetes) using ACR and Helm."
+image: 2019-11-19-deploying-worker-service-to-kubernetes/cargo-ship.jpg
 ---
 
 <p class="intro"><span class="dropcap">O</span>nce you have the worker service configured with health checks it's time to get it deployed. In this article I'll show you how to deploy the service to AKS (Kubernetes) using ACR and Helm.</p>
 
-This article is based on a [previous article]({{ site.baseurl }}{% post_url 2019-11-07-worker-service-in-kubernetes-with-health-checks %}) where we created a Worker Service in .NET Core 3 with health checks endpoints enabled.
+This article is based on a [previous article]({{ site.baseurl }}{% post_url 2019-11-07-worker-service-in-kubernetes-with-health-checks %}) where we created a Worker Service in .NET Core 3 with health check endpoints enabled.
 
 In a real world scenario you would set up complete CI/CD pipelines doing some of these steps for you. However, in this article I'll do all the steps manually to show a bit more in detail how it's being done.
 
@@ -113,7 +115,7 @@ In Azure Container Registry it should now look like this.
 
 {%
   include image.html
-  url="2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry.png"
+  url="2019-11-19-deploying-worker-service-to-kubernetes/container-registry.png"
   alt="Docker images in Azure Container Registry after being pushed"
   description=""
 %}

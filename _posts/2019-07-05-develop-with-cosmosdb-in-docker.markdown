@@ -3,6 +3,7 @@ layout: post
 title: "Develop with CosmosDB in Docker"
 date: 2019-07-05
 tags: asp.net-core .net-core cosmosdb docker
+description: "Micro services are increasingly more popular in new development project. In this post I'll show you how to connect to a CosmosDB emulator from your docker app."
 ---
 
 <p class="intro"><span class="dropcap">M</span>icro services are increasingly more popular in new development project. In this post I'll show you how to connect to a CosmosDB emulator from your docker app.</p>

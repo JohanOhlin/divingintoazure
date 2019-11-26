@@ -3,6 +3,8 @@ layout: post
 title: "Re-throwing exceptions - the right way"
 date: 2019-08-02
 tags: c#
+description: "In the company where I work we have an interview question for candidates where we ask them to explain the difference between different ways to re-throw an exception in a C# try-catch expression. How hard can it be? Well, surprisingly many developers get it wrong."
+image: 2019-08-02-re-throwing-exceptions/signs.jpg
 ---
 
 <p class="intro"><span class="dropcap">I</span>n the company where I work we have an interview question for candidates where we ask them to explain the difference between different ways to re-throw an exception in a C# try-catch expression. How hard can it be? Well, surprisingly many developers get it wrong.</p>
