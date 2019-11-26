@@ -20,7 +20,7 @@
       <meta content="article" property="og:type">
     
     
-      <meta content="Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects." property="og:description">
+      <meta content="Once you have the worker service configured with health checks it's time to get it deployed. In this article I'll show you how to deploy the service to AKS (Kubernetes) using ACR and Helm." property="og:description">
     
     
       <meta content="https://www.johanohlin.com/blog/deploying-worker-service-to-kubernetes/" property="og:url">
@@ -30,7 +30,7 @@
       <meta content="https://www.johanohlin.com/about/" property="article:author">
     
     
-      <meta content="https://www.johanohlin.com/assets/img/azure-background.jpg" property="og:image">
+      <meta content="https://www.johanohlin.com/assets/img/2019-11-19-deploying-worker-service-to-kubernetes/cargo-ship.jpg" property="og:image">
     
 
     <!-- Twitter Cards -->
@@ -44,10 +44,10 @@
       <meta name="twitter:url" content="https://www.johanohlin.com/blog/deploying-worker-service-to-kubernetes/">
     
     
-      <meta name="twitter:description" content="Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects.">
+      <meta name="twitter:description" content="Once you have the worker service configured with health checks it's time to get it deployed. In this article I'll show you how to deploy the service to AKS (Kubernetes) using ACR and Helm.">
     
     
-      <meta name="twitter:image:src" content="https://www.johanohlin.com/assets/img/azure-background.jpg">
+      <meta name="twitter:image:src" content="https://www.johanohlin.com/assets/img/2019-11-19-deploying-worker-service-to-kubernetes/cargo-ship.jpg">
     
 
 
@@ -122,6 +122,18 @@
          <div class="container">
             <div class="post">
   
+  <div class="featuredImage">
+      <figure class="image">
+  <picture class="awesome" data-volume="11">
+  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-11-19-deploying-worker-service-to-kubernetes/cargo-ship-400by183-ca2667.webp 400w, /assets/img/2019-11-19-deploying-worker-service-to-kubernetes/cargo-ship-800by366-ca2667.webp 800w, /assets/img/2019-11-19-deploying-worker-service-to-kubernetes/cargo-ship-1200by549-ca2667.webp 1200w, /assets/img/2019-11-19-deploying-worker-service-to-kubernetes/cargo-ship-1600by732-ca2667.webp 1600w" type="image/webp">
+  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-11-19-deploying-worker-service-to-kubernetes/cargo-ship-400by183-ca2667.jpg 400w, /assets/img/2019-11-19-deploying-worker-service-to-kubernetes/cargo-ship-800by366-ca2667.jpg 800w, /assets/img/2019-11-19-deploying-worker-service-to-kubernetes/cargo-ship-1200by549-ca2667.jpg 1200w, /assets/img/2019-11-19-deploying-worker-service-to-kubernetes/cargo-ship-1600by732-ca2667.jpg 1600w" type="image/jpeg">
+  <img class="some-other-class" src="/assets/img/2019-11-19-deploying-worker-service-to-kubernetes/cargo-ship-800by366-ca2667.jpg">
+</picture>
+
+  <figcaption></figcaption>
+</figure>
+  </div>
+  
   <h1 class="postTitle">Deploying a worker service to Kubernetes</h1>
   <p class="meta">
     November 19, 2019 |
@@ -131,7 +143,7 @@
 
   <p class="intro"><span class="dropcap">O</span>nce you have the worker service configured with health checks it's time to get it deployed. In this article I'll show you how to deploy the service to AKS (Kubernetes) using ACR and Helm.</p>
 
-<p>This article is based on a <a href="/blog/worker-service-in-kubernetes-with-health-checks/">previous article</a> where we created a Worker Service in .NET Core 3 with health checks endpoints enabled.</p>
+<p>This article is based on a <a href="/blog/worker-service-in-kubernetes-with-health-checks/">previous article</a> where we created a Worker Service in .NET Core 3 with health check endpoints enabled.</p>
 
 <p>In a real world scenario you would set up complete CI/CD pipelines doing some of these steps for you. However, in this article I’ll do all the steps manually to show a bit more in detail how it’s being done.</p>
 
@@ -218,9 +230,9 @@ ce65098xxxxx: Pushed
 
 <figure class="image">
   <picture class="awesome" data-volume="11">
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-400by194-658e8d.webp 400w, /assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-800by388-658e8d.webp 800w, /assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-1200by582-658e8d.webp 1200w, /assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-1600by775-658e8d.webp 1600w" type="image/webp" />
-  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-400by194-658e8d.png 400w, /assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-800by388-658e8d.png 800w, /assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-1200by582-658e8d.png 1200w, /assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-1600by775-658e8d.png 1600w" type="image/png" />
-  <img class="some-other-class" alt="Docker images in Azure Container Registry after being pushed" src="/assets/img/2019-11-12-worker-service-in-kubernetes/2019-11-12-worker-service-in-kubernetes-container-registry-800by388-658e8d.png" />
+  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-11-19-deploying-worker-service-to-kubernetes/container-registry-400by194-658e8d.webp 400w, /assets/img/2019-11-19-deploying-worker-service-to-kubernetes/container-registry-800by388-658e8d.webp 800w, /assets/img/2019-11-19-deploying-worker-service-to-kubernetes/container-registry-1200by582-658e8d.webp 1200w, /assets/img/2019-11-19-deploying-worker-service-to-kubernetes/container-registry-1600by775-658e8d.webp 1600w" type="image/webp" />
+  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-11-19-deploying-worker-service-to-kubernetes/container-registry-400by194-658e8d.png 400w, /assets/img/2019-11-19-deploying-worker-service-to-kubernetes/container-registry-800by388-658e8d.png 800w, /assets/img/2019-11-19-deploying-worker-service-to-kubernetes/container-registry-1200by582-658e8d.png 1200w, /assets/img/2019-11-19-deploying-worker-service-to-kubernetes/container-registry-1600by775-658e8d.png 1600w" type="image/png" />
+  <img class="some-other-class" alt="Docker images in Azure Container Registry after being pushed" src="/assets/img/2019-11-19-deploying-worker-service-to-kubernetes/container-registry-800by388-658e8d.png" />
 </picture>
 
   <figcaption></figcaption>
@@ -447,9 +459,14 @@ workerservicewithhealthchecks-6c69799695-gxmgv   1/1     Running   424        3d
   <div class="postNav clearfix">
     
     <a
-      class="prev"
+      class="prev image"
       href="/blog/worker-service-in-kubernetes-with-health-checks/"
       ><span>&laquo;&nbsp;Worker services in Kubernetes with health checks</span>
+      
+      <img
+        src="/assets/img/2019-11-07-worker-service-in-kubernetes/health-check.jpg"
+        alt=""
+      />
       
     </a>
      

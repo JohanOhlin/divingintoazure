@@ -20,7 +20,7 @@
       <meta content="article" property="og:type">
     
     
-      <meta content="Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects." property="og:description">
+      <meta content="One of the key features of Kubernetes is its ability to kick out bad pods and start up new ones. But to be able to do that, Kubernetes needs to communicate with the service to determine its health status." property="og:description">
     
     
       <meta content="https://www.johanohlin.com/blog/worker-service-in-kubernetes-with-health-checks/" property="og:url">
@@ -30,7 +30,7 @@
       <meta content="https://www.johanohlin.com/about/" property="article:author">
     
     
-      <meta content="https://www.johanohlin.com/assets/img/azure-background.jpg" property="og:image">
+      <meta content="https://www.johanohlin.com/assets/img/2019-11-07-worker-service-in-kubernetes/health-check.jpg" property="og:image">
     
 
     <!-- Twitter Cards -->
@@ -44,10 +44,10 @@
       <meta name="twitter:url" content="https://www.johanohlin.com/blog/worker-service-in-kubernetes-with-health-checks/">
     
     
-      <meta name="twitter:description" content="Take a deep dive into a selection of all the awesome things Azure has to offer. All mixed up with .Net Core, React, TypeScript and some private projects.">
+      <meta name="twitter:description" content="One of the key features of Kubernetes is its ability to kick out bad pods and start up new ones. But to be able to do that, Kubernetes needs to communicate with the service to determine its health status.">
     
     
-      <meta name="twitter:image:src" content="https://www.johanohlin.com/assets/img/azure-background.jpg">
+      <meta name="twitter:image:src" content="https://www.johanohlin.com/assets/img/2019-11-07-worker-service-in-kubernetes/health-check.jpg">
     
 
 
@@ -122,6 +122,18 @@
          <div class="container">
             <div class="post">
   
+  <div class="featuredImage">
+      <figure class="image">
+  <picture class="awesome" data-volume="11">
+  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-11-07-worker-service-in-kubernetes/health-check-400by169-7a58c3.webp 400w, /assets/img/2019-11-07-worker-service-in-kubernetes/health-check-800by339-7a58c3.webp 800w, /assets/img/2019-11-07-worker-service-in-kubernetes/health-check-1200by508-7a58c3.webp 1200w, /assets/img/2019-11-07-worker-service-in-kubernetes/health-check-1600by678-7a58c3.webp 1600w" type="image/webp">
+  <source sizes="(max-width: 800px) 100vw, (min-width: 1201px) 60vw, 800px" srcset="/assets/img/2019-11-07-worker-service-in-kubernetes/health-check-400by169-7a58c3.jpg 400w, /assets/img/2019-11-07-worker-service-in-kubernetes/health-check-800by339-7a58c3.jpg 800w, /assets/img/2019-11-07-worker-service-in-kubernetes/health-check-1200by508-7a58c3.jpg 1200w, /assets/img/2019-11-07-worker-service-in-kubernetes/health-check-1600by678-7a58c3.jpg 1600w" type="image/jpeg">
+  <img class="some-other-class" src="/assets/img/2019-11-07-worker-service-in-kubernetes/health-check-800by339-7a58c3.jpg">
+</picture>
+
+  <figcaption></figcaption>
+</figure>
+  </div>
+  
   <h1 class="postTitle">Worker services in Kubernetes with health checks</h1>
   <p class="meta">
     November 07, 2019 |
@@ -131,7 +143,9 @@
 
   <p class="intro"><span class="dropcap">O</span>ne of the key features of Kubernetes is its ability to kick out bad pods and start up new ones. But to be able to do that, Kubernetes needs to communicate with the service to determine its health status.</p>
 
-<p>In the example below, we’re creating a .NET Core 3 Worker Service that will throw an unhandled exception after some time causing the worker loop to stop, but the process is still running like before. This is a typical example of when we want Kubernets to remove the bad service and start up a new one instead. How can we achieve this? We do it by adding regular health checks to the service.</p>
+<p>In this first article, we’re creating a .NET Core 3 Worker Service with the ability to report it’s status and determine if it’s good or bad. In the <a href="/blog/deploying-worker-service-to-kubernetes/">next article</a>, we continue with deploying this worker service to AKS, enabling Kubernetes to detect if app is in a bad state and then restart it automatically.</p>
+
+<p>To make a practical example out of this, we’ll set the service to always throw an unhandled exception after some time causing the worker loop to stop. This is a typical example of when we want Kubernets to remove the bad service and start up a new one instead.</p>
 
 <h3 id="setting-up-the-worker-service">Setting up the worker service</h3>
 
@@ -478,7 +492,7 @@
     <div style="margin-bottom: 1rem;">
       <div style="display:inline-block; position:relative; top:-8px; margin-right:10px;font-weight:bold;color:rgba(0,0,0,0.5);">Share via</div>
       <div style="display:inline-block; position:relative;">
-        <a href="https://twitter.com/intent/tweet?button_hashtag=&ref_src=twsrc%5Etfw" class="twitter-hashtag-button" data-text="Worker services in Kubernetes with health checks https://www.johanohlin.com/blog/worker-service-in-kubernetes-with-health-checks/ via @OhlinJohan" data-related="ohlinjohan" data-show-count="true" data-size="large"></a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+        <a href="https://twitter.com/intent/tweet?button_hashtag=&ref_src=twsrc%5Etfw" class="twitter-hashtag-button" data-text="#NetCore worker service in #Kubernetes with health checks https://www.johanohlin.com/blog/worker-service-in-kubernetes-with-health-checks/ via @OhlinJohan" data-related="ohlinjohan" data-show-count="true" data-size="large"></a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
       </div>
     </div>
   </div> 
@@ -487,16 +501,26 @@
   <div class="postNav clearfix">
     
     <a
-      class="prev"
+      class="prev image"
       href="/blog/using-azure-app-config-in-a-worker-service/"
       ><span>&laquo;&nbsp;Using Azure App Configuration in a Worker Service</span>
+      
+      <img
+        src="/assets/img/2019-11-05-worker-service-app-config/levers.jpg"
+        alt=""
+      />
       
     </a>
      
     <a
-      class="next"
+      class="next image"
       href="/blog/deploying-worker-service-to-kubernetes/"
       ><span>Deploying a worker service to Kubernetes&nbsp;&raquo;</span>
+      
+      <img
+        src="/assets/img/2019-11-19-deploying-worker-service-to-kubernetes/cargo-ship.jpg"
+        alt=""
+      />
       
     </a>
     
